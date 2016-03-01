@@ -45,6 +45,7 @@
 #include <qmaillog.h>
 #include <qloggers.h>
 #include <signal.h>
+#include <stdlib.h>
 #ifdef USE_HTML_PARSER
 #include <QtGui>
 #endif
@@ -74,7 +75,8 @@ static void recreateLoggers(int n)
 Q_DECL_EXPORT int main(int argc, char** argv)
 {
 #ifdef USE_HTML_PARSER
-    // Need for html parsing by <QTextdocument> in qmailmessage.cpp
+    // Need for html parsing by <QTextdocument> in qmailmessage.cpp, but don't need real UI
+    setenv("QT_QPA_PLATFORM", "minimal", 1);
     QGuiApplication app(argc, argv);
 #else
     QCoreApplication app(argc, argv);
