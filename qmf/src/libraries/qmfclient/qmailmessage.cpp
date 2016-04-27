@@ -1159,6 +1159,9 @@ namespace findAttachments
             if (container.multipartType() == QMailMessagePart::MultipartMixed) {
                 inMultipartMixed(container, found, hasAttachments);
             }
+            if (container.multipartType() == QMailMessagePart::MultipartAlternative) {
+                inMultipartMixed(container, found, hasAttachments);
+            }
             if (container.multipartType() == QMailMessagePart::MultipartSigned) {
                 inMultipartSigned(container, found, hasAttachments);
             }
@@ -1205,6 +1208,10 @@ namespace findAttachments
                 switch (part.multipartType()) {
                 case QMailMessagePart::MultipartNone:
                     inMultipartNone(part, found, hasAttachments);
+                    break;
+                case QMailMessagePart::MultipartMixed:
+                case QMailMessagePart::MultipartAlternative:
+                    inMultipartMixed(part, found, hasAttachments);
                     break;
                 default:
                     break;
