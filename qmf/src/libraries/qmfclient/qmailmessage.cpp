@@ -1178,6 +1178,9 @@ namespace findAttachments
             bool isText = (contentType.type().toLower() == "text") &&
                 ((contentType.subType().toLower() == "plain") || (contentType.subType().toLower() == "html"));
 
+            bool isCalendar = (contentType.type().toLower() == "text") &&
+                (contentType.subType().toLower() == "calendar");
+
             bool isInLine = (!part.contentDisposition().isNull()) &&
                 (part.contentDisposition().type() == QMailMessageContentDisposition::Inline);
 
@@ -1189,7 +1192,7 @@ namespace findAttachments
 
             // Attached messages are considered as attachments even if content disposition
             // is inline instead of attachment, but only if they aren't text/plain nor text/html
-            if (isRFC822 || isAttachment || (isInLine && !isText)) {
+            if (isRFC822 || isAttachment || (isInLine && !isText && !isCalendar)) {
                 if (found) {
                     *found << part.location();
                 }
