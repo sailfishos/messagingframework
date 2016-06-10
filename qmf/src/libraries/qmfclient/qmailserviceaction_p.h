@@ -56,6 +56,8 @@
 #include "qmailserviceaction.h"
 #include "qmailmessageserver.h"
 
+#include <QSharedPointer>
+
 // These classes are implemented via qmailmessage.cpp and qmailinstantiations.cpp
 
 class QMailServiceActionCommand
