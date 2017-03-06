@@ -6739,7 +6739,7 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddMessage(QMailMessa
     values.insert("recipients", recipients.join(","));
     values.insert("subject", metaData->subject());
     values.insert("stamp", QMailTimeStamp(metaData->date()).toUTC());
-    values.insert("status", static_cast<int>(metaData->status()));
+    values.insert("status", static_cast<qint64>(metaData->status()));
     values.insert("parentaccountid", metaData->parentAccountId().toULongLong());
     values.insert("mailfile", ::contentUri(*metaData));
     values.insert("serveruid", metaData->serverUid());
