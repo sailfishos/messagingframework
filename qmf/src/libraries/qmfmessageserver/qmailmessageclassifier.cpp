@@ -95,26 +95,21 @@ QMailMessageClassifier::~QMailMessageClassifier()
 
 static QMailMessage::ContentType fromContentType(const QMailMessageContentType& contentType)
 {
-    QString type(contentType.type().toLower());
-    QString subtype(contentType.subType().toLower());
-
     QMailMessage::ContentType content = QMailMessage::UnknownContent;
 
-    if (type == "text") {
-        if (subtype == "html") {
-            content = QMailMessage::HtmlContent;
-        } else if (subtype == "plain") {
-            content = QMailMessage::PlainTextContent;
-        } else if (subtype == "x-vcard") {
-            content = QMailMessage::VCardContent;
-        } else if (subtype == "x-vcalendar") {
-            content = QMailMessage::VCalendarContent;
-        }
-    } else if (contentType.type().toLower() == "image") {
+    if (contentType.matches("text", "html")) {
+        content = QMailMessage::HtmlContent;
+    } else if (contentType.matches("text", "plain")) {
+        content = QMailMessage::PlainTextContent;
+    } else if (contentType.matches("text", "x-vcard")) {
+        content = QMailMessage::VCardContent;
+    } else if (contentType.matches("text", "x-vcalendar")) {
+        content = QMailMessage::VCalendarContent;
+    } else if (contentType.matches("image")) {
         content = QMailMessage::ImageContent;
-    } else if (contentType.type().toLower() == "audio") {
+    } else if (contentType.matches("audio")) {
         content = QMailMessage::AudioContent;
-    } else if (contentType.type().toLower() == "video") {
+    } else if (contentType.matches("video")) {
         content = QMailMessage::VideoContent;
     }
 
@@ -191,7 +186,7 @@ bool QMailMessageClassifier::classifyMessage(QMailMessage& message)
             if (multipartType == QMailMessagePartContainer::MultipartNone) {
                 content = fromContentType(contentType);
                 if (content == QMailMessage::UnknownContent) {
-                    if (contentType.type().toLower() == "text") {
+                    if (contentType.matches("text")) {
                         // Assume some type of richer-than-plain text 
                         content = QMailMessage::RichTextContent;
                     }
@@ -210,7 +205,7 @@ bool QMailMessageClassifier::classifyMessage(QMailMessage& message)
             if (multipartType == QMailMessagePartContainer::MultipartNone) {
                 content = fromContentType(contentType);
                 if (content == QMailMessage::UnknownContent) {
-                    if (contentType.type().toLower() == "text") {
+                    if (contentType.matches("text")) {
                         // Assume some type of richer-than-plain text 
                         content = QMailMessage::RichTextContent;
                     }
