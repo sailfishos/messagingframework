@@ -1403,7 +1403,7 @@ void ImapFetchSelectedMessagesStrategy::metaDataAnalysis(ImapStrategyContextBase
     }
 
     ImapConfiguration imapCfg(context->config());
-    QString preferred(imapCfg.preferredTextSubtype().toLower());
+    QByteArray preferred(imapCfg.preferredTextSubtype().toLocal8Bit());
 
     // Iterate over all parts, looking for the preferred body,
     // download that first giving preference over all other parts
@@ -1416,8 +1416,7 @@ void ImapFetchSelectedMessagesStrategy::metaDataAnalysis(ImapStrategyContextBase
             if ((part.partCount() == 0)
                 && (!part.partialContentAvailable())
                 && (disposition.size() > 0)
-                && (contentType.type().toLower() == "text")
-                && (contentType.subType().toLower() == preferred)) {
+                && (contentType.matches("text", preferred))) {
                 // There is a preferred text sub-part to retrieve.
                 // The preferred text part has priority over other parts so,
                 // we put it directly into the main completion list.
@@ -1484,7 +1483,7 @@ void ImapFetchSelectedMessagesStrategy::prepareCompletionList(
         completionList.append(message.id());
     } else {
         const QMailMessageContentType contentType(message.contentType());
-        if (contentType.type().toLower() == "text") {
+        if (contentType.matches("text")) {
             // It is a text part. So, we can retrieve the first
             // portion of it.
             QMailMessagePart::Location location;
@@ -1509,7 +1508,7 @@ void ImapFetchSelectedMessagesStrategy::prepareCompletionList(
                     completionSectionList.append(qMakePair(it->first, (uint)0));
                     bytesLeft -= it->second;
                     ++partsToRetrieve;
-                } else if (part.contentType().type().toLower() == "text") {
+                } else if (part.contentType().matches("text")) {
                     // Text parts can be downloaded partially.
                     completionSectionList.append(qMakePair(it->first, (uint)bytesLeft));
                     bytesLeft = 0;

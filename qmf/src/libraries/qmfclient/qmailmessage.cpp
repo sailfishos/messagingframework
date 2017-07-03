@@ -928,11 +928,7 @@ namespace findBody
 
     bool inMultipartNone(const QMailMessagePartContainer &container, Context &ctx)
     {
-        if (!ctx.contentType.isEmpty()
-        && ctx.contentType != container.contentType().type().toLower())
-            return false;
-        if (!ctx.contentSubtype.isEmpty()
-        && ctx.contentSubtype != container.contentType().subType().toLower())
+        if (!container.contentType().matches(ctx.contentType, ctx.contentSubtype))
             return false;
         ctx.found = const_cast<QMailMessagePartContainer*>(&container);
         return true;
@@ -943,12 +939,7 @@ namespace findBody
         if (part.contentDisposition().type() == QMailMessageContentDisposition::Attachment)
             return false;
 
-        if (!ctx.contentType.isEmpty()
-        && ctx.contentType != part.contentType().type().toLower())
-            return false;
-
-        if (!ctx.contentSubtype.isEmpty()
-        && ctx.contentSubtype != part.contentType().subType().toLower())
+        if (!part.contentType().matches(ctx.contentType, ctx.contentSubtype))
             return false;
 
         ctx.found = const_cast<QMailMessagePart*> (&part);
@@ -1023,7 +1014,7 @@ namespace findBody
         for (int i = (int)container.partCount() - 1; i >= 0; i--) {
             if (i != bodyPart) {
                 const QMailMessagePart &part = container.partAt(i);
-                if (imageContentType == part.contentType().type().toLower()) {
+                if (part.contentType().matches(imageContentType)) {
                     ctx.htmlImageLoc << part.location();
                     ctx.htmlImageParts << &part;
                 } else if (!part.contentID().isEmpty()) {
@@ -1175,8 +1166,8 @@ namespace findAttachments
         {
             QMailMessageContentType contentType = part.contentType();
 
-            bool isText = (contentType.type().toLower() == "text") &&
-                ((contentType.subType().toLower() == "plain") || (contentType.subType().toLower() == "html"));
+            bool isText = (contentType.matches("text", "plain")
+                           || contentType.matches("text", "html"));
 
             bool isInLine = (!part.contentDisposition().isNull()) &&
                 (part.contentDisposition().type() == QMailMessageContentDisposition::Inline);
@@ -1184,8 +1175,7 @@ namespace findAttachments
             bool isAttachment = (!part.contentDisposition().isNull()) &&
                 (part.contentDisposition().type() == QMailMessageContentDisposition::Attachment);
 
-            bool isRFC822 = (contentType.type().toLower() == "message") &&
-                (contentType.subType().toLower() == "rfc822");
+            bool isRFC822 = contentType.matches("message", "rfc822");
 
             // Attached messages are considered as attachments even if content disposition
             // is inline instead of attachment, but only if they aren't text/plain nor text/html
@@ -1278,18 +1268,17 @@ namespace findAttachments
                 const QMailMessagePart &part = container.partAt(i);
 
                 // Skip parts of the message body
-                const QString contentType = QString(part.contentType().content()).toLower();
                 switch (i) {
                 case 0:
-                    if (contentType == QString("text/plain")) {
+                    if (part.contentType().matches("text", "plain")) {
                         firstPartIsTextPlain = true;
                         continue;
-                    } else if (contentType == QString("text/html")) {
+                    } else if (part.contentType().matches("text", "html")) {
                         continue;
                     }
                     break;
                 case 1:
-                    if (firstPartIsTextPlain && contentType == QString("text/html")) {
+                    if (firstPartIsTextPlain && part.contentType().matches("text", "html")) {
                         continue;
                     }
                     break;
@@ -2694,6 +2683,18 @@ void QMailMessageContentType::setCharset(const QByteArray& charset)
     setParameter("charset", charset);
 }
 
+/*!
+    Allow to test if the content type matches a specific "type / subtype" string.
+*/
+bool QMailMessageContentType::matches(const QByteArray& primary, const QByteArray& sub) const
+{
+    // Content type is not encoded, we can use qstricmp directly.
+    if (!primary.isEmpty() && qstricmp(type(), primary) != 0)
+        return false;
+
+    return (sub.isEmpty() || qstricmp(subType(), sub) == 0);
+}
+
 
 /*!
     \class QMailMessageContentDisposition
@@ -3185,9 +3186,7 @@ QMailMessageBodyPrivate::QMailMessageBodyPrivate()
 
 void QMailMessageBodyPrivate::ensureCharsetExist()
 {
-    if (_type.type().toLower() != "text"
-        || (_type.subType().toLower() != "plain"
-            && _type.subType().toLower() != "html")) {
+    if (!_type.matches("text", "plain") && !_type.matches("text", "html")) {
         QByteArray best(QMailCodec::bestCompatibleCharset(_type.charset(), true));
         if (!best.isEmpty()) {
             _type.setCharset(best);
@@ -4043,7 +4042,7 @@ void QMailMessagePartContainerPrivate::defaultContentType(const QMailMessagePart
     {
         // Note that the default is 'message/rfc822' when the parent is 'multipart/digest'
         QMailMessageContentType parentType = parent->contentType();
-        if (parentType.content().toLower() == "multipart/digest")
+        if (parentType.matches("multipart", "digest"))
         {
             type.setType("message");
             type.setSubType("rfc822");
@@ -4217,7 +4216,7 @@ void QMailMessagePartContainerPrivate::setBody(const QMailMessageBody& body, QMa
     setBodyProperties(body.contentType(), body.transferEncoding());
 
     // Multipart messages do not have their own bodies
-    if (body.contentType().type().toLower() != "multipart") {
+    if (!body.contentType().matches("multipart")) {
         _body = body;
         _hasBody = !_body.isEmpty();
     }
@@ -6110,14 +6109,10 @@ QString QMailMessagePart::displayName() const
     if (id.isEmpty())
         id = contentID();
 
-    if (id.isEmpty()) {
-        bool isRFC822 = (contentType().type().toLower() == "message") &&
-            (contentType().subType().toLower() == "rfc822");
-        if (isRFC822) {
-            // TODO don't load entire body into memory
-            QMailMessage msg = QMailMessage::fromRfc2822(body().data(QMailMessageBody::Decoded));
-            id = msg.subject();
-        }
+    if (id.isEmpty() && contentType().matches("message", "rfc822")) {
+        // TODO don't load entire body into memory
+        QMailMessage msg = QMailMessage::fromRfc2822(body().data(QMailMessageBody::Decoded));
+        id = msg.subject();
     }
 
     if (id.isEmpty()) {
@@ -6249,7 +6244,7 @@ static QString partFileName(const QMailMessagePart &part)
     // Application/octet-stream is a fallback for the case when mimetype
     // is unknown by MUA, so it's treated exceptionally here, so the original
     // attachment name is preserved
-    if (part.contentType().content()!=QString("application/octet-stream")) {
+    if (!part.contentType().matches("application", "octet-stream")) {
         // If possible, create the file with a useful filename extension
         QString existing;
         int index = fileName.lastIndexOf('.');
@@ -8478,8 +8473,7 @@ bool QMailMessage::hasCalendarInvitation() const
             }
         } else {
             const QMailMessageContentType &ct(part->contentType());
-            if ((ct.type().toLower() == "text") &&
-                (ct.subType().toLower() == "calendar") &&
+            if (ct.matches("text", "calendar") &&
                 (ct.parameter("method").toLower() == "request")) {
                 return true;
             }
