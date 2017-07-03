@@ -345,6 +345,12 @@ public:
     QByteArray boundary() const;
     void setBoundary(const QByteArray& text);
 
+    QString contentDescription() const;
+    void setContentDescription(const QString &s);
+
+    QMailMessageContentDisposition contentDisposition() const;
+    void setContentDisposition(const QMailMessageContentDisposition& disposition);
+
     // Body management interface:
     void setBody(const QMailMessageBody& body, QMailMessageBody::EncodingFormat encodingStatus = QMailMessageBody::None);
     QMailMessageBody body() const;
@@ -454,12 +460,6 @@ public:
 
     QString contentLocation() const;
     void setContentLocation(const QString &s);
-
-    QString contentDescription() const;
-    void setContentDescription(const QString &s);
-
-    QMailMessageContentDisposition contentDisposition() const;
-    void setContentDisposition(const QMailMessageContentDisposition& disposition);
 
     QString contentLanguage() const;
     void setContentLanguage(const QString &s);
