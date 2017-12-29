@@ -1,6 +1,6 @@
 Name: qmf-qt5
 Summary:    Qt Messaging Framework (QMF) Qt5
-Version:    4.0.4+git52
+Version:    4.0.4+git63
 Release:    1
 Group:      System/Libraries
 License:    LGPLv2.1 with exception or GPLv3
@@ -14,7 +14,6 @@ BuildRequires:  pkgconfig(Qt5Gui)
 BuildRequires:  pkgconfig(Qt5DBus)
 BuildRequires:  pkgconfig(Qt5Test)
 BuildRequires: 	pkgconfig(Qt5Network)
-#BuildRequires: pkgconfig(Qt5Webkit)
 BuildRequires:  pkgconfig(Qt5Sql)
 BuildRequires:  pkgconfig(accounts-qt5) >= 1.13
 BuildRequires:  pkgconfig(libsignon-qt5)
@@ -121,12 +120,8 @@ This package contains the documentation for Qt Messaging Framework (QMF).
 
 %prep
 %setup -q -n %{name}-%{version}/qmf
-# >> setup
-# << setup
 
 %build
-# >> build pre
-# << build pre
 
 %qmake5  \
     QMF_INSTALL_ROOT=%{_prefix} \
@@ -139,21 +134,13 @@ This package contains the documentation for Qt Messaging Framework (QMF).
 
 make %{?_smp_mflags}
 
-# >> build post
-# << build post
-
 %install
 rm -rf %{buildroot}
-# >> install pre
-# << install pre
 %qmake5_install
 UNIT_DIR=%{buildroot}%{_libdir}/systemd/user/user-session.target.wants
 mkdir -p "$UNIT_DIR"
 ln -sf ../messageserver5.service "$UNIT_DIR/messageserver5.service"
 ln -sf ../messageserver5-accounts-check.service "$UNIT_DIR/messageserver5-accounts-check.service"
-
-# >> install post
-# << install post
 
 %fdupes  %{buildroot}/%{_includedir}
 
@@ -167,7 +154,6 @@ ln -sf ../messageserver5-accounts-check.service "$UNIT_DIR/messageserver5-accoun
 
 %files devel
 %defattr(-,root,root,-)
-# >> files devel
 %{_includedir}/qmfmessageserver5/qmail*.h
 %{_includedir}/qmfclient5/qloggers.h
 %{_includedir}/qmfclient5/qlogsystem.h
@@ -181,11 +167,9 @@ ln -sf ../messageserver5-accounts-check.service "$UNIT_DIR/messageserver5-accoun
 %{_libdir}/libqmfclient5.so
 %{_libdir}/pkgconfig/qmfmessageserver5.pc
 %{_libdir}/pkgconfig/qmfclient5.pc
-# << files devel
 
 %files -n libqmfmessageserver1-qt5
 %defattr(-,root,root,-)
-# >> files libqmfmessageserver1-qt5
 %{_bindir}/messageserver5
 %{_bindir}/qmf-accountscheck
 %{_libdir}/libqmfmessageserver5.so.*
@@ -197,25 +181,18 @@ ln -sf ../messageserver5-accounts-check.service "$UNIT_DIR/messageserver5-accoun
 %{_libdir}/systemd/user/messageserver5-accounts-check.service
 %{_libdir}/systemd/user/user-session.target.wants/messageserver5.service
 %{_libdir}/systemd/user/user-session.target.wants/messageserver5-accounts-check.service
-# << files libqmfmessageserver1-qt5
 
 %files -n libqmfclient1-qt5
 %defattr(-,root,root,-)
-# >> files libqmfclient1-qt5
 %{_libdir}/libqmfclient5.so.*
 %{_libdir}/qmf/plugins5/contentmanagers/libqmfstoragemanager.so
 %{_libdir}/qmf/plugins5/ssoauth/libpasswordplugin.so
-# << files libqmfclient1-qt5
 
 %files tests
 %defattr(-,root,root,-)
-# >> files tests
 %{_datadir}/accounts/*
 /opt/tests/qmf-qt5/*
-# << files tests
 
 %files doc
 %defattr(-,root,root,-)
-# >> files doc
 %doc %{_docdir}/qmf-qt5/qch/qmf.qch
-# << files doc
