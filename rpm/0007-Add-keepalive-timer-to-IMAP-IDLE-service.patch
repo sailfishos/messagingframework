@@ -1,0 +1,208 @@
+From f3962e67a67a77fa004886f4553bc4b9e6f28313 Mon Sep 17 00:00:00 2001
+From: Valerio Valerio <valerio.valerio@jollamobile.com>
+Date: Wed, 10 Sep 2014 14:36:13 +0300
+Subject: [PATCH 07/20] Add keepalive timer to IMAP IDLE service
+
+This commit introduce a dependency on nemo-keepalive via
+DEFINES+=USE_KEEPALIVE
+---
+ src/plugins/messageservices/imap/imap.pro     |  4 ++
+ .../messageservices/imap/imapclient.cpp       |  3 +
+ src/plugins/messageservices/imap/imapclient.h |  6 ++
+ .../messageservices/imap/imapservice.cpp      | 64 +++++++++++++++++++
+ .../messageservices/imap/imapservice.h        | 11 +++-
+ 5 files changed, 87 insertions(+), 1 deletion(-)
+
+diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
+index 1c0ae6bb..1b5742b4 100644
+--- a/src/plugins/messageservices/imap/imap.pro
++++ b/src/plugins/messageservices/imap/imap.pro
+@@ -5,6 +5,10 @@ load(qt_plugin)
+ 
+ QT = core network qmfclient qmfclient-private qmfmessageserver
+ 
++contains(DEFINES, USE_KEEPALIVE) {
++    PKGCONFIG += keepalive
++}
++
+ contains(DEFINES,QT_QMF_USE_ALIGNEDTIMER) {
+     QT += alignedtimer
+ }
+diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
+index 33f17d5d..e6398bea 100644
+--- a/src/plugins/messageservices/imap/imapclient.cpp
++++ b/src/plugins/messageservices/imap/imapclient.cpp
+@@ -1995,6 +1995,9 @@ void ImapClient::closeIdleConnections()
+     qMailLog(IMAP) << Q_FUNC_INFO << "Account was modified. Closing connections";
+ 
+     closeConnection();
++#ifdef USE_KEEPALIVE
++    emit stopPushEmail();
++#endif
+     // closing idle connections
+     foreach(const QMailFolderId &id, _monitored.keys()) {
+         IdleProtocol *protocol = _monitored.take(id);
+diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
+index 74dfbbb7..1945b951 100644
+--- a/src/plugins/messageservices/imap/imapclient.h
++++ b/src/plugins/messageservices/imap/imapclient.h
+@@ -51,6 +51,9 @@
+ #include <ssosessionmanager.h>
+ #endif
+ 
++#ifdef USE_KEEPALIVE
++#include <keepalive/backgroundactivity.h>
++#endif
+ 
+ class ImapStrategy;
+ class ImapStrategyContext;
+@@ -107,6 +110,9 @@ signals:
+     void errorOccurred(QMailServiceAction::Status::ErrorCode, const QString &);
+     void updateStatus(const QString &);
+     void restartPushEmail();
++#ifdef USE_KEEPALIVE
++    void stopPushEmail();
++#endif
+ 
+     void progressChanged(uint, uint);
+     void retrievalCompleted();
+diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
+index d03aed78..6a0954dd 100644
+--- a/src/plugins/messageservices/imap/imapservice.cpp
++++ b/src/plugins/messageservices/imap/imapservice.cpp
+@@ -1512,6 +1512,14 @@ ImapService::ImapService(const QMailAccountId &accountId)
+       _accountWasPushEnabled(false),
+       _initiatePushEmailTimer(new QTimer(this))
+ {
++#ifdef USE_KEEPALIVE
++    _lastSyncCounter = 0;
++    _idling = false;
++    _backgroundActivity = new BackgroundActivity(this);
++    _backgroundActivity->setWakeupFrequency(BackgroundActivity::ThirtySeconds);
++    connect(_backgroundActivity, SIGNAL(running()), this, SLOT(onUpdateLastSyncTime()));
++#endif
++
+     QMailAccount account(accountId);
+     if (!(account.status() & QMailAccount::CanSearchOnServer)) {
+         account.setStatus(QMailAccount::CanSearchOnServer, true);
+@@ -1542,6 +1550,9 @@ void ImapService::enable()
+     connect(_client, SIGNAL(errorOccurred(QMailServiceAction::Status::ErrorCode, QString)), this, SLOT(errorOccurred(QMailServiceAction::Status::ErrorCode, QString)));
+     connect(_client, SIGNAL(updateStatus(QString)), this, SLOT(updateStatus(QString)));
+     connect(_client, SIGNAL(restartPushEmail()), this, SLOT(restartPushEmail()));
++#ifdef USE_KEEPALIVE
++    connect(_client, SIGNAL(stopPushEmail()), this, SLOT(stopPushEmail()));
++#endif
+ 
+     QMailAccountConfiguration accountCfg(_accountId);
+     ImapConfiguration imapCfg(accountCfg);
+@@ -1581,6 +1592,10 @@ void ImapService::disable()
+     _previousConnectionSettings = connectionSettings(imapCfg);
+     _restartPushEmailTimer->stop();
+     _initiatePushEmailTimer->stop();
++#ifdef USE_KEEPALIVE
++    _idling = false;
++    _backgroundActivity->stop();
++#endif
+     _source->setIntervalTimer(0);
+     _source->setPushIntervalTimer(0);
+     _source->retrievalTerminated();
+@@ -1693,9 +1708,22 @@ void ImapService::initiatePushEmail()
+                         << QMailAccount(_accountId).name();
+     _restartPushEmailTimer->stop();
+     _initiatePushEmailTimer->stop();
++#ifdef USE_KEEPALIVE
++    _idling = false;
++    if (_backgroundActivity->isRunning()) {
++        _backgroundActivity->stop();
++        qMailLog(Messaging) << Q_FUNC_INFO <<  "Stopping keepalive";
++    }
++#endif
+     QMailFolderIdList ids(_client->configurationIdleFolderIds());
+     if (ids.count()) {
+         _establishingPushEmail = true;
++#ifdef USE_KEEPALIVE
++    qMailLog(Messaging) << Q_FUNC_INFO <<  "Starting keepalive";
++    _lastSyncCounter = 0;
++    _idling = true;
++    _backgroundActivity->wait();
++#endif
+         foreach(QMailFolderId id, ids) {
+             // Check for flag changes and new mail
+             _source->queueFlagsChangedCheck(id);
+@@ -1743,6 +1771,42 @@ void ImapService::updateStatus(const QString &text)
+     updateStatus(QMailServiceAction::Status::ErrNoError, text, _accountId);
+ }
+ 
++#ifdef USE_KEEPALIVE
++void ImapService::onUpdateLastSyncTime()
++{
++    if (_idling && _client->idlesEstablished()) {
++        _lastSyncCounter++;
++        if (_lastSyncCounter == 2) {
++            QMailAccount account(_accountId);
++            account.setLastSynchronized(QMailTimeStamp::currentDateTime());
++            if (!QMailStore::instance()->updateAccount(&account)) {
++                qWarning() << "Unable to update account" << account.id() << "to set lastSynchronized";
++            }
++            _lastSyncCounter = 0;
++        }
++    }
++
++    // start timer again if still in idle mode
++    if (_idling) {
++         _backgroundActivity->wait();
++    } else if (_backgroundActivity->isRunning()){
++        qMailLog(Messaging) << Q_FUNC_INFO << "Stopping keepalive";
++        _backgroundActivity->stop();
++        _lastSyncCounter = 0;
++    }
++}
++
++void ImapService::stopPushEmail()
++{
++    qMailLog(Messaging) << "Stopping push email for account" << _accountId
++                        << QMailAccount(_accountId).name();
++    _idling = false;
++    _backgroundActivity->stop();
++    _restartPushEmailTimer->stop();
++    _initiatePushEmailTimer->stop();
++}
++#endif
++
+ class ImapConfigurator : public QMailMessageServiceConfigurator
+ {
+ public:
+diff --git a/src/plugins/messageservices/imap/imapservice.h b/src/plugins/messageservices/imap/imapservice.h
+index 7b688c52..1855eba5 100644
+--- a/src/plugins/messageservices/imap/imapservice.h
++++ b/src/plugins/messageservices/imap/imapservice.h
+@@ -68,9 +68,13 @@ protected slots:
+     virtual void accountsUpdated(const QMailAccountIdList &ids);
+     void errorOccurred(int code, const QString &text);
+     void errorOccurred(QMailServiceAction::Status::ErrorCode code, const QString &text);
+-
+     void updateStatus(const QString& text);
+ 
++#ifdef USE_KEEPALIVE
++    void onUpdateLastSyncTime();
++    void stopPushEmail();
++#endif
++
+ private:
+     class Source;
+     friend class Source;
+@@ -88,6 +92,11 @@ private:
+     enum { ThirtySeconds = 30 };
+     static QMap<QMailAccountId, int> _initiatePushDelay; // Limit battery consumption
+     QTimer *_initiatePushEmailTimer;
++#ifdef USE_KEEPALIVE
++    BackgroundActivity* _backgroundActivity;
++    int _lastSyncCounter;
++    bool _idling;
++#endif
+ };
+ 
+ class ImapServicePlugin : public QMailMessageServicePlugin
+-- 
+2.17.1
+
