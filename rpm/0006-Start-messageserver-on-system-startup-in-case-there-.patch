@@ -1,0 +1,176 @@
+From 70e6395e26de1486977839a3eafba5d19ae0179f Mon Sep 17 00:00:00 2001
+From: Evgeny Karpov <evgeny.karpov@oss.tieto.com>
+Date: Thu, 24 Oct 2013 09:37:30 +0000
+Subject: [PATCH 06/20] Start messageserver on system startup in case there are
+ email accounts present
+
+Squashed:
+Do not try to restart messageserver when there are no accounts. Fixes: JB#12100
+
+Split off the accounts check to its own .service file so we do not try
+to restart messageserver several times. Also now the accounts check works
+and when there are no accounts configured we do not start the messageserver.
+
+Signed-off-by: Philippe De Swert <philippe.deswert@jollamobile.com>
+
+Squashed:
+Start messageserver only after all accounts related services. Contributes JB#28613
+---
+ src/tools/accountscheck/accountscheck.cpp     | 63 +++++++++++++++++++
+ src/tools/accountscheck/accountscheck.pro     | 19 ++++++
+ .../messageserver5-accounts-check.service     | 12 ++++
+ src/tools/systemd/messageserver5.service      | 15 +++++
+ src/tools/tools.pro                           |  4 ++
+ 5 files changed, 113 insertions(+)
+ create mode 100644 src/tools/accountscheck/accountscheck.cpp
+ create mode 100644 src/tools/accountscheck/accountscheck.pro
+ create mode 100644 src/tools/systemd/messageserver5-accounts-check.service
+ create mode 100644 src/tools/systemd/messageserver5.service
+
+diff --git a/src/tools/accountscheck/accountscheck.cpp b/src/tools/accountscheck/accountscheck.cpp
+new file mode 100644
+index 00000000..364fb77e
+--- /dev/null
++++ b/src/tools/accountscheck/accountscheck.cpp
+@@ -0,0 +1,63 @@
++/****************************************************************************
++**
++** Copyright (C) 2013 Jolla Ltd.
++** Contact: Valério Valério <valerio.valerio@jollamobile.com>
++**
++** This file is part of the Qt Messaging Framework.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and Digia.  For licensing terms and
++** conditions see http://qt.digia.com/licensing.  For further information
++** use the contact form at http://qt.digia.com/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 as published by the Free Software
++** Foundation and appearing in the file LICENSE.LGPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU Lesser General Public License version 2.1 requirements
++** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Digia gives you certain additional
++** rights.  These rights are described in the Digia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 3.0 as published by the Free Software
++** Foundation and appearing in the file LICENSE.GPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU General Public License version 3.0 requirements will be
++** met: http://www.gnu.org/copyleft/gpl.html.
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include <QDebug>
++#include <QCoreApplication>
++#include <Accounts/Manager>
++
++int main(int argc, char* argv[])
++{
++    QCoreApplication app(argc, argv);
++
++    qDebug() << "QMF accounts check: checking email accounts in the system";
++
++    Accounts::Manager manager;
++    Accounts::AccountIdList accountIDList = manager.accountListEnabled("e-mail");
++
++    // check if there are any accounts
++    if(accountIDList.size() > 0) {
++        qDebug() << "QMF accounts check: found enabled accounts";
++        return 0;
++    }
++
++    qDebug() << "QMF accounts check: no accounts found";
++    return 1;
++}
+diff --git a/src/tools/accountscheck/accountscheck.pro b/src/tools/accountscheck/accountscheck.pro
+new file mode 100644
+index 00000000..0c707b92
+--- /dev/null
++++ b/src/tools/accountscheck/accountscheck.pro
+@@ -0,0 +1,19 @@
++
++TEMPLATE = app
++TARGET = qmf-accountscheck
++QT -= gui
++QT += qmfclient
++
++target.path += /usr/bin
++
++CONFIG += link_pkgconfig
++PKGCONFIG += accounts-qt5
++
++SOURCES += accountscheck.cpp
++
++# Target to install systemd service file
++systemd.files = ../systemd/messageserver5.service \
++		../systemd/messageserver5-accounts-check.service
++systemd.path= /usr/lib/systemd/user/
++
++INSTALLS+= target systemd
+diff --git a/src/tools/systemd/messageserver5-accounts-check.service b/src/tools/systemd/messageserver5-accounts-check.service
+new file mode 100644
+index 00000000..c2ec29ea
+--- /dev/null
++++ b/src/tools/systemd/messageserver5-accounts-check.service
+@@ -0,0 +1,12 @@
++[Unit]
++Description=check accounts for messageserver5
++After=oneshot-user.service
++After=jolla-settings-accounts-update.service
++Before=messageserver5.service
++
++[Service]
++Type=oneshot
++ExecStart=/usr/bin/qmf-accountscheck
++
++[Install]
++WantedBy=user-session.target
+diff --git a/src/tools/systemd/messageserver5.service b/src/tools/systemd/messageserver5.service
+new file mode 100644
+index 00000000..0d583d15
+--- /dev/null
++++ b/src/tools/systemd/messageserver5.service
+@@ -0,0 +1,15 @@
++[Unit]
++Description=messageserver5
++Requires=messageserver5-accounts-check.service
++Requires=booster-generic.service
++After=booster-generic.service
++After=messageserver5-accounts-check.service
++
++[Service]
++Type=simple
++ExecStart=/usr/bin/invoker -o --type=generic --global-syms /usr/bin/messageserver5
++Restart=on-failure
++RestartSec=1
++
++[Install]
++WantedBy=user-session.target
+diff --git a/src/tools/tools.pro b/src/tools/tools.pro
+index d05c3377..689ad320 100644
+--- a/src/tools/tools.pro
++++ b/src/tools/tools.pro
+@@ -1,2 +1,6 @@
+ TEMPLATE = subdirs
+ SUBDIRS = messageserver
++
++contains(DEFINES,USE_ACCOUNTS_QT) {
++    SUBDIRS += accountscheck
++}
+-- 
+2.17.1
+

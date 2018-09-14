@@ -26,6 +26,27 @@ BuildRequires:  qt5-plugin-sqldriver-sqlite
 BuildRequires:  fdupes
 Requires:       buteo-syncfw-qt5 >= 0.7.16 
 
+Patch1: 0001-Stop-_incomingDataTimer-when-imapprotocol-object-is-.patch
+Patch2: 0002-Use-QTextDocument-to-parse-html.patch
+Patch3: 0003-Introduce-acceptUntrustedCertificates-configuration.patch
+Patch4: 0004-fix-tests-installation-path.patch
+Patch5: 0005-Accounts-qt-integration.patch
+Patch6: 0006-Start-messageserver-on-system-startup-in-case-there-.patch
+Patch7: 0007-Add-keepalive-timer-to-IMAP-IDLE-service.patch
+Patch8: 0008-Use-Qt5-booster-to-save-memory.patch
+Patch9: 0009-Introduce-QMailAccount-HasPersistentConnection-statu.patch
+Patch10: 0010-Introduce-discovery-of-authentication-from-the-anoun.patch
+Patch11: 0011-Handle-SMTP-response-504.patch
+Patch12: 0012-Recreate-SSO-identity-for-smtp-in-case-of-failure.patch
+Patch13: 0013-Listen-to-sync-schedule-changes-from-buteo-sync-fram.patch
+Patch14: 0014-Use-periodic-keepalive-instead-of-a-long-running-one.patch
+Patch15: 0015-Add-network-listeners-to-IDLE-connections.patch
+Patch16: 0016-Use-setPresistentConnection-function-when-account-it.patch
+Patch17: 0017-Do-AUTHENTICATE-PLAIN-in-two-stages.patch
+Patch18: 0018-Prevent-push-enabled-status-to-go-out-of-sync.patch
+Patch19: 0019-Check-if-IDLE-connection-needs-to-be-established-aft.patch
+Patch20: 0020-Revert-Fix-bundled-zlib-detection.patch
+
 %description
 The Qt Messaging Framework, QMF, consists of a C++ library and daemon server
 process that can be used to build email clients, and more generally software
@@ -37,6 +58,16 @@ Summary:    Qt Messaging Framework (QMF) Qt5 - development files
 Group:      Development/Libraries
 Requires:   libqmfmessageserver1-qt5 = %{version}
 Requires:   libqmfclient1-qt5 = %{version}
+# depending packages get linkage to following which doesn't work without .so files
+Requires:   pkgconfig(accounts-qt5)
+Requires:   pkgconfig(libsignon-qt5)
+# FIXME: these shouldn't really be needed by depending packages, but upstream
+# currently forces explicit linkage on mostly everything used on its own build
+Requires:   pkgconfig(Qt5Core)
+Requires:   pkgconfig(Qt5Gui)
+Requires:   pkgconfig(Qt5Sql)
+Requires:   pkgconfig(Qt5Network)
+
 
 %description devel
 The Qt Messaging Framework, QMF, consists of a C++ library and daemon server
@@ -94,6 +125,8 @@ This package contains a library for developing applications that work with
 messages.
 
 
+# TODO: upstream stopped installing tests. get them back.
+%if 0
 %package tests
 Summary:    Qt Messaging Framework (QMF) tests
 Group:      System/X11
@@ -104,30 +137,46 @@ process that can be used to build email clients, and more generally software
 that interacts with email and mail servers.
 
 This package contains the tests for Qt Messaging Framework (QMF).
+%endif
 
-
-%package doc
-Summary:    Qt Messaging Framework (QMF) - documentation
-Group:      Documentation
-BuildArch:    noarch
-
-%description doc
-The Qt Messaging Framework, QMF, consists of a C++ library and daemon server
-process that can be used to build email clients, and more generally software
-that interacts with email and mail servers.
-
-This package contains the documentation for Qt Messaging Framework (QMF).
 
 %prep
-%setup -q -n %{name}-%{version}/qmf
+%setup -q -n %{name}-%{version}/upstream
+
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
+%patch10 -p1
+%patch11 -p1
+%patch12 -p1
+%patch13 -p1
+%patch14 -p1
+%patch15 -p1
+%patch16 -p1
+%patch17 -p1
+%patch18 -p1
+%patch19 -p1
+%patch20 -p1
 
 %build
 
-%qmake5  \
+# syncqt.pl doesn't generate headers if build is not detected to be git_build
+touch .git
+
+%qmake5 \
+    QT_BUILD_PARTS+=tests \
     QMF_INSTALL_ROOT=%{_prefix} \
     DEFINES+=QMF_ENABLE_LOGGING \
     DEFINES+=MESSAGESERVER_PLUGINS \
     DEFINES+=QMF_NO_MESSAGE_SERVICE_EDITOR \
+    DEFINES+=QMF_NO_WIDGETS \
+    DEFINES+=USE_ACCOUNTS_QT \
     DEFINES+=USE_KEEPALIVE \
     DEFINES+=USE_HTML_PARSER \
     CONFIG+=syslog
@@ -154,29 +203,29 @@ ln -sf ../messageserver5-accounts-check.service "$UNIT_DIR/messageserver5-accoun
 
 %files devel
 %defattr(-,root,root,-)
-%{_includedir}/qmfmessageserver5/qmail*.h
-%{_includedir}/qmfclient5/qloggers.h
-%{_includedir}/qmfclient5/qlogsystem.h
-%{_includedir}/qmfclient5/qmail*.h
-%{_includedir}/qmfclient5/qprivateimplementation.h
-%{_includedir}/qmfclient5/qprivateimplementationdef.h
-%{_includedir}/qmfclient5/sso*.h
-%{_libdir}/libqmfmessageserver5.prl
-%{_libdir}/libqmfmessageserver5.so
-%{_libdir}/libqmfclient5.prl
-%{_libdir}/libqmfclient5.so
-%{_libdir}/pkgconfig/qmfmessageserver5.pc
-%{_libdir}/pkgconfig/qmfclient5.pc
+%{_includedir}/qt5/QmfClient
+%{_includedir}/qt5/QmfMessageServer
+%exclude %{_libdir}/cmake/Qt5QmfClient/Qt5QmfClient_.cmake
+%exclude %{_libdir}/cmake/Qt5QmfMessageServer/Qt5QmfMessageServer_.cmake
+%{_libdir}/libQmfMessageServer.prl
+%{_libdir}/libQmfMessageServer.so
+%exclude %{_libdir}/libQmfMessageServer.la
+%{_libdir}/libQmfClient.prl
+%{_libdir}/libQmfClient.so
+%exclude %{_libdir}/libQmfClient.la
+%{_libdir}/pkgconfig/QmfMessageServer.pc
+%{_libdir}/pkgconfig/QmfClient.pc
+%{_datadir}/qt5/mkspecs/modules/qt_lib_qmfclient.pri
+%{_datadir}/qt5/mkspecs/modules/qt_lib_qmfclient_private.pri
+%{_datadir}/qt5/mkspecs/modules/qt_lib_qmfmessageserver.pri
+%{_datadir}/qt5/mkspecs/modules/qt_lib_qmfmessageserver_private.pri
 
 %files -n libqmfmessageserver1-qt5
 %defattr(-,root,root,-)
 %{_bindir}/messageserver5
 %{_bindir}/qmf-accountscheck
-%{_libdir}/libqmfmessageserver5.so.*
-%{_libdir}/qmf/plugins5/messageservices/libimap.so
-%{_libdir}/qmf/plugins5/messageservices/libpop.so
-%{_libdir}/qmf/plugins5/messageservices/libqmfsettings.so
-%{_libdir}/qmf/plugins5/messageservices/libsmtp.so
+%{_libdir}/libQmfMessageServer.so.*
+%{_libdir}/qt5/plugins/messageservices/
 %{_libdir}/systemd/user/messageserver5.service
 %{_libdir}/systemd/user/messageserver5-accounts-check.service
 %{_libdir}/systemd/user/user-session.target.wants/messageserver5.service
@@ -184,15 +233,15 @@ ln -sf ../messageserver5-accounts-check.service "$UNIT_DIR/messageserver5-accoun
 
 %files -n libqmfclient1-qt5
 %defattr(-,root,root,-)
-%{_libdir}/libqmfclient5.so.*
-%{_libdir}/qmf/plugins5/contentmanagers/libqmfstoragemanager.so
-%{_libdir}/qmf/plugins5/ssoauth/libpasswordplugin.so
+%{_libdir}/libQmfClient.so.*
+%{_libdir}/qt5/plugins/contentmanagers/libqmfstoragemanager.so
+%{_libdir}/qt5/plugins/ssoauth/
 
+%if 0
 %files tests
 %defattr(-,root,root,-)
 %{_datadir}/accounts/*
 /opt/tests/qmf-qt5/*
-
-%files doc
-%defattr(-,root,root,-)
-%doc %{_docdir}/qmf-qt5/qch/qmf.qch
+%else
+%exclude %{_datadir}/accounts/*
+%endif

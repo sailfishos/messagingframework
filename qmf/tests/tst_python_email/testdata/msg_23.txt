@@ -1,8 +1,0 @@
-From: aperson@domain.example
-Content-Type: multipart/mixed; boundary="BOUNDARY"
-
---BOUNDARY
-Content-Type: text/plain
-
-A message part
---BOUNDARY--
