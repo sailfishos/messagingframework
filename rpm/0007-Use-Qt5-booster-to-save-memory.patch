@@ -1,7 +1,7 @@
-From 974c88d9bb8dcc1c39f47d6231c4c790841b7c46 Mon Sep 17 00:00:00 2001
+From 5a1106dad9f9c11e808e36e7f68e9c22176986db Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Mon, 27 Oct 2014 09:49:12 +0200
-Subject: [PATCH 08/20] Use Qt5 booster to save memory.
+Subject: [PATCH 07/19] Use Qt5 booster to save memory.
 
 ---
  src/tools/messageserver/main.cpp          | 2 +-
@@ -10,11 +10,11 @@ Subject: [PATCH 08/20] Use Qt5 booster to save memory.
  3 files changed, 10 insertions(+), 4 deletions(-)
 
 diff --git a/src/tools/messageserver/main.cpp b/src/tools/messageserver/main.cpp
-index cb10d301..e60940a7 100644
+index 9c107629..d9a35c53 100644
 --- a/src/tools/messageserver/main.cpp
 +++ b/src/tools/messageserver/main.cpp
-@@ -64,7 +64,7 @@ static void recreateLoggers(int n)
- }
+@@ -41,7 +41,7 @@
+ #include <QtGui>
  #endif
  
 -int main(int argc, char** argv)

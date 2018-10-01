@@ -1,7 +1,7 @@
-From fefdaa06b233ba150e370257910bfc7d255db592 Mon Sep 17 00:00:00 2001
+From f5cebc65f479f23184e78e0d07a51c93bcbba02d Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Fri, 20 Feb 2015 15:06:21 +0200
-Subject: [PATCH 17/20] Do AUTHENTICATE PLAIN in two stages
+Subject: [PATCH 16/19] Do AUTHENTICATE PLAIN in two stages
 
 Some servers(e.g yandex.ru) do not support AUTHENTICATE PLAIN in a
 single command, according to RFC4616 this way is optional, so we allways

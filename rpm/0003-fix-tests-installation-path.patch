@@ -1,7 +1,7 @@
-From 7f938de0c58908f64bed0bb222f203df8670a38b Mon Sep 17 00:00:00 2001
+From 28ca7ccd92627207196b76babfe04b064bc2da18 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Tue, 30 Apr 2013 14:38:17 +0300
-Subject: [PATCH 04/20] fix tests installation path.
+Subject: [PATCH 03/19] fix tests installation path.
 
 ---
  .../tst_messageserver/tst_messageserver.pro   |   2 +-

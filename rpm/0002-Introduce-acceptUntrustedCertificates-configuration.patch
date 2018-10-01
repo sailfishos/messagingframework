@@ -1,7 +1,7 @@
-From 9d25c07bcfa9b1a706c6749711b20a9f14bfb2fd Mon Sep 17 00:00:00 2001
+From 978bc8b258fb36cb517a1db4c873033cdf56e718 Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
 Date: Mon, 13 Aug 2018 15:45:24 +0300
-Subject: [PATCH 03/20] Introduce acceptUntrustedCertificates() configuration.
+Subject: [PATCH 02/19] Introduce acceptUntrustedCertificates() configuration.
 
 ---
  src/libraries/qmfclient/qmailserviceaction.h  |  2 ++

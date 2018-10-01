@@ -1,7 +1,7 @@
-From eb41c09172f3bc92731aec62caf4b215cf6d9873 Mon Sep 17 00:00:00 2001
+From de2e14269e59691b8fb6509ccdc645c8fd611843 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Tue, 3 Feb 2015 11:22:59 +0200
-Subject: [PATCH 14/20] Use periodic keepalive instead of a long running
+Subject: [PATCH 13/19] Use periodic keepalive instead of a long running
  one(IMAP IDLE).
 
 This is a partial revert of d45bc6ca22e5f7e7a6b8e4e38ebad29794f61fcd

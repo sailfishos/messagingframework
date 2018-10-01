@@ -1,7 +1,7 @@
-From cb6387c8145087c4cffedf4855bbb235a6e834ca Mon Sep 17 00:00:00 2001
+From 6420ebb4577b99c0cedf0adc7a6c5a5b5f601dbe Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
 Date: Wed, 15 Aug 2018 11:26:49 +0300
-Subject: [PATCH 10/20] Introduce discovery of authentication from the anounced
+Subject: [PATCH 09/19] Introduce discovery of authentication from the anounced
  capabilities(IMAP/SMTP)
 
 Squashed oneliner:

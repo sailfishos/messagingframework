@@ -1,7 +1,7 @@
-From f7499fbdd3477768333333465b34aaae269572a7 Mon Sep 17 00:00:00 2001
+From 18c16fb202b69d2d533a252f501b0d6681ae0047 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Wed, 17 Dec 2014 17:16:45 +0000
-Subject: [PATCH 11/20] Handle SMTP response 504.
+Subject: [PATCH 10/19] Handle SMTP response 504.
 
 Handle SMTP response 504 and reset auth method if auth from caps is
 enabled.

@@ -27,25 +27,24 @@ BuildRequires:  fdupes
 Requires:       buteo-syncfw-qt5 >= 0.7.16 
 
 Patch1: 0001-Stop-_incomingDataTimer-when-imapprotocol-object-is-.patch
-Patch2: 0002-Use-QTextDocument-to-parse-html.patch
-Patch3: 0003-Introduce-acceptUntrustedCertificates-configuration.patch
-Patch4: 0004-fix-tests-installation-path.patch
-Patch5: 0005-Accounts-qt-integration.patch
-Patch6: 0006-Start-messageserver-on-system-startup-in-case-there-.patch
-Patch7: 0007-Add-keepalive-timer-to-IMAP-IDLE-service.patch
-Patch8: 0008-Use-Qt5-booster-to-save-memory.patch
-Patch9: 0009-Introduce-QMailAccount-HasPersistentConnection-statu.patch
-Patch10: 0010-Introduce-discovery-of-authentication-from-the-anoun.patch
-Patch11: 0011-Handle-SMTP-response-504.patch
-Patch12: 0012-Recreate-SSO-identity-for-smtp-in-case-of-failure.patch
-Patch13: 0013-Listen-to-sync-schedule-changes-from-buteo-sync-fram.patch
-Patch14: 0014-Use-periodic-keepalive-instead-of-a-long-running-one.patch
-Patch15: 0015-Add-network-listeners-to-IDLE-connections.patch
-Patch16: 0016-Use-setPresistentConnection-function-when-account-it.patch
-Patch17: 0017-Do-AUTHENTICATE-PLAIN-in-two-stages.patch
-Patch18: 0018-Prevent-push-enabled-status-to-go-out-of-sync.patch
-Patch19: 0019-Check-if-IDLE-connection-needs-to-be-established-aft.patch
-Patch20: 0020-Revert-Fix-bundled-zlib-detection.patch
+Patch2: 0002-Introduce-acceptUntrustedCertificates-configuration.patch
+Patch3: 0003-fix-tests-installation-path.patch
+Patch4: 0004-Accounts-qt-integration.patch
+Patch5: 0005-Start-messageserver-on-system-startup-in-case-there-.patch
+Patch6: 0006-Add-keepalive-timer-to-IMAP-IDLE-service.patch
+Patch7: 0007-Use-Qt5-booster-to-save-memory.patch
+Patch8: 0008-Introduce-QMailAccount-HasPersistentConnection-statu.patch
+Patch9: 0009-Introduce-discovery-of-authentication-from-the-anoun.patch
+Patch10: 0010-Handle-SMTP-response-504.patch
+Patch11: 0011-Recreate-SSO-identity-for-smtp-in-case-of-failure.patch
+Patch12: 0012-Listen-to-sync-schedule-changes-from-buteo-sync-fram.patch
+Patch13: 0013-Use-periodic-keepalive-instead-of-a-long-running-one.patch
+Patch14: 0014-Add-network-listeners-to-IDLE-connections.patch
+Patch15: 0015-Use-setPresistentConnection-function-when-account-it.patch
+Patch16: 0016-Do-AUTHENTICATE-PLAIN-in-two-stages.patch
+Patch17: 0017-Prevent-push-enabled-status-to-go-out-of-sync.patch
+Patch18: 0018-Check-if-IDLE-connection-needs-to-be-established-aft.patch
+Patch19: 0019-Revert-Fix-bundled-zlib-detection.patch
 
 %description
 The Qt Messaging Framework, QMF, consists of a C++ library and daemon server
@@ -162,7 +161,6 @@ This package contains the tests for Qt Messaging Framework (QMF).
 %patch17 -p1
 %patch18 -p1
 %patch19 -p1
-%patch20 -p1
 
 %build
 
