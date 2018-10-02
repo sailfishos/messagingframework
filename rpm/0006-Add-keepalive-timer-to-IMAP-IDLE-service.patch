@@ -1,7 +1,7 @@
-From f3962e67a67a77fa004886f4553bc4b9e6f28313 Mon Sep 17 00:00:00 2001
+From 8fa73f84d55e1948f29be4d3c4ba51ac7342f271 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Wed, 10 Sep 2014 14:36:13 +0300
-Subject: [PATCH 07/20] Add keepalive timer to IMAP IDLE service
+Subject: [PATCH 06/19] Add keepalive timer to IMAP IDLE service
 
 This commit introduce a dependency on nemo-keepalive via
 DEFINES+=USE_KEEPALIVE

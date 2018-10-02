@@ -1,7 +1,7 @@
-From 8e92af7994b3b6689dc69c5379579dcfd404bc4b Mon Sep 17 00:00:00 2001
+From 23f4da85120b89876a7486ca763fbc8b63eeca3b Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Tue, 17 Feb 2015 10:01:07 +0200
-Subject: [PATCH 16/20] Use setPresistentConnection function when account it
+Subject: [PATCH 15/19] Use setPresistentConnection function when account it
  disabled
 
 ---

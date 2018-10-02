@@ -1,7 +1,7 @@
-From 864309f3047b3c491f9d1c336c5656cc33f35780 Mon Sep 17 00:00:00 2001
+From a64236e4a89ad05a440feada22b8789ff647869a Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Fri, 6 Feb 2015 15:16:31 +0200
-Subject: [PATCH 15/20] Add network listeners to IDLE connections.
+Subject: [PATCH 14/19] Add network listeners to IDLE connections.
 
 ---
  .../messageservices/imap/imapservice.cpp      | 314 +++++++++++++++---
