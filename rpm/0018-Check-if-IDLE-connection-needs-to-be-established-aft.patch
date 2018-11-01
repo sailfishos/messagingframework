@@ -1,4 +1,4 @@
-From e441e54b1a370dadbf424a22bfdd828329888523 Mon Sep 17 00:00:00 2001
+From 10c75d9ba527669e67089859ecc249c81f9fbfe4 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Mon, 11 May 2015 15:12:07 +0300
 Subject: [PATCH 18/19] Check if IDLE connection needs to be established after
@@ -12,10 +12,10 @@ cases.
  1 file changed, 10 insertions(+)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 1840fa79..cf5fc72a 100644
+index 72c65543..0f4cff59 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -872,6 +872,16 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
+@@ -798,6 +798,16 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
                  }
  #endif
              }
@@ -33,5 +33,5 @@ index 1840fa79..cf5fc72a 100644
              bool compressCapable(_protocol.capabilities().contains("COMPRESS=DEFLATE", Qt::CaseInsensitive));
              if (!_protocol.encrypted() && QMFALLOWCOMPRESS && compressCapable && !_protocol.compress()) {
 -- 
-2.17.1
+2.17.2
 

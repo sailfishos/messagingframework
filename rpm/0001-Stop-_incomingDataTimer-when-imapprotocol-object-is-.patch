@@ -1,4 +1,4 @@
-From 14476c4887a4e47ca7135749cf3acc218d7bd5cb Mon Sep 17 00:00:00 2001
+From 861537a78563e2a4cc92bcd1913f021421b7b8e6 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Mon, 23 Feb 2015 13:08:24 +0200
 Subject: [PATCH 01/19] Stop _incomingDataTimer when imapprotocol object is
@@ -10,10 +10,10 @@ A crash occurs in case the timer is active and the object is destroyed.
  1 file changed, 3 insertions(+)
 
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index b37d990d..df5da7f2 100644
+index 6de98d68..2c945d3f 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
-@@ -2995,6 +2995,9 @@ ImapProtocol::ImapProtocol()
+@@ -3012,6 +3012,9 @@ ImapProtocol::ImapProtocol()
  
  ImapProtocol::~ImapProtocol()
  {
@@ -24,5 +24,5 @@ index b37d990d..df5da7f2 100644
      delete _fsm;
  }
 -- 
-2.17.1
+2.17.2
 

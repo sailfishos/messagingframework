@@ -1,4 +1,4 @@
-From 28ca7ccd92627207196b76babfe04b064bc2da18 Mon Sep 17 00:00:00 2001
+From ff786f09e3d6edd8a11b173f4ce6cb9e7917f971 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Tue, 30 Apr 2013 14:38:17 +0300
 Subject: [PATCH 03/19] fix tests installation path.
@@ -1475,10 +1475,10 @@ index 623b19ca..1d3ba39e 100644
  include(../common.pri)
  
 diff --git a/tests/tests.pro b/tests/tests.pro
-index 383d8419..6edc0344 100644
+index cac44948..cae08159 100644
 --- a/tests/tests.pro
 +++ b/tests/tests.pro
-@@ -37,5 +37,5 @@ CONFIG += unittest
+@@ -41,5 +41,5 @@ CONFIG += unittest
  
  # Install test file description
  test_description.files = qt5/tests.xml
@@ -2935,5 +2935,5 @@ index 4cde1fe3..204ecd5a 100644
  
  INSTALLS += testdata
 -- 
-2.17.1
+2.17.2
 

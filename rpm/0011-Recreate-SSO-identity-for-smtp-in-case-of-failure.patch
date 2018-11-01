@@ -1,4 +1,4 @@
-From 9f67ef1016dd80dd36870d30bc9a15bc7e0082e0 Mon Sep 17 00:00:00 2001
+From bca2db1fc2a8743e1206112e39a100f7318a998d Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Mon, 19 Jan 2015 11:25:01 +0200
 Subject: [PATCH 11/19] Recreate SSO identity for smtp in case of failure.
@@ -10,7 +10,7 @@ Similar to what is already done for IMAP.
  2 files changed, 12 insertions(+)
 
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 799c3929..a9c19464 100644
+index b15bf40d..38de0874 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -118,6 +118,8 @@ SmtpClient::SmtpClient(QObject* parent)
@@ -19,10 +19,10 @@ index 799c3929..a9c19464 100644
      , sendLogin(false)
 +    , recreateIdentity(false)
 +    , recreateIdentityCount(0)
+ #endif
  {
-     connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)),
-             this, SLOT(accountsUpdated(const QMailAccountIdList&)));
-@@ -659,6 +661,9 @@ void SmtpClient::nextAction(const QString &response)
+     connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
+@@ -643,6 +645,9 @@ void SmtpClient::nextAction(const QString &response)
                      operationFailed(QMailServiceAction::Status::ErrLoginFailed, response);
                  }
              }
@@ -32,7 +32,7 @@ index 799c3929..a9c19464 100644
          } else {
              if (!ssoSessionManager->waitForSso()) {
                  QByteArray authCmd(SmtpAuthenticator::getAuthentication(config.serviceConfiguration("smtp"), capabilities, ssoLogin));
-@@ -1186,6 +1191,8 @@ void SmtpClient::onSsoSessionResponse(const QMap<QString, QList<QByteArray> > &s
+@@ -1170,6 +1175,8 @@ void SmtpClient::onSsoSessionResponse(const QMap<QString, QList<QByteArray> > &s
          ssoLogin = ssoCredentials;
          if (sendLogin) {
              sendLogin = false;
@@ -41,7 +41,7 @@ index 799c3929..a9c19464 100644
              QByteArray authCmd(SmtpAuthenticator::getAuthentication(config.serviceConfiguration("smtp"), capabilities, ssoLogin));
              if (!authCmd.isEmpty()) {
                  sendCommand(authCmd);
-@@ -1203,6 +1210,9 @@ void SmtpClient::onSsoSessionError(const QString &error)
+@@ -1187,6 +1194,9 @@ void SmtpClient::onSsoSessionError(const QString &error)
      // Reset vars
      loginFailed = false;
      sendLogin = false;
@@ -65,5 +65,5 @@ index 96852b2b..12003c7e 100644
  #endif
  };
 -- 
-2.17.1
+2.17.2
 
