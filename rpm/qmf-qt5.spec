@@ -24,6 +24,7 @@ BuildRequires:  qt5-qttools-qthelp-devel
 BuildRequires:  qt5-plugin-platform-minimal
 BuildRequires:  qt5-plugin-sqldriver-sqlite
 BuildRequires:  fdupes
+BuildRequires:  gpgme-devel
 Requires:       buteo-syncfw-qt5 >= 0.7.16 
 
 Patch1: 0001-Stop-_incomingDataTimer-when-imapprotocol-object-is-.patch
@@ -45,6 +46,7 @@ Patch16: 0016-Do-AUTHENTICATE-PLAIN-in-two-stages.patch
 Patch17: 0017-Prevent-push-enabled-status-to-go-out-of-sync.patch
 Patch18: 0018-Check-if-IDLE-connection-needs-to-be-established-aft.patch
 Patch19: 0019-Revert-Fix-bundled-zlib-detection.patch
+Patch20: 0020-Add-signature-settings-in-account.patch
 
 %description
 The Qt Messaging Framework, QMF, consists of a C++ library and daemon server
@@ -105,6 +107,7 @@ This package contains:
 %package -n libqmfclient1-qt5
 Summary:    Qt Messaging Framework (QMF) client library
 Group:      System/Libraries
+Requires:   dirmngr
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
@@ -161,6 +164,7 @@ This package contains the tests for Qt Messaging Framework (QMF).
 %patch17 -p1
 %patch18 -p1
 %patch19 -p1
+%patch20 -p1
 
 %build
 
@@ -234,6 +238,7 @@ ln -sf ../messageserver5-accounts-check.service "$UNIT_DIR/messageserver5-accoun
 %{_libdir}/libQmfClient.so.*
 %{_libdir}/qt5/plugins/contentmanagers/libqmfstoragemanager.so
 %{_libdir}/qt5/plugins/ssoauth/
+%{_libdir}/qt5/plugins/crypto/
 
 %if 0
 %files tests
