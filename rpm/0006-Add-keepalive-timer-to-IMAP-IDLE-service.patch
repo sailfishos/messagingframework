@@ -1,4 +1,4 @@
-From 8fa73f84d55e1948f29be4d3c4ba51ac7342f271 Mon Sep 17 00:00:00 2001
+From c6a7e74090171af6d67bb4fc97c745c6c50fc4d2 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Wed, 10 Sep 2014 14:36:13 +0300
 Subject: [PATCH 06/19] Add keepalive timer to IMAP IDLE service
@@ -29,10 +29,10 @@ index 1c0ae6bb..1b5742b4 100644
      QT += alignedtimer
  }
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 33f17d5d..e6398bea 100644
+index 1c132995..24dfa0cf 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -1995,6 +1995,9 @@ void ImapClient::closeIdleConnections()
+@@ -2003,6 +2003,9 @@ void ImapClient::closeIdleConnections()
      qMailLog(IMAP) << Q_FUNC_INFO << "Account was modified. Closing connections";
  
      closeConnection();
@@ -43,7 +43,7 @@ index 33f17d5d..e6398bea 100644
      foreach(const QMailFolderId &id, _monitored.keys()) {
          IdleProtocol *protocol = _monitored.take(id);
 diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
-index 74dfbbb7..1945b951 100644
+index 36428286..ebd7afb7 100644
 --- a/src/plugins/messageservices/imap/imapclient.h
 +++ b/src/plugins/messageservices/imap/imapclient.h
 @@ -51,6 +51,9 @@
@@ -67,7 +67,7 @@ index 74dfbbb7..1945b951 100644
      void progressChanged(uint, uint);
      void retrievalCompleted();
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index d03aed78..6a0954dd 100644
+index 61a049b3..65bfee9d 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -1512,6 +1512,14 @@ ImapService::ImapService(const QMailAccountId &accountId)
@@ -204,5 +204,5 @@ index 7b688c52..1855eba5 100644
  
  class ImapServicePlugin : public QMailMessageServicePlugin
 -- 
-2.17.1
+2.17.2
 

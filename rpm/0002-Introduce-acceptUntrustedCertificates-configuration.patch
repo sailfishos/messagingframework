@@ -1,4 +1,4 @@
-From 978bc8b258fb36cb517a1db4c873033cdf56e718 Mon Sep 17 00:00:00 2001
+From 036c88b752d8926f1a699452a121f88c211c92ce Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
 Date: Mon, 13 Aug 2018 15:45:24 +0300
 Subject: [PATCH 02/19] Introduce acceptUntrustedCertificates() configuration.
@@ -198,10 +198,10 @@ index f0c0569a..69dc8ad1 100644
  
      void setDeleteMail(bool b);
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index df5da7f2..4d1ecfe7 100644
+index 2c945d3f..35614ea5 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
-@@ -3036,10 +3036,18 @@ bool ImapProtocol::open( const ImapConfiguration& config, qint64 bufferSize)
+@@ -3053,10 +3053,18 @@ bool ImapProtocol::open( const ImapConfiguration& config, qint64 bufferSize)
                  this, SLOT(connected(QMailTransport::EncryptType)));
          connect(_transport, SIGNAL(readyRead()),
                  this, SLOT(incomingData()));
@@ -264,7 +264,7 @@ index a1c50426..50c12e51 100644
      void test();
  
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index 523850f2..37626baf 100644
+index 16562e0b..595c62a9 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
 @@ -112,6 +112,10 @@ void PopClient::createTransport()
@@ -441,5 +441,5 @@ index e8b28a6b..ed115d53 100644
      void setSmtpPassword(const QString& password);
      void setSmtpAuthentication(int t);
 -- 
-2.17.1
+2.17.2
 

@@ -1,4 +1,4 @@
-From de2e14269e59691b8fb6509ccdc645c8fd611843 Mon Sep 17 00:00:00 2001
+From e156cb5326a0ff8e02fd4320e161af06cc003b5f Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Tue, 3 Feb 2015 11:22:59 +0200
 Subject: [PATCH 13/19] Use periodic keepalive instead of a long running
@@ -14,10 +14,10 @@ to cause less battery comsumption in the long run.
  3 files changed, 22 insertions(+), 5 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index fec1d06d..1840fa79 100644
+index 73af61b3..72c65543 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -1922,7 +1922,7 @@ bool ImapClient::pushEnabled()
+@@ -1930,7 +1930,7 @@ bool ImapClient::pushEnabled()
  
  void ImapClient::setPushEnabled(bool state)
  {
@@ -26,7 +26,7 @@ index fec1d06d..1840fa79 100644
          qMailLog(Messaging) << Q_FUNC_INFO << "Setting push enabled state to " << state;
          _pushEnabled = state;
      }
-@@ -1984,8 +1984,7 @@ void ImapClient::onSsoSessionResponse(const QMap<QString,QList<QByteArray> > &ss
+@@ -1992,8 +1992,7 @@ void ImapClient::onSsoSessionResponse(const QMap<QString,QList<QByteArray> > &ss
      }
      if (_sendLogin) {
          _protocol.sendLogin(_config, _ssoLogin);
@@ -37,7 +37,7 @@ index fec1d06d..1840fa79 100644
      }
  }
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 3dae8ed1..314052bc 100644
+index 82c03876..4cdd4e0f 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -1534,8 +1534,10 @@ ImapService::ImapService(const QMailAccountId &accountId)
@@ -122,5 +122,5 @@ index 856fb4d8..8e3d8ff2 100644
      bool _buteoReplyReceived;
  #endif
 -- 
-2.17.1
+2.17.2
 

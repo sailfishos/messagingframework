@@ -1,4 +1,4 @@
-From 23f4da85120b89876a7486ca763fbc8b63eeca3b Mon Sep 17 00:00:00 2001
+From 0a3a72aaee6b271a4e2e978a7d6fca7348ba358f Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Tue, 17 Feb 2015 10:01:07 +0200
 Subject: [PATCH 15/19] Use setPresistentConnection function when account it
@@ -9,7 +9,7 @@ Subject: [PATCH 15/19] Use setPresistentConnection function when account it
  1 file changed, 2 insertions(+), 12 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 7621d477..2de325fc 100644
+index 1c756c00..5c8312c6 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -1621,17 +1621,7 @@ void ImapService::disable()
@@ -41,5 +41,5 @@ index 7621d477..2de325fc 100644
          closeIdleSession();
      }
 -- 
-2.17.1
+2.17.2
 

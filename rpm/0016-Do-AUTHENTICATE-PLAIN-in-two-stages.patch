@@ -1,4 +1,4 @@
-From f5cebc65f479f23184e78e0d07a51c93bcbba02d Mon Sep 17 00:00:00 2001
+From af3a3808ec7a9c527de75edc5e3ac52f54fb9495 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Fri, 20 Feb 2015 15:06:21 +0200
 Subject: [PATCH 16/19] Do AUTHENTICATE PLAIN in two stages
@@ -98,5 +98,5 @@ index 20d2cf57..279f9721 100644
  
      // Currently pop account does not have any auth settings, so only plain can be used
 -- 
-2.17.1
+2.17.2
 

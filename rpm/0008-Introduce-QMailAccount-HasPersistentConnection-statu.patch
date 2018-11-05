@@ -1,4 +1,4 @@
-From d37dae961bf066d758406f105224d555c5fec30e Mon Sep 17 00:00:00 2001
+From a1b4652fc0c67cb9d4eeeaede7ce1a3752fa5d47 Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
 Date: Mon, 13 Aug 2018 17:24:36 +0300
 Subject: [PATCH 08/19] Introduce QMailAccount::HasPersistentConnection status
@@ -12,10 +12,10 @@ keepalive(less state transitions).
  src/libraries/qmfclient/qmailaccount.cpp      | 11 +++
  src/libraries/qmfclient/qmailaccount.h        |  1 +
  src/libraries/qmfclient/qmailstore_p.cpp      | 12 ++++
- .../messageservices/imap/imapclient.cpp       | 13 +++-
+ .../messageservices/imap/imapclient.cpp       | 12 ++++
  .../messageservices/imap/imapservice.cpp      | 70 ++++++++++---------
  .../messageservices/imap/imapservice.h        |  3 -
- 6 files changed, 72 insertions(+), 38 deletions(-)
+ 6 files changed, 72 insertions(+), 37 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailaccount.cpp b/src/libraries/qmfclient/qmailaccount.cpp
 index 3211155d..85796363 100644
@@ -66,7 +66,7 @@ index 4d5ab660..8ba3efa9 100644
      QMailAccount();
      explicit QMailAccount(const QMailAccountId& id);
 diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
-index 12c71068..c3035d9f 100644
+index 8180cb64..599b573b 100644
 --- a/src/libraries/qmfclient/qmailstore_p.cpp
 +++ b/src/libraries/qmfclient/qmailstore_p.cpp
 @@ -2671,6 +2671,10 @@ bool SSOAccountSatisfyTheProperty(Accounts::Account* ssoAccount, const QMailAcco
@@ -89,7 +89,7 @@ index 12c71068..c3035d9f 100644
                  || attemptRegisterStatusBit(QLatin1String("SynchronizationEnabled"), QLatin1String("folderstatus"),
                                              63, true, const_cast<quint64 *>(&QMailFolder::SynchronizationEnabled), t, false)
                  || attemptRegisterStatusBit(QLatin1String("Synchronized"), QLatin1String("folderstatus"),
-@@ -3708,11 +3714,13 @@ QMailAccount QMailStorePrivate::extractAccount(const QSharedPointer<Accounts::Ac
+@@ -3710,11 +3716,13 @@ QMailAccount QMailStorePrivate::extractAccount(const QSharedPointer<Accounts::Ac
      const bool& isDefault = ssoAccount->valueAsBool("email/default");
      const bool& canTransmit = ssoAccount->valueAsBool("canTransmit", true);
      const bool& appendSignature = ssoAccount->valueAsBool("signatureEnabled", true);
@@ -103,7 +103,7 @@ index 12c71068..c3035d9f 100644
  
      result.setSignature(ssoAccount->valueAsString("signature"));
      result.setFromAddress(ssoAccount->contains("fullName")?
-@@ -6217,6 +6225,8 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddAccount(QMailAccou
+@@ -6219,6 +6227,8 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddAccount(QMailAccou
      ssoAccount->setValue("status", account->status());
      const bool appendSignature = (account->status() & QMailAccount::AppendSignature);
      ssoAccount->setValue("signatureEnabled", appendSignature);
@@ -112,7 +112,7 @@ index 12c71068..c3035d9f 100644
      ssoAccount->setValue("signature", account->signature());
      ssoAccount->setValue("emailaddress", account->fromAddress().address());
      ssoAccount->setValue("fullName", account->fromAddress().name());
-@@ -7019,6 +7029,8 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
+@@ -7021,6 +7031,8 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
          ssoAccount->setValue("status", account->status());
          bool signatureEnabled = account->status() & QMailAccount::AppendSignature;
          ssoAccount->setValue("signatureEnabled", signatureEnabled);
@@ -122,17 +122,15 @@ index 12c71068..c3035d9f 100644
          ssoAccount->setValue("emailaddress", account->fromAddress().address());
          ssoAccount->setValue("fullName", account->fromAddress().name());
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index e6398bea..aa05b3dc 100644
+index 24dfa0cf..793e6177 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -1564,7 +1564,18 @@ void ImapClient::setAccount(const QMailAccountId &id)
+@@ -1573,6 +1573,18 @@ void ImapClient::setAccount(const QMailAccountId &id)
+         }
      }
  
-     _config = QMailAccountConfiguration(id);
--
 +    // At this point account can't have a persistent connection to the server, if for some reason the status is wrong(crash/abort) we will
 +    // reset correct status here.
-+    QMailAccount account(id);
 +    const bool hasPersistentConnection = (account.status() & QMailAccount::HasPersistentConnection);
 +    if (hasPersistentConnection) {
 +        account.setStatus(QMailAccount::HasPersistentConnection, false);
@@ -142,11 +140,12 @@ index e6398bea..aa05b3dc 100644
 +            qMailLog(Messaging) <<  "HasPersistentConnection for " << account.id() << "changed to" << false;
 +        }
 +    }
++
  #ifdef USE_ACCOUNTS_QT
      if (!_ssoSessionManager) {
          ImapConfiguration imapCfg(_config);
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 6a0954dd..3d33db6d 100644
+index 65bfee9d..3339314e 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -1513,11 +1513,8 @@ ImapService::ImapService(const QMailAccountId &accountId)
@@ -290,5 +289,5 @@ index 1855eba5..e1dcc6b0 100644
  };
  
 -- 
-2.17.1
+2.17.2
 

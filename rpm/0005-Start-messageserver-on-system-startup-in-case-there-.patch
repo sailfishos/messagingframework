@@ -1,4 +1,4 @@
-From a21882a3d1ee1f0b74eafb1773c6437fa8727235 Mon Sep 17 00:00:00 2001
+From b444c7fe216da0b94f67f68786ab6ed4231b1dc1 Mon Sep 17 00:00:00 2001
 From: Evgeny Karpov <evgeny.karpov@oss.tieto.com>
 Date: Thu, 24 Oct 2013 09:37:30 +0000
 Subject: [PATCH 05/19] Start messageserver on system startup in case there are
@@ -172,5 +172,5 @@ index d05c3377..689ad320 100644
 +    SUBDIRS += accountscheck
 +}
 -- 
-2.17.1
+2.17.2
 

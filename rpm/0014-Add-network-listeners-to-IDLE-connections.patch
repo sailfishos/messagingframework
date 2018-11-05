@@ -1,4 +1,4 @@
-From a64236e4a89ad05a440feada22b8789ff647869a Mon Sep 17 00:00:00 2001
+From 06bdf41114716dae2f8dd76809be0e0721825e3b Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Fri, 6 Feb 2015 15:16:31 +0200
 Subject: [PATCH 14/19] Add network listeners to IDLE connections.
@@ -9,7 +9,7 @@ Subject: [PATCH 14/19] Add network listeners to IDLE connections.
  2 files changed, 282 insertions(+), 57 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 314052bc..7621d477 100644
+index 4cdd4e0f..1c756c00 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -1514,9 +1514,14 @@ ImapService::ImapService(const QMailAccountId &accountId)
@@ -505,5 +505,5 @@ index 8e3d8ff2..519faab4 100644
      bool _buteoReplyReceived;
  #endif
 -- 
-2.17.1
+2.17.2
 

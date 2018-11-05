@@ -1,4 +1,4 @@
-From 18c16fb202b69d2d533a252f501b0d6681ae0047 Mon Sep 17 00:00:00 2001
+From f4fbc8ea0bc2e1c3b5dff51ea1649df1f6926393 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Wed, 17 Dec 2014 17:16:45 +0000
 Subject: [PATCH 10/19] Handle SMTP response 504.
@@ -11,9 +11,9 @@ enabled.
  .../qmfmessageserver/qmailauthenticator.h     |  2 +-
  .../imap/imapauthenticator.cpp                | 50 +++++++++----------
  .../smtp/smtpauthenticator.cpp                | 49 +++++++++---------
- .../messageservices/smtp/smtpclient.cpp       | 29 +++++++++--
+ .../messageservices/smtp/smtpclient.cpp       | 28 +++++++++--
  src/plugins/messageservices/smtp/smtpclient.h |  1 +
- 7 files changed, 78 insertions(+), 57 deletions(-)
+ 7 files changed, 77 insertions(+), 57 deletions(-)
 
 diff --git a/src/libraries/qmfclient/ssosessionmanager.cpp b/src/libraries/qmfclient/ssosessionmanager.cpp
 index edb467d1..dd469aec 100644
@@ -222,26 +222,18 @@ index 8e57a76f..100bdc27 100644
              }
          } else {
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index dd49b0e1..799c3929 100644
+index 3b87e6ef..b15bf40d 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
-@@ -113,6 +113,7 @@ SmtpClient::SmtpClient(QObject* parent)
+@@ -112,6 +112,7 @@ SmtpClient::SmtpClient(QObject* parent)
      , temporaryFile(0)
      , waitingForBytes(0)
      , notUsingAuth(false)
 +    , authReset(false)
      , authTimeout(0)
+ #ifdef USE_ACCOUNTS_QT
      , ssoSessionManager(0)
-     , loginFailed(false)
-@@ -131,6 +132,7 @@ SmtpClient::SmtpClient(QObject* parent)
-     , temporaryFile(0)
-     , waitingForBytes(0)
-     , notUsingAuth(false)
-+    , authReset(false)
-     , authTimeout(0)
- {
-     connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
-@@ -235,6 +237,7 @@ void SmtpClient::newConnection()
+@@ -220,6 +221,7 @@ void SmtpClient::newConnection()
      sending = true;
      domainName = QByteArray();
      outstandingResponses = 0;
@@ -249,7 +241,7 @@ index dd49b0e1..799c3929 100644
  
      if (!transport) {
          // Set up the transport
-@@ -694,10 +697,30 @@ void SmtpClient::nextAction(const QString &response)
+@@ -679,10 +681,30 @@ void SmtpClient::nextAction(const QString &response)
              // We are now authenticated
              status = Authenticated;
              nextAction(QString());
@@ -296,5 +288,5 @@ index 1ca218a8..96852b2b 100644
      QTimer *authTimeout;
  
 -- 
-2.17.1
+2.17.2
 
