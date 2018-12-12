@@ -24,7 +24,7 @@ BuildRequires:  qt5-qttools-qthelp-devel
 BuildRequires:  qt5-plugin-platform-minimal
 BuildRequires:  qt5-plugin-sqldriver-sqlite
 BuildRequires:  fdupes
-Requires:       buteo-syncfw-qt5 >= 0.7.16 
+Requires:       buteo-syncfw-qt5 >= 0.7.16
 
 Patch1: 0001-Stop-_incomingDataTimer-when-imapprotocol-object-is-.patch
 Patch2: 0002-Introduce-acceptUntrustedCertificates-configuration.patch
@@ -177,7 +177,8 @@ touch .git
     DEFINES+=USE_ACCOUNTS_QT \
     DEFINES+=USE_KEEPALIVE \
     DEFINES+=USE_HTML_PARSER \
-    CONFIG+=syslog
+    CONFIG+=syslog \
+    VERSION=`echo %{version} | sed 's/+.*//'`
 
 make %{?_smp_mflags}
 
