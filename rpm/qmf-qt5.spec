@@ -107,7 +107,6 @@ This package contains:
 %package -n libqmfclient1-qt5
 Summary:    Qt Messaging Framework (QMF) client library
 Group:      System/Libraries
-Requires:   dirmngr
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
@@ -125,6 +124,14 @@ client applications.
 
 This package contains a library for developing applications that work with
 messages.
+
+%package -n libqmfclient1-qt5-cryptoplugins
+Summary:    QMF crypto plugins
+Requires:   libqmfclient1-qt5 = %{version}
+Requires:   dirmngr
+
+%description -n libqmfclient1-qt5-cryptoplugins
+This package contains the cryptographic plugins for email signing
 
 
 # TODO: upstream stopped installing tests. get them back.
@@ -238,6 +245,8 @@ ln -sf ../messageserver5-accounts-check.service "$UNIT_DIR/messageserver5-accoun
 %{_libdir}/libQmfClient.so.*
 %{_libdir}/qt5/plugins/contentmanagers/libqmfstoragemanager.so
 %{_libdir}/qt5/plugins/ssoauth/
+
+%files -n libqmfclient1-qt5-cryptoplugins
 %{_libdir}/qt5/plugins/crypto/
 
 %if 0
