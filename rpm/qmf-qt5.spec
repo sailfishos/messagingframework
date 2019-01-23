@@ -6,6 +6,7 @@ Group:      System/Libraries
 License:    LGPLv2.1 with exception or GPLv3
 URL:        http://qt.gitorious.org/qt-labs/messagingframework
 Source0:    %{name}-%{version}.tar.bz2
+Source1:    %{name}.privileges
 Requires:   systemd-user-session-targets
 BuildRequires:  pkgconfig(zlib)
 BuildRequires:  pkgconfig(icu-i18n)
@@ -200,6 +201,9 @@ mkdir -p "$UNIT_DIR"
 ln -sf ../messageserver5.service "$UNIT_DIR/messageserver5.service"
 ln -sf ../messageserver5-accounts-check.service "$UNIT_DIR/messageserver5-accounts-check.service"
 
+mkdir -p %{buildroot}%{_datadir}/mapplauncherd/privileges.d
+install -m 644 -p %{SOURCE1} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
+
 %fdupes  %{buildroot}/%{_includedir}
 
 %post -n libqmfmessageserver1-qt5 -p /sbin/ldconfig
@@ -233,6 +237,7 @@ ln -sf ../messageserver5-accounts-check.service "$UNIT_DIR/messageserver5-accoun
 %defattr(-,root,root,-)
 %{_bindir}/messageserver5
 %{_bindir}/qmf-accountscheck
+%{_datadir}/mapplauncherd/privileges.d/*
 %{_libdir}/libQmfMessageServer.so.*
 %{_libdir}/qt5/plugins/messageservices/
 %{_libdir}/systemd/user/messageserver5.service
