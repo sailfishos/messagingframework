@@ -239,26 +239,24 @@ install -m 644 -p %{SOURCE1} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 %{_bindir}/qmf-accountscheck
 %{_datadir}/mapplauncherd/privileges.d/*
 %{_libdir}/libQmfMessageServer.so.*
-%{_libdir}/qt5/plugins/messageservices/
-%{_libdir}/systemd/user/messageserver5.service
-%{_libdir}/systemd/user/messageserver5-accounts-check.service
-%{_libdir}/systemd/user/user-session.target.wants/messageserver5.service
-%{_libdir}/systemd/user/user-session.target.wants/messageserver5-accounts-check.service
+%{_libdir}/qt5/plugins/messageservices
+%{_libdir}/systemd/user/*.service
+%{_libdir}/systemd/user/user-session.target.wants/*.service
 
 %files -n libqmfclient1-qt5
 %defattr(-,root,root,-)
 %{_libdir}/libQmfClient.so.*
-%{_libdir}/qt5/plugins/contentmanagers/libqmfstoragemanager.so
-%{_libdir}/qt5/plugins/ssoauth/
+%{_libdir}/qt5/plugins/contentmanagers
+%{_libdir}/qt5/plugins/ssoauth
 
 %files -n libqmfclient1-qt5-cryptoplugins
-%{_libdir}/qt5/plugins/crypto/
+%{_libdir}/qt5/plugins/crypto
 
 %if 0
 %files tests
 %defattr(-,root,root,-)
 %{_datadir}/accounts/*
-/opt/tests/qmf-qt5/*
+/opt/tests/qmf-qt5
 %else
 %exclude %{_datadir}/accounts/*
 %endif
