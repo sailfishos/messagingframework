@@ -48,6 +48,7 @@ Patch17: 0017-Prevent-push-enabled-status-to-go-out-of-sync.patch
 Patch18: 0018-Check-if-IDLE-connection-needs-to-be-established-aft.patch
 Patch19: 0019-Revert-Fix-bundled-zlib-detection.patch
 Patch20: 0020-Add-signature-settings-in-account.patch
+Patch21: 0021-Prevent-update-of-message-from-failing-due-to-null-p.patch
 
 %description
 The Qt Messaging Framework, QMF, consists of a C++ library and daemon server
@@ -173,6 +174,7 @@ This package contains the tests for Qt Messaging Framework (QMF).
 %patch18 -p1
 %patch19 -p1
 %patch20 -p1
+%patch21 -p1
 
 %build
 

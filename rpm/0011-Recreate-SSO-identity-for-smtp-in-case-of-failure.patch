@@ -1,7 +1,7 @@
-From bca2db1fc2a8743e1206112e39a100f7318a998d Mon Sep 17 00:00:00 2001
+From 39182ea80ff38dc04d864f37adfde4128ac11a8e Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Mon, 19 Jan 2015 11:25:01 +0200
-Subject: [PATCH 11/19] Recreate SSO identity for smtp in case of failure.
+Subject: [PATCH 11/21] Recreate SSO identity for smtp in case of failure.
 
 Similar to what is already done for IMAP.
 ---
@@ -10,7 +10,7 @@ Similar to what is already done for IMAP.
  2 files changed, 12 insertions(+)
 
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index b15bf40d..38de0874 100644
+index 9d8dfbde..19f69880 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -118,6 +118,8 @@ SmtpClient::SmtpClient(QObject* parent)
@@ -65,5 +65,5 @@ index 96852b2b..12003c7e 100644
  #endif
  };
 -- 
-2.17.2
+2.17.1
 

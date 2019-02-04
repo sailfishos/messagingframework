@@ -1,7 +1,7 @@
-From 036c88b752d8926f1a699452a121f88c211c92ce Mon Sep 17 00:00:00 2001
+From 0b04ed285f4c1cd17a59b80ece3a884177612403 Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
 Date: Mon, 13 Aug 2018 15:45:24 +0300
-Subject: [PATCH 02/19] Introduce acceptUntrustedCertificates() configuration.
+Subject: [PATCH 02/21] Introduce acceptUntrustedCertificates() configuration.
 
 ---
  src/libraries/qmfclient/qmailserviceaction.h  |  2 ++
@@ -198,7 +198,7 @@ index f0c0569a..69dc8ad1 100644
  
      void setDeleteMail(bool b);
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index 2c945d3f..35614ea5 100644
+index 26b7837a..09fd772b 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -3053,10 +3053,18 @@ bool ImapProtocol::open( const ImapConfiguration& config, qint64 bufferSize)
@@ -264,7 +264,7 @@ index a1c50426..50c12e51 100644
      void test();
  
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index 16562e0b..595c62a9 100644
+index 85ac8553..b8aa5c7d 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
 @@ -112,6 +112,10 @@ void PopClient::createTransport()
@@ -368,7 +368,7 @@ index 1644faad..fe0119c3 100644
  
      void setDeleteMail(bool b);
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 3560881d..876247d7 100644
+index 27893973..9e1e2198 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -201,10 +201,20 @@ void SmtpClient::newConnection()
@@ -441,5 +441,5 @@ index e8b28a6b..ed115d53 100644
      void setSmtpPassword(const QString& password);
      void setSmtpAuthentication(int t);
 -- 
-2.17.2
+2.17.1
 

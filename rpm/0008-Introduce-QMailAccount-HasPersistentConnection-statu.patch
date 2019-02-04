@@ -1,7 +1,7 @@
-From a1b4652fc0c67cb9d4eeeaede7ce1a3752fa5d47 Mon Sep 17 00:00:00 2001
+From 6c2c523941428b90fcf258d6397fed6230069616 Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
 Date: Mon, 13 Aug 2018 17:24:36 +0300
-Subject: [PATCH 08/19] Introduce QMailAccount::HasPersistentConnection status
+Subject: [PATCH 08/21] Introduce QMailAccount::HasPersistentConnection status
  flag
 
 Use QMailAccount::HasPersistentConnection status flag for IMAP idle instead of
@@ -289,5 +289,5 @@ index 1855eba5..e1dcc6b0 100644
  };
  
 -- 
-2.17.2
+2.17.1
 

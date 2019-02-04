@@ -1,7 +1,7 @@
-From e156cb5326a0ff8e02fd4320e161af06cc003b5f Mon Sep 17 00:00:00 2001
+From 4e5532c93ff95bc586fc914b7620c2f05b99c8e0 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Tue, 3 Feb 2015 11:22:59 +0200
-Subject: [PATCH 13/19] Use periodic keepalive instead of a long running
+Subject: [PATCH 13/21] Use periodic keepalive instead of a long running
  one(IMAP IDLE).
 
 This is a partial revert of d45bc6ca22e5f7e7a6b8e4e38ebad29794f61fcd
@@ -122,5 +122,5 @@ index 856fb4d8..8e3d8ff2 100644
      bool _buteoReplyReceived;
  #endif
 -- 
-2.17.2
+2.17.1
 

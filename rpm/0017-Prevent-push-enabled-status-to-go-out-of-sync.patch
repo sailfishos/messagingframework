@@ -1,7 +1,7 @@
-From 0b5710503a9e7e14daf76331b09faedf137cea95 Mon Sep 17 00:00:00 2001
+From 5da52cae4df467853efc2e1e5a5baea1dc06ac49 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Mon, 23 Feb 2015 13:31:30 +0200
-Subject: [PATCH 17/19] Prevent push enabled status to go out of sync.
+Subject: [PATCH 17/21] Prevent push enabled status to go out of sync.
 
 ---
  .../messageservices/imap/imapservice.cpp      | 57 +++++++++++--------
@@ -131,5 +131,5 @@ index 5c8312c6..bac7c567 100644
      }
  }
 -- 
-2.17.2
+2.17.1
 

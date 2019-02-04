@@ -1,0 +1,43 @@
+From d148ef76b5726a955a9d249b228d1976449a92c0 Mon Sep 17 00:00:00 2001
+From: Chris Adams <chris.adams@jollamobile.com>
+Date: Mon, 4 Feb 2019 15:41:03 +1000
+Subject: [PATCH 21/21] Prevent update of message from failing due to null
+ preview
+
+In the case where a mail message is deleted locally, triggering a move
+to the trash folder on the remote (e.g. exchange) server, the preview
+can sometimes be returned as null (where previously it would contain
+some of the message body content) when attempting to update its status,
+resulting in a "NOT NULL" constraint failure during query execution.
+
+This change ensures that we detect that error case and work around it.
+
+Contributes to JB#43628
+---
+ src/libraries/qmfclient/qmailstore_p.cpp | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
+index bf7331e7..8955ec9b 100644
+--- a/src/libraries/qmfclient/qmailstore_p.cpp
++++ b/src/libraries/qmfclient/qmailstore_p.cpp
+@@ -7830,6 +7830,16 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateMessage(QMailMe
+                     metaData->setParentThreadId(data.parentThreadId());
+                 updateProperties &= ~QMailMessageKey::ParentThreadId;
+             }
++            // Check JB#43628. Sometimes preview is null after a delete operation,
++            // which then causes the NOT NULL constraint to fail.
++            if (metaData->preview().isEmpty())
++            {
++                // Dirty hack to fix JB#43628, but at least it is better than nothing.
++                QMailMessageMetaData data(metaData->id());
++                if (!data.preview().isEmpty())
++                    metaData->setPreview(data.preview());
++                updateProperties &= ~QMailMessageKey::Preview;
++            }
+             extractedValues = messageValues(updateProperties, *metaData);
+             {
+                 QString sql(QLatin1String("UPDATE mailmessages SET %1 WHERE id=?"));
+-- 
+2.17.1
+

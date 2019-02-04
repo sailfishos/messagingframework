@@ -1,7 +1,7 @@
-From af3a3808ec7a9c527de75edc5e3ac52f54fb9495 Mon Sep 17 00:00:00 2001
+From dd1180ba6da3f6f020fc985ce879ddbda5bde56d Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Fri, 20 Feb 2015 15:06:21 +0200
-Subject: [PATCH 16/19] Do AUTHENTICATE PLAIN in two stages
+Subject: [PATCH 16/21] Do AUTHENTICATE PLAIN in two stages
 
 Some servers(e.g yandex.ru) do not support AUTHENTICATE PLAIN in a
 single command, according to RFC4616 this way is optional, so we allways
@@ -98,5 +98,5 @@ index 20d2cf57..279f9721 100644
  
      // Currently pop account does not have any auth settings, so only plain can be used
 -- 
-2.17.2
+2.17.1
 

@@ -1,7 +1,7 @@
-From 10c75d9ba527669e67089859ecc249c81f9fbfe4 Mon Sep 17 00:00:00 2001
+From 6a522136224edef8201de1efab174bcee84a4e52 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Mon, 11 May 2015 15:12:07 +0300
-Subject: [PATCH 18/19] Check if IDLE connection needs to be established after
+Subject: [PATCH 18/21] Check if IDLE connection needs to be established after
  login. Fixes JB#28693
 
 Some servers only advertise full capabilities after sucessful login,
@@ -33,5 +33,5 @@ index 72c65543..0f4cff59 100644
              bool compressCapable(_protocol.capabilities().contains("COMPRESS=DEFLATE", Qt::CaseInsensitive));
              if (!_protocol.encrypted() && QMFALLOWCOMPRESS && compressCapable && !_protocol.compress()) {
 -- 
-2.17.2
+2.17.1
 

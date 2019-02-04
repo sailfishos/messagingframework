@@ -1,16 +1,16 @@
-From 77bc3dc3be744b3b74f90e472edb356c0c34009d Mon Sep 17 00:00:00 2001
+From 2e4ae35504ea03e7d1910a0f3a6307266474d546 Mon Sep 17 00:00:00 2001
 From: Damien Caliste <dcaliste@free.fr>
 Date: Mon, 5 Nov 2018 16:11:29 +0100
-Subject: [PATCH] Add signature settings in account
+Subject: [PATCH 20/21] Add signature settings in account
 
 ---
- src/libraries/qmfclient/qmailaccount.cpp | 48 ++++++++++++++++++++++++++++++++
- src/libraries/qmfclient/qmailaccount.h   |  6 ++++
- src/libraries/qmfclient/qmailstore_p.cpp | 18 ++++++++++++
+ src/libraries/qmfclient/qmailaccount.cpp | 48 ++++++++++++++++++++++++
+ src/libraries/qmfclient/qmailaccount.h   |  6 +++
+ src/libraries/qmfclient/qmailstore_p.cpp | 18 +++++++++
  3 files changed, 72 insertions(+)
 
 diff --git a/src/libraries/qmfclient/qmailaccount.cpp b/src/libraries/qmfclient/qmailaccount.cpp
-index 8579636..b477e90 100644
+index 85796363..b477e907 100644
 --- a/src/libraries/qmfclient/qmailaccount.cpp
 +++ b/src/libraries/qmfclient/qmailaccount.cpp
 @@ -61,6 +61,7 @@ static quint64 canCreateFoldersFlag = 0;
@@ -38,10 +38,11 @@ index 8579636..b477e90 100644
  
  /*!
      Creates an uninitialised account object.
-@@ -480,6 +484,50 @@ void QMailAccount::setSignature(const QString &str)
+@@ -479,6 +483,50 @@ void QMailAccount::setSignature(const QString &str)
+     d->_signature = str;
  }
  
- /*!
++/*!
 +    Returns an id list configured for the account. These ids should be used to
 +    numericaly sign an outgoing mail of this account.
 +
@@ -85,12 +86,11 @@ index 8579636..b477e90 100644
 +    d->_cryptoSignatureType = type;
 +}
 +
-+/*!
+ /*!
      Returns the time the account was last succesfully synchronized.
      
-     Should be updated by QMailRetrievalAction::retrieveMessageList() when an account is synchronized.
 diff --git a/src/libraries/qmfclient/qmailaccount.h b/src/libraries/qmfclient/qmailaccount.h
-index 8ba3efa..9306dd9 100644
+index 8ba3efa9..9306dd9c 100644
 --- a/src/libraries/qmfclient/qmailaccount.h
 +++ b/src/libraries/qmfclient/qmailaccount.h
 @@ -77,6 +77,7 @@ public:
@@ -114,7 +114,7 @@ index 8ba3efa..9306dd9 100644
      void setLastSynchronized(const QMailTimeStamp &synced);
  
 diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
-index 599b573..bf7331e 100644
+index 599b573b..bf7331e7 100644
 --- a/src/libraries/qmfclient/qmailstore_p.cpp
 +++ b/src/libraries/qmfclient/qmailstore_p.cpp
 @@ -2671,6 +2671,10 @@ bool SSOAccountSatisfyTheProperty(Accounts::Account* ssoAccount, const QMailAcco
@@ -184,5 +184,5 @@ index 599b573..bf7331e 100644
          ssoAccount->setValue("fullName", account->fromAddress().name());
          if (account->lastSynchronized().isValid()) {
 -- 
-2.7.4
+2.17.1
 

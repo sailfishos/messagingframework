@@ -1,7 +1,7 @@
-From f4fbc8ea0bc2e1c3b5dff51ea1649df1f6926393 Mon Sep 17 00:00:00 2001
+From dc28e5024215dc6ac2e58a7ed6b0296ea0f5150b Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Wed, 17 Dec 2014 17:16:45 +0000
-Subject: [PATCH 10/19] Handle SMTP response 504.
+Subject: [PATCH 10/21] Handle SMTP response 504.
 
 Handle SMTP response 504 and reset auth method if auth from caps is
 enabled.
@@ -222,7 +222,7 @@ index 8e57a76f..100bdc27 100644
              }
          } else {
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 3b87e6ef..b15bf40d 100644
+index ba0d5cf0..9d8dfbde 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -112,6 +112,7 @@ SmtpClient::SmtpClient(QObject* parent)
@@ -288,5 +288,5 @@ index 1ca218a8..96852b2b 100644
      QTimer *authTimeout;
  
 -- 
-2.17.2
+2.17.1
 
