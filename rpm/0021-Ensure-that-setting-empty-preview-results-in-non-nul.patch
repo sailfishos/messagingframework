@@ -1,0 +1,26 @@
+From fa1c1c42af70fc8afb1b6b15b63b1f21309c2d63 Mon Sep 17 00:00:00 2001
+From: Chris Adams <chris.adams@jollamobile.com>
+Date: Thu, 7 Feb 2019 14:21:35 +1000
+Subject: [PATCH 21/21] Ensure that setting empty preview results in non-null
+ string value
+
+---
+ src/libraries/qmfclient/qmailmessage.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
+index 7c003ee9..71491f1a 100644
+--- a/src/libraries/qmfclient/qmailmessage.cpp
++++ b/src/libraries/qmfclient/qmailmessage.cpp
+@@ -6646,7 +6646,7 @@ void QMailMessageMetaDataPrivate::setResponseType(QMailMessageMetaData::Response
+ 
+ void QMailMessageMetaDataPrivate::setPreview(const QString &s)
+ {
+-    updateMember(_preview, s);
++    updateMember(_preview, s.isNull() ? QString("") : s);
+ }
+ 
+ uint QMailMessageMetaDataPrivate::indicativeSize() const
+-- 
+2.17.1
+

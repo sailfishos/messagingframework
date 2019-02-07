@@ -1,7 +1,7 @@
-From cd99b495de9daab5b773ceb90c0771c97c102705 Mon Sep 17 00:00:00 2001
+From 98f4a7bc1dad5c6fe7a4e185b6e9509b98b14cd8 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Mon, 2 Feb 2015 17:03:21 +0200
-Subject: [PATCH 12/19] Listen to sync schedule changes from buteo sync
+Subject: [PATCH 12/21] Listen to sync schedule changes from buteo sync
  framework.
 
 This commit introduces d-bus listeners inside IMAP4 service to
@@ -453,5 +453,5 @@ index a5aa05a9..9622d701 100644
  
  [Service]
 -- 
-2.17.2
+2.17.1
 

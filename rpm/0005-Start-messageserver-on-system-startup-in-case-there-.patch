@@ -1,7 +1,7 @@
-From b444c7fe216da0b94f67f68786ab6ed4231b1dc1 Mon Sep 17 00:00:00 2001
+From a4162fb92edf0ae8c94173dd31ef5971e4020b52 Mon Sep 17 00:00:00 2001
 From: Evgeny Karpov <evgeny.karpov@oss.tieto.com>
 Date: Thu, 24 Oct 2013 09:37:30 +0000
-Subject: [PATCH 05/19] Start messageserver on system startup in case there are
+Subject: [PATCH 05/21] Start messageserver on system startup in case there are
  email accounts present
 
 Squashed:
@@ -172,5 +172,5 @@ index d05c3377..689ad320 100644
 +    SUBDIRS += accountscheck
 +}
 -- 
-2.17.2
+2.17.1
 

@@ -1,7 +1,7 @@
-From 1ff27c850d5cecb5ac5dfbeb39a47daab617aeae Mon Sep 17 00:00:00 2001
+From ba4eb3a419a411fc1f0e2ce9ca661943e65b4881 Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
 Date: Wed, 15 Aug 2018 11:26:49 +0300
-Subject: [PATCH 09/19] Introduce discovery of authentication from the anounced
+Subject: [PATCH 09/21] Introduce discovery of authentication from the anounced
  capabilities(IMAP/SMTP)
 
 Squashed oneliner:
@@ -540,7 +540,7 @@ index ebd7afb7..83cd6ec4 100644
  };
  
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index e34e9f67..ec1201da 100644
+index 7a5da761..a23a962b 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -560,7 +560,7 @@ public:
@@ -786,7 +786,7 @@ index 2d1a1040..419b9508 100644
  
  #endif
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index 092cf91c..cca92dd0 100644
+index c34e9e89..f44528fd 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
 @@ -273,11 +273,10 @@ void PopClient::setAccount(const QMailAccountId &id)
@@ -1077,7 +1077,7 @@ index 06183262..23f31cb2 100644
  
  #endif
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index d8450a6d..3b87e6ef 100644
+index 9d77e6c5..ba0d5cf0 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -157,11 +157,10 @@ void SmtpClient::setAccount(const QMailAccountId &id)
@@ -1396,5 +1396,5 @@ index 1ae046d8..a7a25676 100644
  
  #endif // PASSWORDPLUGIN_H
 -- 
-2.17.2
+2.17.1
 

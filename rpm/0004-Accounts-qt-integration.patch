@@ -1,7 +1,7 @@
-From b71cf0c4f632b7156ca5078cc69ed8d71cb63305 Mon Sep 17 00:00:00 2001
+From 4d099195cb582c9600a6b39587219b474bbdc9bb Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Wed, 29 May 2013 09:44:20 +0300
-Subject: [PATCH 04/19] Accounts-qt integration.
+Subject: [PATCH 04/21] Accounts-qt integration.
 
 Squashed commits, either one line description or block comment:
 
@@ -116,12 +116,6 @@ Auth in one step introduced by this commit, better to reduce communication with 
 
 c: AUTH PLAIN <UserName and password encoded in base64>
 S: 235 2.7.0 Authentication successful
-
----
-Add missing implementation for removeSsoIdentity
-
-This hasn't every existed so could just consider removing all the related
-code.
 ---
  common.pri                                    |    6 +
  .../qmfclient/qmailaccountlistmodel.cpp       |   44 +-
@@ -3635,7 +3629,7 @@ index 621cbf72..36428286 100644
  
  #endif
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index 35614ea5..e34e9f67 100644
+index 09fd772b..7a5da761 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -559,8 +559,11 @@ class LoginState : public ImapState
@@ -4070,7 +4064,7 @@ index a704ab57..2d1a1040 100644
  
  #endif
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index 595c62a9..092cf91c 100644
+index b8aa5c7d..c34e9e89 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
 @@ -76,10 +76,18 @@ PopClient::PopClient(QObject* parent)
@@ -4533,7 +4527,7 @@ index 97300b99..06183262 100644
  
  #endif
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 876247d7..d8450a6d 100644
+index 9e1e2198..9d77e6c5 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -113,6 +113,11 @@ SmtpClient::SmtpClient(QObject* parent)
@@ -5426,5 +5420,5 @@ index 176a9cfd..7cb8ec88 100644
      QMailAccount account3(account1.id());
      QCOMPARE(QMailStore::instance()->lastError(), QMailStore::InvalidId);
 -- 
-2.17.2
+2.17.1
 
