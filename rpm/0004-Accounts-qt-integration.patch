@@ -3345,7 +3345,7 @@ index 679abeef..1c132995 100644
  
              bool compressCapable(_protocol.capabilities().contains("COMPRESS=DEFLATE", Qt::CaseInsensitive));
 @@ -1462,6 +1572,25 @@ void ImapClient::setAccount(const QMailAccountId &id)
-             qMailLog(Messaging) << "CanCreateFolders for " << account.id() << "changed to" << true;
+             qMailLog(Messaging) << "Disable HasPersistentConnection for account" << account.id();
          }
      }
 +
@@ -3973,8 +3973,8 @@ index bf4a24ec..61a049b3 100644
 +        _client->removeSsoIdentity(_accountId);
 +#endif
      disable();
+     destroyIdleSession();
      delete _source;
- }
 diff --git a/src/plugins/messageservices/pop/pop.pro b/src/plugins/messageservices/pop/pop.pro
 index 837f928f..eb96f74d 100644
 --- a/src/plugins/messageservices/pop/pop.pro

@@ -40,14 +40,11 @@ Patch9: 0009-Introduce-discovery-of-authentication-from-the-anoun.patch
 Patch10: 0010-Handle-SMTP-response-504.patch
 Patch11: 0011-Recreate-SSO-identity-for-smtp-in-case-of-failure.patch
 Patch12: 0012-Listen-to-sync-schedule-changes-from-buteo-sync-fram.patch
-Patch13: 0013-Use-periodic-keepalive-instead-of-a-long-running-one.patch
-Patch14: 0014-Add-network-listeners-to-IDLE-connections.patch
-Patch15: 0015-Use-setPresistentConnection-function-when-account-it.patch
-Patch16: 0016-Do-AUTHENTICATE-PLAIN-in-two-stages.patch
-Patch17: 0017-Prevent-push-enabled-status-to-go-out-of-sync.patch
-Patch18: 0018-Check-if-IDLE-connection-needs-to-be-established-aft.patch
-Patch19: 0019-Revert-Fix-bundled-zlib-detection.patch
-Patch20: 0020-Add-signature-settings-in-account.patch
+Patch13: 0013-Do-AUTHENTICATE-PLAIN-in-two-stages.patch
+Patch14: 0014-Prevent-push-enabled-status-to-go-out-of-sync.patch
+Patch15: 0015-Check-if-IDLE-connection-needs-to-be-established-aft.patch
+Patch16: 0016-Revert-Fix-bundled-zlib-detection.patch
+Patch17: 0017-Add-signature-settings-in-account.patch
 
 %description
 The Qt Messaging Framework, QMF, consists of a C++ library and daemon server
@@ -170,9 +167,6 @@ This package contains the tests for Qt Messaging Framework (QMF).
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1
-%patch18 -p1
-%patch19 -p1
-%patch20 -p1
 
 %build
 
