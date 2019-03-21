@@ -24,7 +24,7 @@ index 5c8312c6..bac7c567 100644
  
 @@ -1523,6 +1526,11 @@ ImapService::ImapService(const QMailAccountId &accountId)
        _networkSession(0),
-       _sessionTimer(new QTimer(this))
+       _networkSessionTimer(new QTimer(this))
  {
 +#ifdef USE_KEEPALIVE
 +    _accountPushEnabled = false;

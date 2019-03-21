@@ -1,7 +1,7 @@
-From a1b4652fc0c67cb9d4eeeaede7ce1a3752fa5d47 Mon Sep 17 00:00:00 2001
+From 4749c990bb8892333c0e713718e3e34cb47874fc Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
 Date: Mon, 13 Aug 2018 17:24:36 +0300
-Subject: [PATCH 08/19] Introduce QMailAccount::HasPersistentConnection status
+Subject: [PATCH 08/17] Introduce QMailAccount::HasPersistentConnection status
  flag
 
 Use QMailAccount::HasPersistentConnection status flag for IMAP idle instead of
@@ -9,64 +9,11 @@ updating last sync time every minute, this reduces accounts db writes(they
 trigger notifications to other processes) and also make use of a linger
 keepalive(less state transitions).
 ---
- src/libraries/qmfclient/qmailaccount.cpp      | 11 +++
- src/libraries/qmfclient/qmailaccount.h        |  1 +
- src/libraries/qmfclient/qmailstore_p.cpp      | 12 ++++
- .../messageservices/imap/imapclient.cpp       | 12 ++++
- .../messageservices/imap/imapservice.cpp      | 70 ++++++++++---------
- .../messageservices/imap/imapservice.h        |  3 -
- 6 files changed, 72 insertions(+), 37 deletions(-)
+ src/libraries/qmfclient/qmailstore_p.cpp | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/src/libraries/qmfclient/qmailaccount.cpp b/src/libraries/qmfclient/qmailaccount.cpp
-index 3211155d..85796363 100644
---- a/src/libraries/qmfclient/qmailaccount.cpp
-+++ b/src/libraries/qmfclient/qmailaccount.cpp
-@@ -60,6 +60,7 @@ static quint64 canTransmitViaReferenceFlag = 0;
- static quint64 canCreateFoldersFlag = 0;
- static quint64 useSmartReplyFlag = 0;
- static quint64 canSearchOnServerFlag = 0;
-+static quint64 hasPersistentConnectionFlag = 0;
- 
- class QMailAccountPrivate : public QSharedData
- {
-@@ -344,6 +345,15 @@ public:
-     \sa QMailSearchAction::searchMessages()
- */
- 
-+/*!
-+    \variable QMailAccount::HasPersistentConnection
-+
-+    The status mask needed for testing the value of the registered status flag named
-+    \c "HasPersistentConnection" against the result of QMailAccount::status().
-+
-+    This flag indicates that an account has a persistent connection to the server(always online).
-+*/
-+
- const quint64 &QMailAccount::SynchronizationEnabled = synchronizationEnabledFlag;
- const quint64 &QMailAccount::Synchronized = synchronizedFlag;
- const quint64 &QMailAccount::AppendSignature = appendSignatureFlag;
-@@ -360,6 +370,7 @@ const quint64 &QMailAccount::CanTransmitViaReference = canTransmitViaReferenceFl
- const quint64 &QMailAccount::CanCreateFolders = canCreateFoldersFlag;
- const quint64 &QMailAccount::UseSmartReply = useSmartReplyFlag;
- const quint64 &QMailAccount::CanSearchOnServer = canSearchOnServerFlag;
-+const quint64 &QMailAccount::HasPersistentConnection = hasPersistentConnectionFlag;
- 
- /*!
-     Creates an uninitialised account object.
-diff --git a/src/libraries/qmfclient/qmailaccount.h b/src/libraries/qmfclient/qmailaccount.h
-index 4d5ab660..8ba3efa9 100644
---- a/src/libraries/qmfclient/qmailaccount.h
-+++ b/src/libraries/qmfclient/qmailaccount.h
-@@ -76,6 +76,7 @@ public:
-     static const quint64 &CanCreateFolders;
-     static const quint64 &UseSmartReply;
-     static const quint64 &CanSearchOnServer;
-+    static const quint64 &HasPersistentConnection;
- 
-     QMailAccount();
-     explicit QMailAccount(const QMailAccountId& id);
 diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
-index 8180cb64..599b573b 100644
+index f352b1d..599b573 100644
 --- a/src/libraries/qmfclient/qmailstore_p.cpp
 +++ b/src/libraries/qmfclient/qmailstore_p.cpp
 @@ -2671,6 +2671,10 @@ bool SSOAccountSatisfyTheProperty(Accounts::Account* ssoAccount, const QMailAcco
@@ -80,16 +27,7 @@ index 8180cb64..599b573b 100644
              return SSOAccountCompareProperty<quint64>(ssoAccount,
                                                        status,
                                                        argument.op, argument.valueList);
-@@ -3122,6 +3126,8 @@ bool QMailStorePrivate::initStore()
-                                             63, true, const_cast<quint64 *>(&QMailAccount::UseSmartReply), t, false)
-                 || attemptRegisterStatusBit(QLatin1String("CanSearchOnServer"), QLatin1String("accountstatus"),
-                                             63, true, const_cast<quint64 *>(&QMailAccount::CanSearchOnServer), t, false)
-+                || attemptRegisterStatusBit(QLatin1String("HasPersistentConnection"), QLatin1String("accountstatus"),
-+                                            63, true, const_cast<quint64 *>(&QMailAccount::HasPersistentConnection), t, false)
-                 || attemptRegisterStatusBit(QLatin1String("SynchronizationEnabled"), QLatin1String("folderstatus"),
-                                             63, true, const_cast<quint64 *>(&QMailFolder::SynchronizationEnabled), t, false)
-                 || attemptRegisterStatusBit(QLatin1String("Synchronized"), QLatin1String("folderstatus"),
-@@ -3710,11 +3716,13 @@ QMailAccount QMailStorePrivate::extractAccount(const QSharedPointer<Accounts::Ac
+@@ -3712,11 +3716,13 @@ QMailAccount QMailStorePrivate::extractAccount(const QSharedPointer<Accounts::Ac
      const bool& isDefault = ssoAccount->valueAsBool("email/default");
      const bool& canTransmit = ssoAccount->valueAsBool("canTransmit", true);
      const bool& appendSignature = ssoAccount->valueAsBool("signatureEnabled", true);
@@ -103,7 +41,7 @@ index 8180cb64..599b573b 100644
  
      result.setSignature(ssoAccount->valueAsString("signature"));
      result.setFromAddress(ssoAccount->contains("fullName")?
-@@ -6219,6 +6227,8 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddAccount(QMailAccou
+@@ -6221,6 +6227,8 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddAccount(QMailAccou
      ssoAccount->setValue("status", account->status());
      const bool appendSignature = (account->status() & QMailAccount::AppendSignature);
      ssoAccount->setValue("signatureEnabled", appendSignature);
@@ -112,7 +50,7 @@ index 8180cb64..599b573b 100644
      ssoAccount->setValue("signature", account->signature());
      ssoAccount->setValue("emailaddress", account->fromAddress().address());
      ssoAccount->setValue("fullName", account->fromAddress().name());
-@@ -7021,6 +7031,8 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
+@@ -7023,6 +7031,8 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
          ssoAccount->setValue("status", account->status());
          bool signatureEnabled = account->status() & QMailAccount::AppendSignature;
          ssoAccount->setValue("signatureEnabled", signatureEnabled);
@@ -121,173 +59,6 @@ index 8180cb64..599b573b 100644
          ssoAccount->setValue("signature", account->signature());
          ssoAccount->setValue("emailaddress", account->fromAddress().address());
          ssoAccount->setValue("fullName", account->fromAddress().name());
-diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 24dfa0cf..793e6177 100644
---- a/src/plugins/messageservices/imap/imapclient.cpp
-+++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -1573,6 +1573,18 @@ void ImapClient::setAccount(const QMailAccountId &id)
-         }
-     }
- 
-+    // At this point account can't have a persistent connection to the server, if for some reason the status is wrong(crash/abort) we will
-+    // reset correct status here.
-+    const bool hasPersistentConnection = (account.status() & QMailAccount::HasPersistentConnection);
-+    if (hasPersistentConnection) {
-+        account.setStatus(QMailAccount::HasPersistentConnection, false);
-+        if (!QMailStore::instance()->updateAccount(&account)) {
-+            qWarning() << "Unable to update account" << account.id() << "to HasPersistentConnection" << false;
-+        } else {
-+            qMailLog(Messaging) <<  "HasPersistentConnection for " << account.id() << "changed to" << false;
-+        }
-+    }
-+
- #ifdef USE_ACCOUNTS_QT
-     if (!_ssoSessionManager) {
-         ImapConfiguration imapCfg(_config);
-diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 65bfee9d..3339314e 100644
---- a/src/plugins/messageservices/imap/imapservice.cpp
-+++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1513,11 +1513,8 @@ ImapService::ImapService(const QMailAccountId &accountId)
-       _initiatePushEmailTimer(new QTimer(this))
- {
- #ifdef USE_KEEPALIVE
--    _lastSyncCounter = 0;
--    _idling = false;
-     _backgroundActivity = new BackgroundActivity(this);
-     _backgroundActivity->setWakeupFrequency(BackgroundActivity::ThirtySeconds);
--    connect(_backgroundActivity, SIGNAL(running()), this, SLOT(onUpdateLastSyncTime()));
- #endif
- 
-     QMailAccount account(accountId);
-@@ -1586,6 +1583,17 @@ void ImapService::disable()
- {
-     QMailAccountConfiguration accountCfg(_accountId);
-     ImapConfiguration imapCfg(accountCfg);
-+    QMailAccount account(_accountId);
-+    const bool hasPersistentConnection = (account.status() & QMailAccount::HasPersistentConnection);
-+    if (hasPersistentConnection) {
-+        account.setStatus(QMailAccount::HasPersistentConnection, false);
-+        account.setLastSynchronized(QMailTimeStamp::currentDateTime());
-+        if (!QMailStore::instance()->updateAccount(&account)) {
-+            qWarning() << "Unable to update account" << account.id() << "to HasPersistentConnection" << false;
-+        } else {
-+            qMailLog(Messaging) <<  "HasPersistentConnection for " << account.id() << "changed to" << false;
-+        }
-+    }
-     _accountWasEnabled = false;
-     _accountWasPushEnabled = imapCfg.pushEnabled();
-     _previousPushFolders = imapCfg.pushFolders();
-@@ -1593,7 +1601,6 @@ void ImapService::disable()
-     _restartPushEmailTimer->stop();
-     _initiatePushEmailTimer->stop();
- #ifdef USE_KEEPALIVE
--    _idling = false;
-     _backgroundActivity->stop();
- #endif
-     _source->setIntervalTimer(0);
-@@ -1709,7 +1716,6 @@ void ImapService::initiatePushEmail()
-     _restartPushEmailTimer->stop();
-     _initiatePushEmailTimer->stop();
- #ifdef USE_KEEPALIVE
--    _idling = false;
-     if (_backgroundActivity->isRunning()) {
-         _backgroundActivity->stop();
-         qMailLog(Messaging) << Q_FUNC_INFO <<  "Stopping keepalive";
-@@ -1719,11 +1725,20 @@ void ImapService::initiatePushEmail()
-     if (ids.count()) {
-         _establishingPushEmail = true;
- #ifdef USE_KEEPALIVE
--    qMailLog(Messaging) << Q_FUNC_INFO <<  "Starting keepalive";
--    _lastSyncCounter = 0;
--    _idling = true;
--    _backgroundActivity->wait();
-+        qMailLog(Messaging) << Q_FUNC_INFO <<  "Starting keepalive";
-+        _backgroundActivity->run();
- #endif
-+        QMailAccount account(_accountId);
-+        const bool hasPersistentConnection = (account.status() & QMailAccount::HasPersistentConnection);
-+        if (!hasPersistentConnection) {
-+            account.setStatus(QMailAccount::HasPersistentConnection, true);
-+            if (!QMailStore::instance()->updateAccount(&account)) {
-+                qWarning() << "Unable to update account" << account.id() << "to HasPersistentConnection" << true;
-+            } else {
-+                qMailLog(Messaging) <<  "HasPersistentConnection for " << account.id() << "changed to" << true;
-+            }
-+        }
-+
-         foreach(QMailFolderId id, ids) {
-             // Check for flag changes and new mail
-             _source->queueFlagsChangedCheck(id);
-@@ -1772,35 +1787,22 @@ void ImapService::updateStatus(const QString &text)
- }
- 
- #ifdef USE_KEEPALIVE
--void ImapService::onUpdateLastSyncTime()
--{
--    if (_idling && _client->idlesEstablished()) {
--        _lastSyncCounter++;
--        if (_lastSyncCounter == 2) {
--            QMailAccount account(_accountId);
--            account.setLastSynchronized(QMailTimeStamp::currentDateTime());
--            if (!QMailStore::instance()->updateAccount(&account)) {
--                qWarning() << "Unable to update account" << account.id() << "to set lastSynchronized";
--            }
--            _lastSyncCounter = 0;
--        }
--    }
--
--    // start timer again if still in idle mode
--    if (_idling) {
--         _backgroundActivity->wait();
--    } else if (_backgroundActivity->isRunning()){
--        qMailLog(Messaging) << Q_FUNC_INFO << "Stopping keepalive";
--        _backgroundActivity->stop();
--        _lastSyncCounter = 0;
--    }
--}
--
- void ImapService::stopPushEmail()
- {
-     qMailLog(Messaging) << "Stopping push email for account" << _accountId
-                         << QMailAccount(_accountId).name();
--    _idling = false;
-+
-+    QMailAccount account(_accountId);
-+    const bool hasPersistentConnection = (account.status() & QMailAccount::HasPersistentConnection);
-+    if (hasPersistentConnection) {
-+        account.setStatus(QMailAccount::HasPersistentConnection, false);
-+        account.setLastSynchronized(QMailTimeStamp::currentDateTime());
-+        if (!QMailStore::instance()->updateAccount(&account)) {
-+            qWarning() << "Unable to update account" << account.id() << "to HasPersistentConnection" << false;
-+        } else {
-+            qMailLog(Messaging) <<  "HasPersistentConnection for " << account.id() << "changed to" << false;
-+        }
-+    }
-     _backgroundActivity->stop();
-     _restartPushEmailTimer->stop();
-     _initiatePushEmailTimer->stop();
-diff --git a/src/plugins/messageservices/imap/imapservice.h b/src/plugins/messageservices/imap/imapservice.h
-index 1855eba5..e1dcc6b0 100644
---- a/src/plugins/messageservices/imap/imapservice.h
-+++ b/src/plugins/messageservices/imap/imapservice.h
-@@ -71,7 +71,6 @@ protected slots:
-     void updateStatus(const QString& text);
- 
- #ifdef USE_KEEPALIVE
--    void onUpdateLastSyncTime();
-     void stopPushEmail();
- #endif
- 
-@@ -94,8 +93,6 @@ private:
-     QTimer *_initiatePushEmailTimer;
- #ifdef USE_KEEPALIVE
-     BackgroundActivity* _backgroundActivity;
--    int _lastSyncCounter;
--    bool _idling;
- #endif
- };
- 
 -- 
-2.17.2
+2.7.4
 
