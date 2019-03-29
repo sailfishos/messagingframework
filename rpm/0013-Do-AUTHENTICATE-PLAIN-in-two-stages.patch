@@ -1,19 +1,19 @@
-From af3a3808ec7a9c527de75edc5e3ac52f54fb9495 Mon Sep 17 00:00:00 2001
+From 4a87f431dc1c8f4a99a7b767fc450f7255a6baab Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Fri, 20 Feb 2015 15:06:21 +0200
-Subject: [PATCH 16/19] Do AUTHENTICATE PLAIN in two stages
+Subject: [PATCH 13/17] Do AUTHENTICATE PLAIN in two stages
 
 Some servers(e.g yandex.ru) do not support AUTHENTICATE PLAIN in a
 single command, according to RFC4616 this way is optional, so we allways
 perform the authentication in two stages that is gurantee to be supported
 by all implementations of the protocol.
 ---
- .../imap/imapauthenticator.cpp                | 11 +++++++---
- .../ssoauth/password/passwordplugin.cpp       | 20 ++++++++++---------
+ .../messageservices/imap/imapauthenticator.cpp       | 11 ++++++++---
+ src/plugins/ssoauth/password/passwordplugin.cpp      | 20 +++++++++++---------
  2 files changed, 19 insertions(+), 12 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapauthenticator.cpp b/src/plugins/messageservices/imap/imapauthenticator.cpp
-index 46de9f49..97d94764 100644
+index 46de9f4..97d9476 100644
 --- a/src/plugins/messageservices/imap/imapauthenticator.cpp
 +++ b/src/plugins/messageservices/imap/imapauthenticator.cpp
 @@ -44,11 +44,11 @@
@@ -53,7 +53,7 @@ index 46de9f49..97d94764 100644
      return QMailAuthenticator::getResponse(svcCfg, challenge);
  #endif
 diff --git a/src/plugins/ssoauth/password/passwordplugin.cpp b/src/plugins/ssoauth/password/passwordplugin.cpp
-index 20d2cf57..279f9721 100644
+index 20d2cf5..279f972 100644
 --- a/src/plugins/ssoauth/password/passwordplugin.cpp
 +++ b/src/plugins/ssoauth/password/passwordplugin.cpp
 @@ -94,20 +94,22 @@ QMap<QString, QList<QByteArray> > SSOPasswordPlugin::getIMAPAuthentication(const
@@ -98,5 +98,5 @@ index 20d2cf57..279f9721 100644
  
      // Currently pop account does not have any auth settings, so only plain can be used
 -- 
-2.17.2
+1.8.3-rc3
 

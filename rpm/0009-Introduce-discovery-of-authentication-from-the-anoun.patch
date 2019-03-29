@@ -1,40 +1,40 @@
-From 1ff27c850d5cecb5ac5dfbeb39a47daab617aeae Mon Sep 17 00:00:00 2001
+From bba720da13248c3f0d5eb1d460f04a1c22af9764 Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
 Date: Wed, 15 Aug 2018 11:26:49 +0300
-Subject: [PATCH 09/19] Introduce discovery of authentication from the anounced
+Subject: [PATCH 09/17] Introduce discovery of authentication from the anounced
  capabilities(IMAP/SMTP)
 
 Squashed oneliner:
 Default to IMAP LOGIN if server does not advertise any auth caps and LOGINDISABLED.
 ---
- src/libraries/qmfclient/ssoauthplugin.h       |   4 +-
- src/libraries/qmfclient/ssosessionmanager.cpp |  12 +-
- src/libraries/qmfclient/ssosessionmanager.h   |   7 +-
- .../qmfmessageserver/qmailauthenticator.cpp   |   9 +-
- .../qmfmessageserver/qmailauthenticator.h     |   3 +-
- .../imap/imapauthenticator.cpp                | 135 ++++++++++++----
- .../messageservices/imap/imapauthenticator.h  |   5 +-
- .../messageservices/imap/imapclient.cpp       |  41 ++---
- src/plugins/messageservices/imap/imapclient.h |   5 +-
- .../messageservices/imap/imapprotocol.cpp     |  20 +--
- .../messageservices/imap/imapprotocol.h       |   3 +-
- .../messageservices/imap/imapservice.cpp      |  35 ++--
- .../messageservices/pop/popauthenticator.cpp  |  48 +++---
- .../messageservices/pop/popauthenticator.h    |   5 +-
- src/plugins/messageservices/pop/popclient.cpp |  13 +-
- src/plugins/messageservices/pop/popclient.h   |   4 +-
- .../smtp/smtpauthenticator.cpp                | 152 ++++++++++++------
- .../messageservices/smtp/smtpauthenticator.h  |   6 +-
- .../messageservices/smtp/smtpclient.cpp       |  28 ++--
- src/plugins/messageservices/smtp/smtpclient.h |   4 +-
- .../smtp/smtpconfiguration.cpp                |   9 ++
- .../messageservices/smtp/smtpconfiguration.h  |   2 +
- .../ssoauth/password/passwordplugin.cpp       | 109 ++++++++-----
- src/plugins/ssoauth/password/passwordplugin.h |  10 +-
+ src/libraries/qmfclient/ssoauthplugin.h            |   4 +-
+ src/libraries/qmfclient/ssosessionmanager.cpp      |  12 +-
+ src/libraries/qmfclient/ssosessionmanager.h        |   7 +-
+ .../qmfmessageserver/qmailauthenticator.cpp        |   9 +-
+ .../qmfmessageserver/qmailauthenticator.h          |   3 +-
+ .../messageservices/imap/imapauthenticator.cpp     | 135 ++++++++++++++----
+ .../messageservices/imap/imapauthenticator.h       |   5 +-
+ src/plugins/messageservices/imap/imapclient.cpp    |  41 +++---
+ src/plugins/messageservices/imap/imapclient.h      |   5 +-
+ src/plugins/messageservices/imap/imapprotocol.cpp  |  20 +--
+ src/plugins/messageservices/imap/imapprotocol.h    |   3 +-
+ src/plugins/messageservices/imap/imapservice.cpp   |  35 +++--
+ .../messageservices/pop/popauthenticator.cpp       |  48 +++----
+ src/plugins/messageservices/pop/popauthenticator.h |   5 +-
+ src/plugins/messageservices/pop/popclient.cpp      |  13 +-
+ src/plugins/messageservices/pop/popclient.h        |   4 +-
+ .../messageservices/smtp/smtpauthenticator.cpp     | 152 ++++++++++++++-------
+ .../messageservices/smtp/smtpauthenticator.h       |   6 +-
+ src/plugins/messageservices/smtp/smtpclient.cpp    |  28 ++--
+ src/plugins/messageservices/smtp/smtpclient.h      |   4 +-
+ .../messageservices/smtp/smtpconfiguration.cpp     |   9 ++
+ .../messageservices/smtp/smtpconfiguration.h       |   2 +
+ src/plugins/ssoauth/password/passwordplugin.cpp    | 109 +++++++++------
+ src/plugins/ssoauth/password/passwordplugin.h      |  10 +-
  24 files changed, 420 insertions(+), 249 deletions(-)
 
 diff --git a/src/libraries/qmfclient/ssoauthplugin.h b/src/libraries/qmfclient/ssoauthplugin.h
-index faf3713c..bbc59a76 100644
+index faf3713..bbc59a7 100644
 --- a/src/libraries/qmfclient/ssoauthplugin.h
 +++ b/src/libraries/qmfclient/ssoauthplugin.h
 @@ -57,8 +57,8 @@ public:
@@ -49,7 +49,7 @@ index faf3713c..bbc59a76 100644
      virtual SignOn::SessionData sessionData(const QString &accountProvider, QVariantMap authParameters) const = 0;
      virtual SSOAuthService *createService() = 0;
 diff --git a/src/libraries/qmfclient/ssosessionmanager.cpp b/src/libraries/qmfclient/ssosessionmanager.cpp
-index e988ed61..edb467d1 100644
+index e988ed6..edb467d 100644
 --- a/src/libraries/qmfclient/ssosessionmanager.cpp
 +++ b/src/libraries/qmfclient/ssosessionmanager.cpp
 @@ -67,7 +67,7 @@
@@ -102,7 +102,7 @@ index e988ed61..edb467d1 100644
  }
  
 diff --git a/src/libraries/qmfclient/ssosessionmanager.h b/src/libraries/qmfclient/ssosessionmanager.h
-index eaecf916..61806ba4 100644
+index eaecf91..61806ba 100644
 --- a/src/libraries/qmfclient/ssosessionmanager.h
 +++ b/src/libraries/qmfclient/ssosessionmanager.h
 @@ -63,8 +63,7 @@ public:
@@ -139,7 +139,7 @@ index eaecf916..61806ba4 100644
      QString _authMechanism;
      QString _authUsername;
 diff --git a/src/libraries/qmfmessageserver/qmailauthenticator.cpp b/src/libraries/qmfmessageserver/qmailauthenticator.cpp
-index 92a12e70..373bcf21 100644
+index 92a12e7..373bcf2 100644
 --- a/src/libraries/qmfmessageserver/qmailauthenticator.cpp
 +++ b/src/libraries/qmfmessageserver/qmailauthenticator.cpp
 @@ -32,7 +32,6 @@
@@ -170,7 +170,7 @@ index 92a12e70..373bcf21 100644
          return cramMd5Response(challenge, configuration.value("username").toUtf8(), password.toUtf8());
      }
 diff --git a/src/libraries/qmfmessageserver/qmailauthenticator.h b/src/libraries/qmfmessageserver/qmailauthenticator.h
-index a9f2d214..3891139d 100644
+index a9f2d21..3891139 100644
 --- a/src/libraries/qmfmessageserver/qmailauthenticator.h
 +++ b/src/libraries/qmfmessageserver/qmailauthenticator.h
 @@ -35,6 +35,7 @@
@@ -191,7 +191,7 @@ index a9f2d214..3891139d 100644
      static QByteArray getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge);
  #endif
 diff --git a/src/plugins/messageservices/imap/imapauthenticator.cpp b/src/plugins/messageservices/imap/imapauthenticator.cpp
-index 941801dd..38dd4d9f 100644
+index 941801d..38dd4d9 100644
 --- a/src/plugins/messageservices/imap/imapauthenticator.cpp
 +++ b/src/plugins/messageservices/imap/imapauthenticator.cpp
 @@ -40,11 +40,16 @@
@@ -368,7 +368,7 @@ index 941801dd..38dd4d9f 100644
 +}
  
 diff --git a/src/plugins/messageservices/imap/imapauthenticator.h b/src/plugins/messageservices/imap/imapauthenticator.h
-index 879629ff..02b3d67c 100644
+index 879629f..02b3d67 100644
 --- a/src/plugins/messageservices/imap/imapauthenticator.h
 +++ b/src/plugins/messageservices/imap/imapauthenticator.h
 @@ -44,12 +44,11 @@ class ImapAuthenticator
@@ -387,7 +387,7 @@ index 879629ff..02b3d67c 100644
  };
  
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 793e6177..fcb0c92b 100644
+index f5028aa..949c254 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -183,7 +183,7 @@ class IdleProtocol : public ImapProtocol {
@@ -414,7 +414,7 @@ index 793e6177..fcb0c92b 100644
      : _idleRetryDelay(InitialIdleRetryDelay),
        _ssoAccount(ssoAccount),
        _ssoLogin(ssoLogin)
-@@ -333,7 +333,7 @@ void IdleProtocol::idleCommandTransition(const ImapCommand command, const Operat
+@@ -335,7 +335,7 @@ void IdleProtocol::idleCommandTransition(const ImapCommand command, const Operat
              if (_ssoAccount)
                  sendLogin(config, _ssoLogin);
              else
@@ -423,7 +423,7 @@ index 793e6177..fcb0c92b 100644
  #else
              // We are now connected
              sendLogin(config);
-@@ -346,7 +346,7 @@ void IdleProtocol::idleCommandTransition(const ImapCommand command, const Operat
+@@ -348,7 +348,7 @@ void IdleProtocol::idleCommandTransition(const ImapCommand command, const Operat
          if (_ssoAccount)
              sendLogin(config, _ssoLogin);
          else
@@ -432,7 +432,7 @@ index 793e6177..fcb0c92b 100644
  #else
              sendLogin(config);
  #endif
-@@ -721,7 +721,7 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
+@@ -723,7 +723,7 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
                      _sendLogin = true;
                      ssoProcessLogin();
                  } else
@@ -441,7 +441,7 @@ index 793e6177..fcb0c92b 100644
  #else
                  _protocol.sendLogin(_config);
  #endif
-@@ -737,7 +737,7 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
+@@ -739,7 +739,7 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
                  _sendLogin = true;
                  ssoProcessLogin();
              } else
@@ -450,7 +450,7 @@ index 793e6177..fcb0c92b 100644
  #else
              _protocol.sendLogin(_config);
  #endif
-@@ -1587,11 +1587,10 @@ void ImapClient::setAccount(const QMailAccountId &id)
+@@ -1588,11 +1588,10 @@ void ImapClient::setAccount(const QMailAccountId &id)
  
  #ifdef USE_ACCOUNTS_QT
      if (!_ssoSessionManager) {
@@ -465,7 +465,7 @@ index 793e6177..fcb0c92b 100644
               ENFORCE(connect(_ssoSessionManager, SIGNAL(ssoSessionError(QString))
                               ,this, SLOT(onSsoSessionError(QString))));
               qMailLog(IMAP) << Q_FUNC_INFO << "SSO identity is found for account id: "<< id;
-@@ -1769,6 +1768,15 @@ void ImapClient::updateFolderCountStatus(QMailFolder *folder)
+@@ -1770,6 +1769,15 @@ void ImapClient::updateFolderCountStatus(QMailFolder *folder)
      folder->setStatus(QMailFolder::PartialContent, (count < folder->serverCount()));
  }
  
@@ -481,7 +481,7 @@ index 793e6177..fcb0c92b 100644
  bool ImapClient::idlesEstablished()
  {
      ImapConfiguration imapCfg(_config);
-@@ -1942,15 +1950,11 @@ void ImapClient::ssoCredentialsNeedUpdate()
+@@ -1943,15 +1951,11 @@ void ImapClient::ssoCredentialsNeedUpdate()
      }
  }
  
@@ -499,7 +499,7 @@ index 793e6177..fcb0c92b 100644
      }
  
      if (_loginFailed) {
-@@ -1975,8 +1979,7 @@ void ImapClient::onSsoSessionError(const QString &error)
+@@ -1976,8 +1980,7 @@ void ImapClient::onSsoSessionError(const QString &error)
  
  void ImapClient::onAccountsUpdated(const QMailAccountIdList &list)
  {
@@ -510,10 +510,10 @@ index 793e6177..fcb0c92b 100644
          // copying here as the data is shared
          QMailAccountConfiguration config = QMailAccountConfiguration(_config.id());
 diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
-index ebd7afb7..83cd6ec4 100644
+index b4dc7b3..bd4b320 100644
 --- a/src/plugins/messageservices/imap/imapclient.h
 +++ b/src/plugins/messageservices/imap/imapclient.h
-@@ -95,6 +95,7 @@ public:
+@@ -92,6 +92,7 @@ public:
      QMailMessageKey trashKey(const QMailFolderId &folderId) const;
      QStringList deletedMessages(const QMailFolderId &folderId) const;
  
@@ -521,7 +521,7 @@ index ebd7afb7..83cd6ec4 100644
      bool idlesEstablished();
      void idling(const QMailFolderId &id);
      QMailFolderIdList configurationIdleFolderIds();
-@@ -160,7 +161,7 @@ protected slots:
+@@ -155,7 +156,7 @@ protected slots:
  #ifdef USE_ACCOUNTS_QT
      void onAccountsUpdated(const QMailAccountIdList& list);
      void onSsoSessionError(const QString &error);
@@ -530,7 +530,7 @@ index ebd7afb7..83cd6ec4 100644
  #endif
  
  private:
-@@ -209,7 +210,7 @@ private:
+@@ -204,7 +205,7 @@ private:
      bool _loginFailed;
      bool _sendLogin;
      bool _recreateIdentity;
@@ -540,7 +540,7 @@ index ebd7afb7..83cd6ec4 100644
  };
  
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index e34e9f67..ec1201da 100644
+index e4e0f0e..1b05dc1 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -560,7 +560,7 @@ public:
@@ -589,7 +589,7 @@ index e34e9f67..ec1201da 100644
      if (!response.isEmpty()) {
          c->sendData(response.toBase64(), true);
      } else {
-@@ -3185,6 +3182,11 @@ void ImapProtocol::setReceivedCapabilities(bool received)
+@@ -3192,6 +3189,11 @@ void ImapProtocol::setReceivedCapabilities(bool received)
      _receivedCapabilities = received;
  }
  
@@ -601,7 +601,7 @@ index e34e9f67..ec1201da 100644
  bool ImapProtocol::loggingOut() const
  {
      return _fsm->state() == &_fsm->logoutState;
-@@ -3217,7 +3219,7 @@ void ImapProtocol::sendStartTLS()
+@@ -3224,7 +3226,7 @@ void ImapProtocol::sendStartTLS()
  }
  
  #ifdef USE_ACCOUNTS_QT
@@ -611,7 +611,7 @@ index e34e9f67..ec1201da 100644
      _fsm->loginState.setConfiguration(config, _capabilities, ssoLogin);
      _fsm->setState(&_fsm->loginState);
 diff --git a/src/plugins/messageservices/imap/imapprotocol.h b/src/plugins/messageservices/imap/imapprotocol.h
-index d3147ea4..166919b8 100644
+index d3147ea..166919b 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.h
 +++ b/src/plugins/messageservices/imap/imapprotocol.h
 @@ -144,6 +144,7 @@ public:
@@ -632,10 +632,10 @@ index d3147ea4..166919b8 100644
      void sendLogin(const QMailAccountConfiguration &config);
  #endif
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 3339314e..bd5eba9d 100644
+index 7cc0085..c5c6118 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1625,6 +1625,10 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
+@@ -1616,6 +1616,10 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
      bool isPushEnabled(imapCfg.pushEnabled());
      QStringList pushFolders(imapCfg.pushFolders());
      QString newConnectionSettings(connectionSettings(imapCfg));
@@ -646,7 +646,7 @@ index 3339314e..bd5eba9d 100644
      if (!isEnabled) {
          if (_accountWasEnabled) {
              // Account changed from enabled to disabled
-@@ -1635,18 +1639,27 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
+@@ -1626,18 +1630,27 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
          return;
      }
  
@@ -686,7 +686,7 @@ index 3339314e..bd5eba9d 100644
      
      // account was enabled and still is, update checkinterval 
 diff --git a/src/plugins/messageservices/pop/popauthenticator.cpp b/src/plugins/messageservices/pop/popauthenticator.cpp
-index 87fa0791..843b1675 100644
+index 87fa079..843b167 100644
 --- a/src/plugins/messageservices/pop/popauthenticator.cpp
 +++ b/src/plugins/messageservices/pop/popauthenticator.cpp
 @@ -40,6 +40,15 @@
@@ -767,7 +767,7 @@ index 87fa0791..843b1675 100644
 +}
  
 diff --git a/src/plugins/messageservices/pop/popauthenticator.h b/src/plugins/messageservices/pop/popauthenticator.h
-index 2d1a1040..419b9508 100644
+index 2d1a104..419b950 100644
 --- a/src/plugins/messageservices/pop/popauthenticator.h
 +++ b/src/plugins/messageservices/pop/popauthenticator.h
 @@ -44,12 +44,11 @@ class PopAuthenticator
@@ -786,7 +786,7 @@ index 2d1a1040..419b9508 100644
  
  #endif
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index 092cf91c..cca92dd0 100644
+index c34e9e8..f44528f 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
 @@ -273,11 +273,10 @@ void PopClient::setAccount(const QMailAccountId &id)
@@ -826,7 +826,7 @@ index 092cf91c..cca92dd0 100644
      qMailLog(POP)  << "Got SSO response";
      if(!ssoCredentials.isEmpty()) {
 diff --git a/src/plugins/messageservices/pop/popclient.h b/src/plugins/messageservices/pop/popclient.h
-index f7df5d5d..44b778bb 100644
+index f7df5d5..44b778b 100644
 --- a/src/plugins/messageservices/pop/popclient.h
 +++ b/src/plugins/messageservices/pop/popclient.h
 @@ -111,7 +111,7 @@ protected slots:
@@ -848,7 +848,7 @@ index f7df5d5d..44b778bb 100644
  };
  
 diff --git a/src/plugins/messageservices/smtp/smtpauthenticator.cpp b/src/plugins/messageservices/smtp/smtpauthenticator.cpp
-index 0dae24c5..8e57a76f 100644
+index 0dae24c..8e57a76 100644
 --- a/src/plugins/messageservices/smtp/smtpauthenticator.cpp
 +++ b/src/plugins/messageservices/smtp/smtpauthenticator.cpp
 @@ -33,78 +33,124 @@
@@ -1050,7 +1050,7 @@ index 0dae24c5..8e57a76f 100644
  }
 -#endif
 diff --git a/src/plugins/messageservices/smtp/smtpauthenticator.h b/src/plugins/messageservices/smtp/smtpauthenticator.h
-index 06183262..23f31cb2 100644
+index 0618326..23f31cb 100644
 --- a/src/plugins/messageservices/smtp/smtpauthenticator.h
 +++ b/src/plugins/messageservices/smtp/smtpauthenticator.h
 @@ -34,6 +34,7 @@
@@ -1077,7 +1077,7 @@ index 06183262..23f31cb2 100644
  
  #endif
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index d8450a6d..3b87e6ef 100644
+index 9d77e6c..ba0d5cf 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -157,11 +157,10 @@ void SmtpClient::setAccount(const QMailAccountId &id)
@@ -1153,7 +1153,7 @@ index d8450a6d..3b87e6ef 100644
      qMailLog(SMTP)  << "Got SSO response";
      if(!ssoCredentials.isEmpty()) {
 diff --git a/src/plugins/messageservices/smtp/smtpclient.h b/src/plugins/messageservices/smtp/smtpclient.h
-index 2c7b2333..1ca218a8 100644
+index 2c7b233..1ca218a 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.h
 +++ b/src/plugins/messageservices/smtp/smtpclient.h
 @@ -104,7 +104,7 @@ private slots:
@@ -1175,7 +1175,7 @@ index 2c7b2333..1ca218a8 100644
  };
  
 diff --git a/src/plugins/messageservices/smtp/smtpconfiguration.cpp b/src/plugins/messageservices/smtp/smtpconfiguration.cpp
-index 23d43949..74056f6c 100644
+index 23d4394..74056f6 100644
 --- a/src/plugins/messageservices/smtp/smtpconfiguration.cpp
 +++ b/src/plugins/messageservices/smtp/smtpconfiguration.cpp
 @@ -93,6 +93,10 @@ int SmtpConfiguration::smtpEncryption() const
@@ -1201,7 +1201,7 @@ index 23d43949..74056f6c 100644
  #endif
  
 diff --git a/src/plugins/messageservices/smtp/smtpconfiguration.h b/src/plugins/messageservices/smtp/smtpconfiguration.h
-index ed115d53..7e03e956 100644
+index ed115d5..7e03e95 100644
 --- a/src/plugins/messageservices/smtp/smtpconfiguration.h
 +++ b/src/plugins/messageservices/smtp/smtpconfiguration.h
 @@ -75,6 +75,7 @@ public:
@@ -1221,7 +1221,7 @@ index ed115d53..7e03e956 100644
  };
  
 diff --git a/src/plugins/ssoauth/password/passwordplugin.cpp b/src/plugins/ssoauth/password/passwordplugin.cpp
-index 1d2304c1..20d2cf57 100644
+index 1d2304c..20d2cf5 100644
 --- a/src/plugins/ssoauth/password/passwordplugin.cpp
 +++ b/src/plugins/ssoauth/password/passwordplugin.cpp
 @@ -88,52 +88,80 @@ SSOPasswordPlugin::~SSOPasswordPlugin()
@@ -1370,7 +1370,7 @@ index 1d2304c1..20d2cf57 100644
  }
  
 diff --git a/src/plugins/ssoauth/password/passwordplugin.h b/src/plugins/ssoauth/password/passwordplugin.h
-index 1ae046d8..a7a25676 100644
+index 1ae046d..a7a2567 100644
 --- a/src/plugins/ssoauth/password/passwordplugin.h
 +++ b/src/plugins/ssoauth/password/passwordplugin.h
 @@ -57,16 +57,16 @@ public:
@@ -1396,5 +1396,5 @@ index 1ae046d8..a7a25676 100644
  
  #endif // PASSWORDPLUGIN_H
 -- 
-2.17.2
+1.8.3-rc3
 

@@ -1,7 +1,7 @@
-From b444c7fe216da0b94f67f68786ab6ed4231b1dc1 Mon Sep 17 00:00:00 2001
+From 428c566dc26d64b06dc0d560bc804c3f8754e222 Mon Sep 17 00:00:00 2001
 From: Evgeny Karpov <evgeny.karpov@oss.tieto.com>
 Date: Thu, 24 Oct 2013 09:37:30 +0000
-Subject: [PATCH 05/19] Start messageserver on system startup in case there are
+Subject: [PATCH 05/17] Start messageserver on system startup in case there are
  email accounts present
 
 Squashed:
@@ -16,11 +16,11 @@ Signed-off-by: Philippe De Swert <philippe.deswert@jollamobile.com>
 Squashed:
 Start messageserver only after all accounts related services. Contributes JB#28613
 ---
- src/tools/accountscheck/accountscheck.cpp     | 63 +++++++++++++++++++
- src/tools/accountscheck/accountscheck.pro     | 19 ++++++
- .../messageserver5-accounts-check.service     | 12 ++++
- src/tools/systemd/messageserver5.service      | 15 +++++
- src/tools/tools.pro                           |  4 ++
+ src/tools/accountscheck/accountscheck.cpp          | 63 ++++++++++++++++++++++
+ src/tools/accountscheck/accountscheck.pro          | 19 +++++++
+ .../systemd/messageserver5-accounts-check.service  | 12 +++++
+ src/tools/systemd/messageserver5.service           | 15 ++++++
+ src/tools/tools.pro                                |  4 ++
  5 files changed, 113 insertions(+)
  create mode 100644 src/tools/accountscheck/accountscheck.cpp
  create mode 100644 src/tools/accountscheck/accountscheck.pro
@@ -29,7 +29,7 @@ Start messageserver only after all accounts related services. Contributes JB#286
 
 diff --git a/src/tools/accountscheck/accountscheck.cpp b/src/tools/accountscheck/accountscheck.cpp
 new file mode 100644
-index 00000000..364fb77e
+index 0000000..364fb77
 --- /dev/null
 +++ b/src/tools/accountscheck/accountscheck.cpp
 @@ -0,0 +1,63 @@
@@ -98,7 +98,7 @@ index 00000000..364fb77e
 +}
 diff --git a/src/tools/accountscheck/accountscheck.pro b/src/tools/accountscheck/accountscheck.pro
 new file mode 100644
-index 00000000..0c707b92
+index 0000000..0c707b9
 --- /dev/null
 +++ b/src/tools/accountscheck/accountscheck.pro
 @@ -0,0 +1,19 @@
@@ -123,7 +123,7 @@ index 00000000..0c707b92
 +INSTALLS+= target systemd
 diff --git a/src/tools/systemd/messageserver5-accounts-check.service b/src/tools/systemd/messageserver5-accounts-check.service
 new file mode 100644
-index 00000000..c2ec29ea
+index 0000000..c2ec29e
 --- /dev/null
 +++ b/src/tools/systemd/messageserver5-accounts-check.service
 @@ -0,0 +1,12 @@
@@ -141,7 +141,7 @@ index 00000000..c2ec29ea
 +WantedBy=user-session.target
 diff --git a/src/tools/systemd/messageserver5.service b/src/tools/systemd/messageserver5.service
 new file mode 100644
-index 00000000..0d583d15
+index 0000000..0d583d1
 --- /dev/null
 +++ b/src/tools/systemd/messageserver5.service
 @@ -0,0 +1,15 @@
@@ -161,7 +161,7 @@ index 00000000..0d583d15
 +[Install]
 +WantedBy=user-session.target
 diff --git a/src/tools/tools.pro b/src/tools/tools.pro
-index d05c3377..689ad320 100644
+index d05c337..689ad32 100644
 --- a/src/tools/tools.pro
 +++ b/src/tools/tools.pro
 @@ -1,2 +1,6 @@
@@ -172,5 +172,5 @@ index d05c3377..689ad320 100644
 +    SUBDIRS += accountscheck
 +}
 -- 
-2.17.2
+1.8.3-rc3
 

@@ -1,4 +1,4 @@
-From 4749c990bb8892333c0e713718e3e34cb47874fc Mon Sep 17 00:00:00 2001
+From 3b543f7c23c2906669d1041419a2e8094c8c8ea3 Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
 Date: Mon, 13 Aug 2018 17:24:36 +0300
 Subject: [PATCH 08/17] Introduce QMailAccount::HasPersistentConnection status
@@ -60,5 +60,5 @@ index f352b1d..599b573 100644
          ssoAccount->setValue("emailaddress", account->fromAddress().address());
          ssoAccount->setValue("fullName", account->fromAddress().name());
 -- 
-2.7.4
+1.8.3-rc3
 
