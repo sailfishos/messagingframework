@@ -1,19 +1,19 @@
-From ff786f09e3d6edd8a11b173f4ce6cb9e7917f971 Mon Sep 17 00:00:00 2001
+From 7f641c940ef2ca28f1c21a245870f4c56721c280 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Tue, 30 Apr 2013 14:38:17 +0300
-Subject: [PATCH 03/19] fix tests installation path.
+Subject: [PATCH 03/17] fix tests installation path.
 
 ---
- .../tst_messageserver/tst_messageserver.pro   |   2 +-
- tests/qt5/tests.xml                           | 532 +++++++++---------
- tests/tests.pri                               |   2 +-
- tests/tests.pro                               |   2 +-
- tests/tests.xml                               | 532 +++++++++---------
- tests/tst_python_email/tst_python_email.pro   |   2 +-
+ benchmarks/tst_messageserver/tst_messageserver.pro |   2 +-
+ tests/qt5/tests.xml                                | 532 ++++++++++-----------
+ tests/tests.pri                                    |   2 +-
+ tests/tests.pro                                    |   2 +-
+ tests/tests.xml                                    | 532 ++++++++++-----------
+ tests/tst_python_email/tst_python_email.pro        |   2 +-
  6 files changed, 536 insertions(+), 536 deletions(-)
 
 diff --git a/benchmarks/tst_messageserver/tst_messageserver.pro b/benchmarks/tst_messageserver/tst_messageserver.pro
-index 2d50131a..1dc2ddd5 100644
+index 2d50131..1dc2ddd 100644
 --- a/benchmarks/tst_messageserver/tst_messageserver.pro
 +++ b/benchmarks/tst_messageserver/tst_messageserver.pro
 @@ -2,7 +2,7 @@ TEMPLATE = app
@@ -26,7 +26,7 @@ index 2d50131a..1dc2ddd5 100644
  BASE=../../
  include($$BASE/common.pri)
 diff --git a/tests/qt5/tests.xml b/tests/qt5/tests.xml
-index ffbb593f..ac9464a6 100644
+index ffbb593..ac9464a 100644
 --- a/tests/qt5/tests.xml
 +++ b/tests/qt5/tests.xml
 @@ -5,123 +5,123 @@
@@ -1462,7 +1462,7 @@ index ffbb593f..ac9464a6 100644
           <environments>
              <scratchbox>true</scratchbox>
 diff --git a/tests/tests.pri b/tests/tests.pri
-index 623b19ca..1d3ba39e 100644
+index 623b19c..1d3ba39 100644
 --- a/tests/tests.pri
 +++ b/tests/tests.pri
 @@ -3,7 +3,7 @@ QT += testlib
@@ -1475,7 +1475,7 @@ index 623b19ca..1d3ba39e 100644
  include(../common.pri)
  
 diff --git a/tests/tests.pro b/tests/tests.pro
-index cac44948..cae08159 100644
+index cac4494..cae0815 100644
 --- a/tests/tests.pro
 +++ b/tests/tests.pro
 @@ -41,5 +41,5 @@ CONFIG += unittest
@@ -1486,7 +1486,7 @@ index cac44948..cae08159 100644
 +test_description.path  = /opt/tests/qmf-qt5/test-definition
  INSTALLS += test_description
 diff --git a/tests/tests.xml b/tests/tests.xml
-index 3a708ed0..b8fff814 100644
+index 3a708ed..b8fff81 100644
 --- a/tests/tests.xml
 +++ b/tests/tests.xml
 @@ -5,123 +5,123 @@
@@ -2922,7 +2922,7 @@ index 3a708ed0..b8fff814 100644
           <environments>
              <scratchbox>true</scratchbox>
 diff --git a/tests/tst_python_email/tst_python_email.pro b/tests/tst_python_email/tst_python_email.pro
-index 4cde1fe3..204ecd5a 100644
+index 4cde1fe..204ecd5 100644
 --- a/tests/tst_python_email/tst_python_email.pro
 +++ b/tests/tst_python_email/tst_python_email.pro
 @@ -4,7 +4,7 @@ TARGET = tst_python_email
@@ -2935,5 +2935,5 @@ index 4cde1fe3..204ecd5a 100644
  
  INSTALLS += testdata
 -- 
-2.17.2
+1.8.3-rc3
 

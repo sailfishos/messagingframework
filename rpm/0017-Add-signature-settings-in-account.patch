@@ -1,7 +1,7 @@
-From 77bc3dc3be744b3b74f90e472edb356c0c34009d Mon Sep 17 00:00:00 2001
+From 06256765a2a6e22f00aa2cbdfcd2be7c37555a34 Mon Sep 17 00:00:00 2001
 From: Damien Caliste <dcaliste@free.fr>
 Date: Mon, 5 Nov 2018 16:11:29 +0100
-Subject: [PATCH] Add signature settings in account
+Subject: [PATCH 17/17] Add signature settings in account
 
 ---
  src/libraries/qmfclient/qmailaccount.cpp | 48 ++++++++++++++++++++++++++++++++
@@ -184,5 +184,5 @@ index 599b573..bf7331e 100644
          ssoAccount->setValue("fullName", account->fromAddress().name());
          if (account->lastSynchronized().isValid()) {
 -- 
-2.7.4
+1.8.3-rc3
 
