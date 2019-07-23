@@ -1,0 +1,69 @@
+From f1d94263e07c729a55abf227ca7a3fc4137a4445 Mon Sep 17 00:00:00 2001
+From: Raine Makelainen <raine.makelainen@jolla.com>
+Date: Tue, 23 Jul 2019 11:44:27 +0300
+Subject: [PATCH 18/18] Use socket's local address for HELO and EHLO messages
+
+Signed-off-by: Raine Makelainen <raine.makelainen@jolla.com>
+---
+ src/plugins/messageservices/smtp/smtpclient.cpp | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
+index 19f69880..0300dcf1 100644
+--- a/src/plugins/messageservices/smtp/smtpclient.cpp
++++ b/src/plugins/messageservices/smtp/smtpclient.cpp
+@@ -81,11 +81,14 @@ static QByteArray messageId(const QByteArray& domainName, quint32 addressCompone
+             '>').toLatin1();
+ }
+ 
+-static QByteArray localName()
++static QByteArray localName(const QHostAddress &hostAddress)
+ {
++
+     QByteArray result(QHostInfo::localDomainName().toLatin1());
+     if (!result.isEmpty())
+         return result;
++    if (!hostAddress.isNull())
++        return "[" + hostAddress.toString().toLatin1() + "]";
+     QList<QHostAddress> addresses(QNetworkInterface::allAddresses());
+     if (addresses.isEmpty())
+         return "localhost.localdomain";
+@@ -317,7 +320,7 @@ void SmtpClient::connected(QMailTransport::EncryptType encryptType)
+ #ifndef QT_NO_SSL
+     if ((smtpCfg.smtpEncryption() == QMailTransport::Encrypt_TLS) && (status == TLS)) {
+         // We have entered TLS mode - restart the SMTP dialog
+-        QByteArray ehlo("EHLO " + localName());
++        QByteArray ehlo("EHLO " + localName(transport->socket().localAddress()));
+         sendCommand(ehlo);
+         status = Helo;
+     }
+@@ -460,7 +463,7 @@ void SmtpClient::nextAction(const QString &response)
+             capabilities.clear();
+ 
+             // We need to know if extensions are supported
+-            QByteArray ehlo("EHLO " + localName());
++            QByteArray ehlo("EHLO " + localName(transport->socket().localAddress()));
+             sendCommand(ehlo);
+             status = Helo;
+         } else {
+@@ -472,7 +475,7 @@ void SmtpClient::nextAction(const QString &response)
+     {
+         if (responseCode == 500) {
+             // EHLO is not implemented by this server - fallback to HELO
+-            QByteArray ehlo("HELO " + localName());
++            QByteArray ehlo("HELO " + localName(transport->socket().localAddress()));
+             sendCommand(ehlo);
+         } else if (responseCode == 250) {
+             if (domainName.isEmpty()) {
+@@ -703,7 +706,7 @@ void SmtpClient::nextAction(const QString &response)
+                     operationFailed(QMailServiceAction::Status::ErrConfiguration, response);
+                 }
+                 // Restart the authentication process
+-                QByteArray ehlo("EHLO " + localName());
++                QByteArray ehlo("EHLO " + localName(transport->socket().localAddress()));
+                 sendCommand(ehlo);
+                 status = Helo;
+             } else {
+-- 
+2.21.0
+
