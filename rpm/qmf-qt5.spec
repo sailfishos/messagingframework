@@ -46,6 +46,7 @@ Patch15: 0015-Check-if-IDLE-connection-needs-to-be-established-aft.patch
 Patch16: 0016-Revert-Fix-bundled-zlib-detection.patch
 Patch17: 0017-Add-signature-settings-in-account.patch
 Patch18: 0018-Use-socket-s-local-address-for-HELO-and-EHLO-message.patch
+Patch19: 0019-Use-EightBit-encoding-instead-of-Base64-for-text-typ.patch
 
 %description
 The Qt Messaging Framework, QMF, consists of a C++ library and daemon server
@@ -169,6 +170,7 @@ This package contains the tests for Qt Messaging Framework (QMF).
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
+%patch19 -p1
 
 %build
 
