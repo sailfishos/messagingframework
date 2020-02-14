@@ -1,0 +1,159 @@
+From e3cb15294cb3ec8a2d127b50cc3d9e79839ae2c7 Mon Sep 17 00:00:00 2001
+From: Damien Caliste <dcaliste@free.fr>
+Date: Fri, 24 Jan 2020 16:28:37 +0100
+Subject: [PATCH] Follow the synchronizationEnabled flag when folders are not specified
+
+If the synchronizationEnabled flag is set to false, a variety
+of strategy, like search, folder listing, will not search in
+such folders. This is maybe a too restrictive usage of this
+flag. This patch change the behavior of this flag to act on
+synchronization strategies only, when desired.
+
+It activates it only for message retrieval in all folders.
+
+Change-Id: Iebec872984c7e2650167ae585b06bfa3d8cd6990
+---
+
+diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
+index eca22f7..339d44e 100644
+--- a/src/plugins/messageservices/imap/imapservice.cpp
++++ b/src/plugins/messageservices/imap/imapservice.cpp
+@@ -213,6 +213,7 @@
+     _service->_client->strategyContext()->foldersOnlyStrategy.setBase(folderId);
+     _service->_client->strategyContext()->foldersOnlyStrategy.setQuickList(!folderId.isValid());
+     _service->_client->strategyContext()->foldersOnlyStrategy.setDescending(descending);
++    _service->_client->strategyContext()->foldersOnlyStrategy.setIgnoreSyncFlag(true);
+     appendStrategy(&_service->_client->strategyContext()->foldersOnlyStrategy);
+     if(!_unavailable)
+         return initiateStrategy();
+@@ -304,6 +305,7 @@
+ 
+     _service->_client->strategyContext()->retrieveMessageListStrategy.setOperation(_service->_client->strategyContext(), QMailRetrievalAction::Auto);
+     _service->_client->strategyContext()->retrieveMessageListStrategy.selectedFoldersAppend(folderIds);
++    _service->_client->strategyContext()->retrieveMessageListStrategy.setIgnoreSyncFlag(!_folderIds.isEmpty());
+     appendStrategy(&_service->_client->strategyContext()->retrieveMessageListStrategy);
+     if(!_unavailable)
+         return initiateStrategy();
+@@ -496,6 +498,7 @@
+     _service->_client->strategyContext()->retrieveAllStrategy.setQuickList(false);
+     _service->_client->strategyContext()->retrieveAllStrategy.setDescending(true);
+     _service->_client->strategyContext()->retrieveAllStrategy.setOperation(_service->_client->strategyContext(), QMailRetrievalAction::Auto);
++    _service->_client->strategyContext()->retrieveAllStrategy.setIgnoreSyncFlag(false);
+     appendStrategy(&_service->_client->strategyContext()->retrieveAllStrategy);
+     if(!_unavailable)
+         return initiateStrategy();
+@@ -571,6 +574,7 @@
+     _service->_client->strategyContext()->synchronizeAccountStrategy.setQuickList(false);
+     _service->_client->strategyContext()->synchronizeAccountStrategy.setDescending(true);
+     _service->_client->strategyContext()->synchronizeAccountStrategy.setOperation(_service->_client->strategyContext(), QMailRetrievalAction::Auto);
++    _service->_client->strategyContext()->synchronizeAccountStrategy.setIgnoreSyncFlag(false);
+     appendStrategy(&_service->_client->strategyContext()->synchronizeAccountStrategy);
+     if(!_unavailable)
+         return initiateStrategy();
+diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
+index 916afdf..142fd0c 100644
+--- a/src/plugins/messageservices/imap/imapstrategy.cpp
++++ b/src/plugins/messageservices/imap/imapstrategy.cpp
+@@ -2208,15 +2208,13 @@
+ 
+ bool ImapFolderListStrategy::nextFolder()
+ {
+-    while (!_mailboxIds.isEmpty()) {
++    if (!_mailboxIds.isEmpty()) {
+         QMailFolderId folderId(_mailboxIds.takeFirst());
+ 
+         // Process this folder
+         setCurrentMailbox(folderId);
+ 
+-        // Bypass any folder for which synchronization is disabled
+-        if (synchronizationEnabled(_currentMailbox))
+-            return true;
++        return true;
+     }
+ 
+     return false;
+@@ -2233,11 +2231,6 @@
+     context->progressChanged(++_processed, _processable);
+ }
+ 
+-bool ImapFolderListStrategy::synchronizationEnabled(const QMailFolder &folder) const 
+-{
+-    return folder.status() & QMailFolder::SynchronizationEnabled;
+-}
+-
+ void ImapFolderListStrategy::folderListCompleted(ImapStrategyContextBase *context)
+ {
+     // We have retrieved all the folders - process any messages
+@@ -2369,6 +2362,27 @@
+     }
+ }
+ 
++void ImapSynchronizeBaseStrategy::setIgnoreSyncFlag(bool ignoreSyncFlag)
++{
++    _ignoreSyncFlag = ignoreSyncFlag;
++}
++
++bool ImapSynchronizeBaseStrategy::synchronizationEnabled(const QMailFolder &folder) const
++{
++    return _ignoreSyncFlag || (folder.status() & QMailFolder::SynchronizationEnabled);
++}
++
++bool ImapSynchronizeBaseStrategy::nextFolder()
++{
++    while (ImapFolderListStrategy::nextFolder()) {
++        // Bypass any folder for which synchronization is disabled
++        if (synchronizationEnabled(_currentMailbox))
++            return true;
++    }
++
++    return false;
++}
++
+ bool ImapSynchronizeBaseStrategy::selectNextPreviewFolder(ImapStrategyContextBase *context)
+ {
+     if (_retrieveUids.isEmpty()) {
+diff --git a/src/plugins/messageservices/imap/imapstrategy.h b/src/plugins/messageservices/imap/imapstrategy.h
+index 1f418e4..260fd58 100644
+--- a/src/plugins/messageservices/imap/imapstrategy.h
++++ b/src/plugins/messageservices/imap/imapstrategy.h
+@@ -396,7 +396,6 @@
+     virtual void processNextFolder(ImapStrategyContextBase *context);
+     virtual bool nextFolder();
+     virtual void processFolder(ImapStrategyContextBase *context);
+-    virtual bool synchronizationEnabled(const QMailFolder &folder) const;
+ 
+     void updateUndiscoveredCount(ImapStrategyContextBase *context);
+ 
+@@ -457,19 +456,23 @@
+ class ImapSynchronizeBaseStrategy : public ImapFolderListStrategy 
+ {
+ public:
+-    ImapSynchronizeBaseStrategy() {}
++    ImapSynchronizeBaseStrategy() : _ignoreSyncFlag(false) {}
+     virtual ~ImapSynchronizeBaseStrategy() {}
+ 
+     virtual void newConnection(ImapStrategyContextBase *context);
+     
+     virtual bool messageFetched(ImapStrategyContextBase *context, QMailMessage &message);
+     virtual void messageFlushed(ImapStrategyContextBase *context, QMailMessage &message);
++    virtual void setIgnoreSyncFlag(bool ignoreSyncFlag);
+ 
+ protected:
+     virtual void handleLogin(ImapStrategyContextBase *context);
+     virtual void handleSelect(ImapStrategyContextBase *context);
+     virtual void handleUidFetch(ImapStrategyContextBase *context);
+ 
++    virtual bool nextFolder();
++    virtual bool synchronizationEnabled(const QMailFolder &folder) const;
++
+     virtual void previewDiscoveredMessages(ImapStrategyContextBase *context);
+     virtual bool selectNextPreviewFolder(ImapStrategyContextBase *context);
+ 
+@@ -486,6 +489,7 @@
+     int _outstandingPreviews;
+ 
+ private:
++    bool _ignoreSyncFlag;
+     uint _progress;
+     uint _total;
+ };
