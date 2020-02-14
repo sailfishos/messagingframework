@@ -48,6 +48,7 @@ Patch17: 0017-Add-signature-settings-in-account.patch
 Patch18: 0018-Use-socket-s-local-address-for-HELO-and-EHLO-message.patch
 Patch19: 0019-Use-EightBit-encoding-instead-of-Base64-for-text-typ.patch
 Patch20: 0020-Follow-the-synchronizationEnabled-flag-when-folders.patch
+Patch21: 0021-Set-new-IMAP-folders-to-inherit-SynchronizationEnab.patch
 
 %description
 The Qt Messaging Framework, QMF, consists of a C++ library and daemon server
@@ -173,6 +174,7 @@ This package contains the tests for Qt Messaging Framework (QMF).
 %patch18 -p1
 %patch19 -p1
 %patch20 -p1
+%patch21 -p1
 
 %build
 
