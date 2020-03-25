@@ -7,6 +7,7 @@ License:    LGPLv2.1 with exception or GPLv3
 URL:        http://qt.gitorious.org/qt-labs/messagingframework
 Source0:    %{name}-%{version}.tar.bz2
 Source1:    %{name}.privileges
+Source2:    qmf-accountscheck.privileges
 Requires:   systemd-user-session-targets
 BuildRequires:  pkgconfig(zlib)
 BuildRequires:  pkgconfig(icu-i18n)
@@ -49,6 +50,7 @@ Patch18: 0018-Use-socket-s-local-address-for-HELO-and-EHLO-message.patch
 Patch19: 0019-Use-EightBit-encoding-instead-of-Base64-for-text-typ.patch
 Patch20: 0020-Follow-the-synchronizationEnabled-flag-when-folders.patch
 Patch21: 0021-Set-new-IMAP-folders-to-inherit-SynchronizationEnab.patch
+Patch22: 0022-Set-qmf-accountscheck-to-be-run-by-the-booster.patch
 
 %description
 The Qt Messaging Framework, QMF, consists of a C++ library and daemon server
@@ -175,6 +177,7 @@ This package contains the tests for Qt Messaging Framework (QMF).
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
+%patch22 -p1
 
 %build
 
@@ -205,6 +208,7 @@ ln -sf ../messageserver5-accounts-check.service "$UNIT_DIR/messageserver5-accoun
 
 mkdir -p %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 install -m 644 -p %{SOURCE1} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
+install -m 644 -p %{SOURCE2} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 
 %fdupes  %{buildroot}/%{_includedir}
 
