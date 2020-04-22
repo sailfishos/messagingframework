@@ -154,30 +154,7 @@ This package contains the tests for Qt Messaging Framework (QMF).
 
 
 %prep
-%setup -q -n %{name}-%{version}/upstream
-
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
-%patch17 -p1
-%patch18 -p1
-%patch19 -p1
-%patch20 -p1
-%patch21 -p1
-%patch22 -p1
+%autosetup -p1 -n %{name}-%{version}/upstream
 
 %build
 
