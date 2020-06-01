@@ -2,9 +2,8 @@ Name: qmf-qt5
 Summary:    Qt Messaging Framework (QMF) Qt5
 Version:    4.0.4+git63
 Release:    1
-Group:      System/Libraries
 License:    LGPLv2.1 with exception or GPLv3
-URL:        http://qt.gitorious.org/qt-labs/messagingframework
+URL:        https://code.qt.io/qt-labs/messagingframework.git
 Source0:    %{name}-%{version}.tar.bz2
 Source1:    %{name}.privileges
 Source2:    qmf-accountscheck.privileges
@@ -27,6 +26,7 @@ BuildRequires:  qt5-plugin-platform-minimal
 BuildRequires:  qt5-plugin-sqldriver-sqlite
 BuildRequires:  fdupes
 BuildRequires:  gpgme-devel
+BuildRequires:  systemd
 Requires:       buteo-syncfw-qt5 >= 0.7.16 
 
 Patch1: 0001-Stop-_incomingDataTimer-when-imapprotocol-object-is-.patch
@@ -60,7 +60,6 @@ that interacts with email and mail servers.
 
 %package devel
 Summary:    Qt Messaging Framework (QMF) Qt5 - development files
-Group:      Development/Libraries
 Requires:   libqmfmessageserver1-qt5 = %{version}
 Requires:   libqmfclient1-qt5 = %{version}
 # depending packages get linkage to following which doesn't work without .so files
@@ -85,7 +84,6 @@ using Qt Messaging Framework libraries.
 
 %package -n libqmfmessageserver1-qt5
 Summary:    Qt Messaging Framework (QMF) message server support library
-Group:      System/Libraries
 Requires:   qt5-qtsql
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
@@ -110,7 +108,6 @@ This package contains:
 
 %package -n libqmfclient1-qt5
 Summary:    Qt Messaging Framework (QMF) client library
-Group:      System/Libraries
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
@@ -142,7 +139,6 @@ This package contains the cryptographic plugins for email signing
 %if 0
 %package tests
 Summary:    Qt Messaging Framework (QMF) tests
-Group:      System/X11
 
 %description tests
 The Qt Messaging Framework, QMF, consists of a C++ library and daemon server
@@ -201,7 +197,7 @@ make %{?_smp_mflags}
 %install
 rm -rf %{buildroot}
 %qmake5_install
-UNIT_DIR=%{buildroot}%{_libdir}/systemd/user/user-session.target.wants
+UNIT_DIR=%{buildroot}%{_userunitdir}/user-session.target.wants
 mkdir -p "$UNIT_DIR"
 ln -sf ../messageserver5.service "$UNIT_DIR/messageserver5.service"
 ln -sf ../messageserver5-accounts-check.service "$UNIT_DIR/messageserver5-accounts-check.service"
@@ -246,8 +242,8 @@ install -m 644 -p %{SOURCE2} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 %{_datadir}/mapplauncherd/privileges.d/*
 %{_libdir}/libQmfMessageServer.so.*
 %{_libdir}/qt5/plugins/messageservices
-%{_libdir}/systemd/user/*.service
-%{_libdir}/systemd/user/user-session.target.wants/*.service
+%{_userunitdir}/*.service
+%{_userunitdir}/user-session.target.wants/*.service
 
 %files -n libqmfclient1-qt5
 %defattr(-,root,root,-)
