@@ -27,6 +27,7 @@ BuildRequires:  qt5-plugin-sqldriver-sqlite
 BuildRequires:  fdupes
 BuildRequires:  gpgme-devel
 BuildRequires:  systemd
+Requires:       qt5-plugin-platform-minimal
 Requires:       buteo-syncfw-qt5 >= 0.7.16 
 
 Patch1: 0001-Stop-_incomingDataTimer-when-imapprotocol-object-is-.patch
