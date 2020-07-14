@@ -53,6 +53,7 @@ Patch20: 0020-Follow-the-synchronizationEnabled-flag-when-folders.patch
 Patch21: 0021-Set-new-IMAP-folders-to-inherit-SynchronizationEnab.patch
 Patch22: 0022-Set-qmf-accountscheck-to-be-run-by-the-booster.patch
 Patch23: 0023-Retrieve-message-lists-based-on-the-folder-sync-poli.patch
+Patch24: 0024-Apply-folder-policy-to-always-on-connection.patch
 
 %description
 The Qt Messaging Framework, QMF, consists of a C++ library and daemon server
