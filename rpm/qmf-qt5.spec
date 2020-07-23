@@ -27,7 +27,6 @@ BuildRequires:  qt5-plugin-sqldriver-sqlite
 BuildRequires:  fdupes
 BuildRequires:  gpgme-devel
 BuildRequires:  systemd
-Requires:       qt5-plugin-platform-minimal
 Requires:       buteo-syncfw-qt5 >= 0.7.16 
 
 Patch1: 0001-Stop-_incomingDataTimer-when-imapprotocol-object-is-.patch
@@ -88,6 +87,7 @@ using Qt Messaging Framework libraries.
 %package -n libqmfmessageserver1-qt5
 Summary:    Qt Messaging Framework (QMF) message server support library
 Requires:   qt5-qtsql
+Requires:   qt5-plugin-platform-minimal
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
