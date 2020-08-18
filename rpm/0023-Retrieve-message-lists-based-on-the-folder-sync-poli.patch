@@ -1,7 +1,7 @@
-From 315a8a1c60150145a42c21023095e878bc1f4a9b Mon Sep 17 00:00:00 2001
+From 0e6d9553c4306e1129a510c1a27d968daaa11eac Mon Sep 17 00:00:00 2001
 From: David Llewellyn-Jones <david.llewellyn-jones@jolla.com>
 Date: Wed, 8 Jul 2020 15:51:08 +0000
-Subject: [PATCH] Retrieve message lists based on the folder sync policy
+Subject: [PATCH 23/24] Retrieve message lists based on the folder sync policy
 
 Uses the folder sync policy extracted from the account and applies it
 when downloading messages from different folders.
@@ -172,7 +172,7 @@ index 3d083d0f..fea94c53 100644
  #endif
  
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 86b88a2c..71664b84 100644
+index 86b88a2c..3050abb3 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -228,7 +228,7 @@ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, co
@@ -212,7 +212,7 @@ index 86b88a2c..71664b84 100644
      _service->_client->strategyContext()->retrieveMessageListStrategy.setOperation(_service->_client->strategyContext(), QMailRetrievalAction::Auto);
      _service->_client->strategyContext()->retrieveMessageListStrategy.selectedFoldersAppend(folderIds);
 -    _service->_client->strategyContext()->retrieveMessageListStrategy.setIgnoreSyncFlag(!_folderIds.isEmpty());
-+    _service->_client->strategyContext()->retrieveMessageListStrategy.setFolderSyncPolicy(folderSyncPolicy);
++    _service->_client->strategyContext()->retrieveMessageListStrategy.setFolderSyncPolicy(_folderIds.isEmpty() ? folderSyncPolicy : QMailAccount::SyncEverything);
      appendStrategy(&_service->_client->strategyContext()->retrieveMessageListStrategy);
      if(!_unavailable)
          return initiateStrategy();
@@ -384,5 +384,5 @@ index 3b8663a7..7b6492ab 100644
      _service->_client.newConnection();
      _unavailable = true;
 -- 
-2.26.2
+2.17.1
 

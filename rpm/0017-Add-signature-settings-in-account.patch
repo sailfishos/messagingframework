@@ -1,16 +1,16 @@
-From 06256765a2a6e22f00aa2cbdfcd2be7c37555a34 Mon Sep 17 00:00:00 2001
+From 5aa26215ddcb4764fed2726369bb3f9c6b70a372 Mon Sep 17 00:00:00 2001
 From: Damien Caliste <dcaliste@free.fr>
 Date: Mon, 5 Nov 2018 16:11:29 +0100
-Subject: [PATCH 17/17] Add signature settings in account
+Subject: [PATCH 17/24] Add signature settings in account
 
 ---
- src/libraries/qmfclient/qmailaccount.cpp | 48 ++++++++++++++++++++++++++++++++
- src/libraries/qmfclient/qmailaccount.h   |  6 ++++
- src/libraries/qmfclient/qmailstore_p.cpp | 18 ++++++++++++
+ src/libraries/qmfclient/qmailaccount.cpp | 48 ++++++++++++++++++++++++
+ src/libraries/qmfclient/qmailaccount.h   |  6 +++
+ src/libraries/qmfclient/qmailstore_p.cpp | 18 +++++++++
  3 files changed, 72 insertions(+)
 
 diff --git a/src/libraries/qmfclient/qmailaccount.cpp b/src/libraries/qmfclient/qmailaccount.cpp
-index 8579636..b477e90 100644
+index 85796363..b477e907 100644
 --- a/src/libraries/qmfclient/qmailaccount.cpp
 +++ b/src/libraries/qmfclient/qmailaccount.cpp
 @@ -61,6 +61,7 @@ static quint64 canCreateFoldersFlag = 0;
@@ -38,10 +38,11 @@ index 8579636..b477e90 100644
  
  /*!
      Creates an uninitialised account object.
-@@ -480,6 +484,50 @@ void QMailAccount::setSignature(const QString &str)
+@@ -479,6 +483,50 @@ void QMailAccount::setSignature(const QString &str)
+     d->_signature = str;
  }
  
- /*!
++/*!
 +    Returns an id list configured for the account. These ids should be used to
 +    numericaly sign an outgoing mail of this account.
 +
@@ -85,12 +86,11 @@ index 8579636..b477e90 100644
 +    d->_cryptoSignatureType = type;
 +}
 +
-+/*!
+ /*!
      Returns the time the account was last succesfully synchronized.
      
-     Should be updated by QMailRetrievalAction::retrieveMessageList() when an account is synchronized.
 diff --git a/src/libraries/qmfclient/qmailaccount.h b/src/libraries/qmfclient/qmailaccount.h
-index 8ba3efa..9306dd9 100644
+index 8ba3efa9..9306dd9c 100644
 --- a/src/libraries/qmfclient/qmailaccount.h
 +++ b/src/libraries/qmfclient/qmailaccount.h
 @@ -77,6 +77,7 @@ public:
@@ -114,7 +114,7 @@ index 8ba3efa..9306dd9 100644
      void setLastSynchronized(const QMailTimeStamp &synced);
  
 diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
-index 599b573..bf7331e 100644
+index ab509afd..a6913276 100644
 --- a/src/libraries/qmfclient/qmailstore_p.cpp
 +++ b/src/libraries/qmfclient/qmailstore_p.cpp
 @@ -2671,6 +2671,10 @@ bool SSOAccountSatisfyTheProperty(Accounts::Account* ssoAccount, const QMailAcco
@@ -128,7 +128,7 @@ index 599b573..bf7331e 100644
              bool hasPersistentConnection = ssoAccount->valueAsBool("hasPersistentConnection", false);
              status &= (~QMailAccount::HasPersistentConnection);
              status |= hasPersistentConnection?(QMailAccount::HasPersistentConnection):0;
-@@ -3224,6 +3228,8 @@ bool QMailStorePrivate::initStore()
+@@ -3223,6 +3227,8 @@ bool QMailStorePrivate::initStore()
                                              63, true, const_cast<quint64 *>(&QMailMessage::Todo), t, false)
                  || attemptRegisterStatusBit(QLatin1String("HasSignature"), QLatin1String("messagestatus"),
                                              63, true, const_cast<quint64 *>(&QMailMessage::HasSignature), t, false)
@@ -137,7 +137,7 @@ index 599b573..bf7331e 100644
                  || attemptRegisterStatusBit(QLatin1String("NoNotification"), QLatin1String("messagestatus"),
                                              63, true, const_cast<quint64 *>(&QMailMessage::NoNotification), t, false);
  
-@@ -3717,17 +3723,21 @@ QMailAccount QMailStorePrivate::extractAccount(const QSharedPointer<Accounts::Ac
+@@ -3718,17 +3724,21 @@ QMailAccount QMailStorePrivate::extractAccount(const QSharedPointer<Accounts::Ac
      const bool& canTransmit = ssoAccount->valueAsBool("canTransmit", true);
      const bool& appendSignature = ssoAccount->valueAsBool("signatureEnabled", true);
      const bool& hasPersistentConnection = ssoAccount->valueAsBool("hasPersistentConnection", false);
@@ -159,7 +159,7 @@ index 599b573..bf7331e 100644
  
      if ((static_cast<uint>(ssoAccount->valueAsUInt64("lastSynchronized"))) == 0) {
              result.setLastSynchronized(QMailTimeStamp());
-@@ -6229,7 +6239,11 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddAccount(QMailAccou
+@@ -6230,7 +6240,11 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddAccount(QMailAccou
      ssoAccount->setValue("signatureEnabled", appendSignature);
      const bool hasPersistentConnection = (account->status() & QMailAccount::HasPersistentConnection);
      ssoAccount->setValue("hasPersistentConnection", hasPersistentConnection);
@@ -171,7 +171,7 @@ index 599b573..bf7331e 100644
      ssoAccount->setValue("emailaddress", account->fromAddress().address());
      ssoAccount->setValue("fullName", account->fromAddress().name());
      //Account was never synced
-@@ -7033,7 +7047,11 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
+@@ -7034,7 +7048,11 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
          ssoAccount->setValue("signatureEnabled", signatureEnabled);
          bool hasPersistentConnection = account->status() & QMailAccount::HasPersistentConnection;
          ssoAccount->setValue("hasPersistentConnection", hasPersistentConnection);
@@ -184,5 +184,5 @@ index 599b573..bf7331e 100644
          ssoAccount->setValue("fullName", account->fromAddress().name());
          if (account->lastSynchronized().isValid()) {
 -- 
-1.8.3-rc3
+2.17.1
 

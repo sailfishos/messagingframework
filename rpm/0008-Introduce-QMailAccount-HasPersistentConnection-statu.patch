@@ -1,7 +1,7 @@
-From 3b543f7c23c2906669d1041419a2e8094c8c8ea3 Mon Sep 17 00:00:00 2001
+From 1c8ac90c0760b5ea00d5f5625dab35e7f4957b80 Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
 Date: Mon, 13 Aug 2018 17:24:36 +0300
-Subject: [PATCH 08/17] Introduce QMailAccount::HasPersistentConnection status
+Subject: [PATCH 08/24] Introduce QMailAccount::HasPersistentConnection status
  flag
 
 Use QMailAccount::HasPersistentConnection status flag for IMAP idle instead of
@@ -13,7 +13,7 @@ keepalive(less state transitions).
  1 file changed, 10 insertions(+)
 
 diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
-index f352b1d..599b573 100644
+index 221fa7c5..ab509afd 100644
 --- a/src/libraries/qmfclient/qmailstore_p.cpp
 +++ b/src/libraries/qmfclient/qmailstore_p.cpp
 @@ -2671,6 +2671,10 @@ bool SSOAccountSatisfyTheProperty(Accounts::Account* ssoAccount, const QMailAcco
@@ -27,7 +27,7 @@ index f352b1d..599b573 100644
              return SSOAccountCompareProperty<quint64>(ssoAccount,
                                                        status,
                                                        argument.op, argument.valueList);
-@@ -3712,11 +3716,13 @@ QMailAccount QMailStorePrivate::extractAccount(const QSharedPointer<Accounts::Ac
+@@ -3713,11 +3717,13 @@ QMailAccount QMailStorePrivate::extractAccount(const QSharedPointer<Accounts::Ac
      const bool& isDefault = ssoAccount->valueAsBool("email/default");
      const bool& canTransmit = ssoAccount->valueAsBool("canTransmit", true);
      const bool& appendSignature = ssoAccount->valueAsBool("signatureEnabled", true);
@@ -41,7 +41,7 @@ index f352b1d..599b573 100644
  
      result.setSignature(ssoAccount->valueAsString("signature"));
      result.setFromAddress(ssoAccount->contains("fullName")?
-@@ -6221,6 +6227,8 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddAccount(QMailAccou
+@@ -6222,6 +6228,8 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddAccount(QMailAccou
      ssoAccount->setValue("status", account->status());
      const bool appendSignature = (account->status() & QMailAccount::AppendSignature);
      ssoAccount->setValue("signatureEnabled", appendSignature);
@@ -50,7 +50,7 @@ index f352b1d..599b573 100644
      ssoAccount->setValue("signature", account->signature());
      ssoAccount->setValue("emailaddress", account->fromAddress().address());
      ssoAccount->setValue("fullName", account->fromAddress().name());
-@@ -7023,6 +7031,8 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
+@@ -7024,6 +7032,8 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
          ssoAccount->setValue("status", account->status());
          bool signatureEnabled = account->status() & QMailAccount::AppendSignature;
          ssoAccount->setValue("signatureEnabled", signatureEnabled);
@@ -60,5 +60,5 @@ index f352b1d..599b573 100644
          ssoAccount->setValue("emailaddress", account->fromAddress().address());
          ssoAccount->setValue("fullName", account->fromAddress().name());
 -- 
-1.8.3-rc3
+2.17.1
 

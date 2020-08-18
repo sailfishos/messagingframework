@@ -1,7 +1,7 @@
-From 6648e72b7db42dac51468c5225d89b2691019572 Mon Sep 17 00:00:00 2001
+From b315ca2e5901c4a139e99ebc2ef198ded1a1c227 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Tomi=20Lepp=C3=A4nen?= <tomi.leppanen@jolla.com>
 Date: Mon, 30 Sep 2019 14:11:57 +0300
-Subject: [PATCH] Use EightBit encoding instead of Base64 for text types
+Subject: [PATCH 19/24] Use EightBit encoding instead of Base64 for text types
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -33,5 +33,5 @@ index 71491f1a..d7678678 100644
              addedSome = true;
          }
 -- 
-2.21.0
+2.17.1
 

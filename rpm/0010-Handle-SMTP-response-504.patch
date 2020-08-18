@@ -1,22 +1,22 @@
-From c63f681dd192b2bbf8d3cd28b77170a837f3e7bc Mon Sep 17 00:00:00 2001
+From 44a6bb349ec2682372242a25bce9ac5f5ada4a49 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Wed, 17 Dec 2014 17:16:45 +0000
-Subject: [PATCH 10/17] Handle SMTP response 504.
+Subject: [PATCH 10/24] Handle SMTP response 504.
 
 Handle SMTP response 504 and reset auth method if auth from caps is
 enabled.
 ---
- src/libraries/qmfclient/ssosessionmanager.cpp      |  2 +-
- .../qmfmessageserver/qmailauthenticator.cpp        |  2 +-
- .../qmfmessageserver/qmailauthenticator.h          |  2 +-
- .../messageservices/imap/imapauthenticator.cpp     | 50 +++++++++++-----------
- .../messageservices/smtp/smtpauthenticator.cpp     | 49 +++++++++++----------
- src/plugins/messageservices/smtp/smtpclient.cpp    | 28 ++++++++++--
- src/plugins/messageservices/smtp/smtpclient.h      |  1 +
+ src/libraries/qmfclient/ssosessionmanager.cpp |  2 +-
+ .../qmfmessageserver/qmailauthenticator.cpp   |  2 +-
+ .../qmfmessageserver/qmailauthenticator.h     |  2 +-
+ .../imap/imapauthenticator.cpp                | 50 +++++++++----------
+ .../smtp/smtpauthenticator.cpp                | 49 +++++++++---------
+ .../messageservices/smtp/smtpclient.cpp       | 28 +++++++++--
+ src/plugins/messageservices/smtp/smtpclient.h |  1 +
  7 files changed, 77 insertions(+), 57 deletions(-)
 
 diff --git a/src/libraries/qmfclient/ssosessionmanager.cpp b/src/libraries/qmfclient/ssosessionmanager.cpp
-index edb467d..dd469ae 100644
+index edb467d1..dd469aec 100644
 --- a/src/libraries/qmfclient/ssosessionmanager.cpp
 +++ b/src/libraries/qmfclient/ssosessionmanager.cpp
 @@ -113,7 +113,7 @@ void SSOSessionManager::cancel()
@@ -29,7 +29,7 @@ index edb467d..dd469ae 100644
      Returns true if the account has one email service enabled and a valid identity stored
      in ths accounts-sso database, otherwise returns false.
 diff --git a/src/libraries/qmfmessageserver/qmailauthenticator.cpp b/src/libraries/qmfmessageserver/qmailauthenticator.cpp
-index 373bcf2..0827ab5 100644
+index 373bcf21..0827ab58 100644
 --- a/src/libraries/qmfmessageserver/qmailauthenticator.cpp
 +++ b/src/libraries/qmfmessageserver/qmailauthenticator.cpp
 @@ -131,7 +131,7 @@ QByteArray QMailAuthenticator::getAuthentication(const QMailAccountConfiguration
@@ -42,7 +42,7 @@ index 373bcf2..0827ab5 100644
      QMailServiceConfiguration configuration(svcCfg);
      if (!configuration.value("smtpusername").isEmpty() && authType == QMail::CramMd5Mechanism) {
 diff --git a/src/libraries/qmfmessageserver/qmailauthenticator.h b/src/libraries/qmfmessageserver/qmailauthenticator.h
-index 3891139..04ded03 100644
+index 3891139d..04ded033 100644
 --- a/src/libraries/qmfmessageserver/qmailauthenticator.h
 +++ b/src/libraries/qmfmessageserver/qmailauthenticator.h
 @@ -46,7 +46,7 @@ public:
@@ -55,7 +55,7 @@ index 3891139..04ded03 100644
      static QByteArray getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge);
  #endif
 diff --git a/src/plugins/messageservices/imap/imapauthenticator.cpp b/src/plugins/messageservices/imap/imapauthenticator.cpp
-index 38dd4d9..46de9f4 100644
+index 38dd4d9f..46de9f49 100644
 --- a/src/plugins/messageservices/imap/imapauthenticator.cpp
 +++ b/src/plugins/messageservices/imap/imapauthenticator.cpp
 @@ -109,6 +109,25 @@ static QMail::SaslMechanism authFromCapabilities(const QStringList &capabilities
@@ -139,7 +139,7 @@ index 38dd4d9..46de9f4 100644
              }
          } else {
 diff --git a/src/plugins/messageservices/smtp/smtpauthenticator.cpp b/src/plugins/messageservices/smtp/smtpauthenticator.cpp
-index 8e57a76..100bdc2 100644
+index 8e57a76f..100bdc27 100644
 --- a/src/plugins/messageservices/smtp/smtpauthenticator.cpp
 +++ b/src/plugins/messageservices/smtp/smtpauthenticator.cpp
 @@ -76,6 +76,25 @@ static SmtpConfiguration::AuthType authFromCapabilities(const QStringList &capab
@@ -222,7 +222,7 @@ index 8e57a76..100bdc2 100644
              }
          } else {
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index ba0d5cf..9d8dfbd 100644
+index ba0d5cf0..9d8dfbde 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -112,6 +112,7 @@ SmtpClient::SmtpClient(QObject* parent)
@@ -276,7 +276,7 @@ index ba0d5cf..9d8dfbd 100644
          } else {
  #ifdef USE_ACCOUNTS_QT
 diff --git a/src/plugins/messageservices/smtp/smtpclient.h b/src/plugins/messageservices/smtp/smtpclient.h
-index 1ca218a..96852b2 100644
+index 1ca218a8..96852b2b 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.h
 +++ b/src/plugins/messageservices/smtp/smtpclient.h
 @@ -167,6 +167,7 @@ private:
@@ -288,5 +288,5 @@ index 1ca218a..96852b2 100644
      QTimer *authTimeout;
  
 -- 
-1.8.3-rc3
+2.17.1
 

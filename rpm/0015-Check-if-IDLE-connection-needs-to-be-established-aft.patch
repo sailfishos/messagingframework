@@ -1,7 +1,7 @@
-From 7521af99e6549f2394ec84495f36696b61866c2c Mon Sep 17 00:00:00 2001
+From 1939da8ce6faf3c02d064a64fe571eef783fe3c9 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Mon, 11 May 2015 15:12:07 +0300
-Subject: [PATCH 15/17] Check if IDLE connection needs to be established after
+Subject: [PATCH 15/24] Check if IDLE connection needs to be established after
  login. Fixes JB#28693
 
 Some servers only advertise full capabilities after sucessful login,
@@ -12,7 +12,7 @@ cases.
  1 file changed, 10 insertions(+)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 40bbe54..d78d897 100644
+index 40bbe543..d78d897e 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -800,6 +800,16 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
@@ -33,5 +33,5 @@ index 40bbe54..d78d897 100644
              bool compressCapable(_protocol.capabilities().contains("COMPRESS=DEFLATE", Qt::CaseInsensitive));
              if (!_protocol.encrypted() && QMFALLOWCOMPRESS && compressCapable && !_protocol.compress()) {
 -- 
-1.8.3-rc3
+2.17.1
 
