@@ -1,27 +1,27 @@
-From bd8c9b6476c2ce24179c39b1c7624a0de260627a Mon Sep 17 00:00:00 2001
+From ebfe9142f6b968a53e7796bdce081e36a852db67 Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
 Date: Mon, 13 Aug 2018 15:45:24 +0300
-Subject: [PATCH 02/17] Introduce acceptUntrustedCertificates() configuration.
+Subject: [PATCH 02/24] Introduce acceptUntrustedCertificates() configuration.
 
 ---
- src/libraries/qmfclient/qmailserviceaction.h       |  2 ++
- src/libraries/qmfmessageserver/qmailtransport.cpp  | 29 +++++++++++++++++-----
- src/libraries/qmfmessageserver/qmailtransport.h    |  9 ++++++-
- .../messageservices/imap/imapconfiguration.cpp     | 14 +++++++++++
- .../messageservices/imap/imapconfiguration.h       |  5 ++++
- src/plugins/messageservices/imap/imapprotocol.cpp  | 10 +++++++-
- src/plugins/messageservices/imap/imaptransport.cpp | 15 -----------
- src/plugins/messageservices/imap/imaptransport.h   |  5 ----
- src/plugins/messageservices/pop/popclient.cpp      | 16 ++++++++++++
- .../messageservices/pop/popconfiguration.cpp       | 13 ++++++++++
- src/plugins/messageservices/pop/popconfiguration.h |  5 ++++
- src/plugins/messageservices/smtp/smtpclient.cpp    | 10 ++++++++
- .../messageservices/smtp/smtpconfiguration.cpp     | 10 ++++++++
- .../messageservices/smtp/smtpconfiguration.h       |  2 ++
+ src/libraries/qmfclient/qmailserviceaction.h  |  2 ++
+ .../qmfmessageserver/qmailtransport.cpp       | 29 +++++++++++++++----
+ .../qmfmessageserver/qmailtransport.h         |  9 +++++-
+ .../imap/imapconfiguration.cpp                | 14 +++++++++
+ .../messageservices/imap/imapconfiguration.h  |  5 ++++
+ .../messageservices/imap/imapprotocol.cpp     | 10 ++++++-
+ .../messageservices/imap/imaptransport.cpp    | 15 ----------
+ .../messageservices/imap/imaptransport.h      |  5 ----
+ src/plugins/messageservices/pop/popclient.cpp | 16 ++++++++++
+ .../messageservices/pop/popconfiguration.cpp  | 13 +++++++++
+ .../messageservices/pop/popconfiguration.h    |  5 ++++
+ .../messageservices/smtp/smtpclient.cpp       | 10 +++++++
+ .../smtp/smtpconfiguration.cpp                | 10 +++++++
+ .../messageservices/smtp/smtpconfiguration.h  |  2 ++
  14 files changed, 117 insertions(+), 28 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailserviceaction.h b/src/libraries/qmfclient/qmailserviceaction.h
-index 3f6a142..6ba4020 100644
+index 3f6a1421..6ba4020e 100644
 --- a/src/libraries/qmfclient/qmailserviceaction.h
 +++ b/src/libraries/qmfclient/qmailserviceaction.h
 @@ -99,6 +99,8 @@ public:
@@ -34,7 +34,7 @@ index 3f6a142..6ba4020 100644
          };
  
 diff --git a/src/libraries/qmfmessageserver/qmailtransport.cpp b/src/libraries/qmfmessageserver/qmailtransport.cpp
-index e2699b2..b9d8e52 100644
+index e2699b24..b9d8e52a 100644
 --- a/src/libraries/qmfmessageserver/qmailtransport.cpp
 +++ b/src/libraries/qmfmessageserver/qmailtransport.cpp
 @@ -47,6 +47,7 @@
@@ -102,7 +102,7 @@ index e2699b2..b9d8e52 100644
  
  /*! \internal */
 diff --git a/src/libraries/qmfmessageserver/qmailtransport.h b/src/libraries/qmfmessageserver/qmailtransport.h
-index 9b56ed6..f811366 100644
+index 9b56ed64..f8113661 100644
 --- a/src/libraries/qmfmessageserver/qmailtransport.h
 +++ b/src/libraries/qmfmessageserver/qmailtransport.h
 @@ -35,6 +35,9 @@
@@ -143,7 +143,7 @@ index 9b56ed6..f811366 100644
  
  #endif
 diff --git a/src/plugins/messageservices/imap/imapconfiguration.cpp b/src/plugins/messageservices/imap/imapconfiguration.cpp
-index b4004bd..07289a1 100644
+index b4004bd6..07289a1c 100644
 --- a/src/plugins/messageservices/imap/imapconfiguration.cpp
 +++ b/src/plugins/messageservices/imap/imapconfiguration.cpp
 @@ -198,6 +198,15 @@ void ImapConfiguration::setSearchLimit(int limit)
@@ -175,7 +175,7 @@ index b4004bd..07289a1 100644
  
  void ImapConfigurationEditor::setDeleteMail(bool b)
 diff --git a/src/plugins/messageservices/imap/imapconfiguration.h b/src/plugins/messageservices/imap/imapconfiguration.h
-index f0c0569..69dc8ad 100644
+index f0c0569a..69dc8ad1 100644
 --- a/src/plugins/messageservices/imap/imapconfiguration.h
 +++ b/src/plugins/messageservices/imap/imapconfiguration.h
 @@ -85,6 +85,10 @@ public:
@@ -198,7 +198,7 @@ index f0c0569..69dc8ad 100644
  
      void setDeleteMail(bool b);
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index 984e263..f82df5a 100644
+index 984e2638..f82df5a3 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -3060,10 +3060,18 @@ bool ImapProtocol::open( const ImapConfiguration& config, qint64 bufferSize)
@@ -222,7 +222,7 @@ index 984e263..f82df5a 100644
          qMailLog(IMAP) << objectName() << "Setting read buffer size to" << bufferSize;
          _transport->socket().setReadBufferSize(bufferSize);
 diff --git a/src/plugins/messageservices/imap/imaptransport.cpp b/src/plugins/messageservices/imap/imaptransport.cpp
-index aaa2a97..7bfbea0 100644
+index aaa2a97f..7bfbea06 100644
 --- a/src/plugins/messageservices/imap/imaptransport.cpp
 +++ b/src/plugins/messageservices/imap/imaptransport.cpp
 @@ -317,21 +317,6 @@ void ImapTransport::imapClose()
@@ -248,7 +248,7 @@ index aaa2a97..7bfbea0 100644
  {
  #if 0
 diff --git a/src/plugins/messageservices/imap/imaptransport.h b/src/plugins/messageservices/imap/imaptransport.h
-index a1c5042..50c12e5 100644
+index a1c50426..50c12e51 100644
 --- a/src/plugins/messageservices/imap/imaptransport.h
 +++ b/src/plugins/messageservices/imap/imaptransport.h
 @@ -68,11 +68,6 @@ public:
@@ -264,7 +264,7 @@ index a1c5042..50c12e5 100644
      void test();
  
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index 85ac855..b8aa5c7 100644
+index 85ac8553..b8aa5c7d 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
 @@ -112,6 +112,10 @@ void PopClient::createTransport()
@@ -314,7 +314,7 @@ index 85ac855..b8aa5c7 100644
  }
  
 diff --git a/src/plugins/messageservices/pop/popconfiguration.cpp b/src/plugins/messageservices/pop/popconfiguration.cpp
-index b56dba0..5c6754f 100644
+index b56dba07..5c6754f9 100644
 --- a/src/plugins/messageservices/pop/popconfiguration.cpp
 +++ b/src/plugins/messageservices/pop/popconfiguration.cpp
 @@ -99,6 +99,14 @@ bool PopConfiguration::intervalCheckRoamingEnabled() const
@@ -345,7 +345,7 @@ index b56dba0..5c6754f 100644
  
  void PopConfigurationEditor::setDeleteMail(bool b)
 diff --git a/src/plugins/messageservices/pop/popconfiguration.h b/src/plugins/messageservices/pop/popconfiguration.h
-index 1644faa..fe0119c 100644
+index 1644faad..fe0119c3 100644
 --- a/src/plugins/messageservices/pop/popconfiguration.h
 +++ b/src/plugins/messageservices/pop/popconfiguration.h
 @@ -67,6 +67,10 @@ public:
@@ -368,7 +368,7 @@ index 1644faa..fe0119c 100644
  
      void setDeleteMail(bool b);
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 2789397..9e1e219 100644
+index 27893973..9e1e2198 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -201,10 +201,20 @@ void SmtpClient::newConnection()
@@ -393,7 +393,7 @@ index 2789397..9e1e219 100644
  
  QMailServiceAction::Status::ErrorCode SmtpClient::addMail(const QMailMessage& mail)
 diff --git a/src/plugins/messageservices/smtp/smtpconfiguration.cpp b/src/plugins/messageservices/smtp/smtpconfiguration.cpp
-index e8807cc..23d4394 100644
+index e8807cc7..23d43949 100644
 --- a/src/plugins/messageservices/smtp/smtpconfiguration.cpp
 +++ b/src/plugins/messageservices/smtp/smtpconfiguration.cpp
 @@ -66,6 +66,11 @@ int SmtpConfiguration::smtpPort() const
@@ -421,7 +421,7 @@ index e8807cc..23d4394 100644
  {
      setValue("smtpusername", str);
 diff --git a/src/plugins/messageservices/smtp/smtpconfiguration.h b/src/plugins/messageservices/smtp/smtpconfiguration.h
-index e8b28a6..ed115d5 100644
+index e8b28a6b..ed115d53 100644
 --- a/src/plugins/messageservices/smtp/smtpconfiguration.h
 +++ b/src/plugins/messageservices/smtp/smtpconfiguration.h
 @@ -69,6 +69,7 @@ public:
@@ -441,5 +441,5 @@ index e8b28a6..ed115d5 100644
      void setSmtpPassword(const QString& password);
      void setSmtpAuthentication(int t);
 -- 
-1.8.3-rc3
+2.17.1
 

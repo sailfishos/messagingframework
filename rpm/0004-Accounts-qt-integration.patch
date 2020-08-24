@@ -1,7 +1,7 @@
-From 8efc819f896bd8456418d41d567197dd2abaaa20 Mon Sep 17 00:00:00 2001
+From 0a0fa3662eb6c99bf70994e858eb5380d37a0619 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Wed, 29 May 2013 09:44:20 +0300
-Subject: [PATCH] Accounts-qt integration.
+Subject: [PATCH 04/24] Accounts-qt integration.
 
 Squashed commits, either one line description or block comment:
 
@@ -3658,7 +3658,7 @@ index 771a7a45..b4dc7b32 100644
  
  #endif
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index 4df62a57..6c548ee6 100644
+index f82df5a3..e4e0f0e1 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -559,8 +559,11 @@ class LoginState : public ImapState
@@ -3736,7 +3736,7 @@ index 4df62a57..6c548ee6 100644
      }
  
      return false;
-@@ -3183,11 +3212,19 @@ void ImapProtocol::sendStartTLS()
+@@ -3194,11 +3223,19 @@ void ImapProtocol::sendStartTLS()
      _fsm->setState(&_fsm->startTlsState);
  }
  
@@ -3756,7 +3756,7 @@ index 4df62a57..6c548ee6 100644
  
  void ImapProtocol::sendLogout()
  {
-@@ -3806,7 +3843,7 @@ QString ImapProtocol::quoteString(const QString& input)
+@@ -3817,7 +3854,7 @@ QString ImapProtocol::quoteString(const QString& input)
  
  QByteArray ImapProtocol::quoteString(const QByteArray& input)
  {
@@ -4093,7 +4093,7 @@ index a704ab57..2d1a1040 100644
  
  #endif
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index 85ac8553..3d567135 100644
+index b8aa5c7d..c34e9e89 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
 @@ -76,10 +76,18 @@ PopClient::PopClient(QObject* parent)
@@ -4126,7 +4126,7 @@ index 85ac8553..3d567135 100644
  }
  
  void PopClient::messageBufferFlushed()
-@@ -156,6 +168,7 @@ void PopClient::newConnection()
+@@ -168,6 +180,7 @@ void PopClient::newConnection()
      testing = false;
      pendingDeletes = false;
      lastStatusTimer.start();
@@ -4134,7 +4134,7 @@ index 85ac8553..3d567135 100644
      if (transport && transport->connected()) {
          if (selected) {
              // Re-use the existing connection
-@@ -241,6 +254,24 @@ void PopClient::setAccount(const QMailAccountId &id)
+@@ -257,6 +270,24 @@ void PopClient::setAccount(const QMailAccountId &id)
              qMailLog(POP) <<  "Flags for POP folder" << folder.id() << folder.path() << "updated";
          }
      }
@@ -4159,7 +4159,7 @@ index 85ac8553..3d567135 100644
  }
  
  QMailAccountId PopClient::accountId() const
-@@ -513,12 +544,30 @@ void PopClient::processResponse(const QString &response)
+@@ -529,12 +560,30 @@ void PopClient::processResponse(const QString &response)
      {
          if (response[0] != '+') {
              // Authentication failed
@@ -4190,7 +4190,7 @@ index 85ac8553..3d567135 100644
  
                  if (!response.isEmpty()) {
                      // Send the response as Base64 encoded
-@@ -727,7 +776,11 @@ void PopClient::nextAction()
+@@ -743,7 +792,11 @@ void PopClient::nextAction()
          emit updateStatus(tr("Logging in"));
  
          // Get the login command sequence to use
@@ -4202,7 +4202,7 @@ index 85ac8553..3d567135 100644
  
          nextStatus = Auth;
          nextCommand = authCommands.takeFirst();
-@@ -1224,6 +1277,11 @@ void PopClient::checkForNewMessages()
+@@ -1240,6 +1293,11 @@ void PopClient::checkForNewMessages()
  void PopClient::cancelTransfer(QMailServiceAction::Status::ErrorCode code, const QString &text)
  {
      operationFailed(code, text);
@@ -4214,7 +4214,7 @@ index 85ac8553..3d567135 100644
  }
  
  void PopClient::retrieveOperationCompleted()
-@@ -1321,3 +1379,72 @@ void PopClient::removeAllFromBuffer(QMailMessage *message)
+@@ -1337,3 +1395,72 @@ void PopClient::removeAllFromBuffer(QMailMessage *message)
          _bufferedMessages.remove(i);
      }
  }
@@ -4556,7 +4556,7 @@ index 97300b99..06183262 100644
  
  #endif
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 27893973..7b768e5e 100644
+index 9e1e2198..9d77e6c5 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -113,6 +113,11 @@ SmtpClient::SmtpClient(QObject* parent)
@@ -4629,7 +4629,7 @@ index 27893973..7b768e5e 100644
      SmtpConfiguration smtpCfg(config);
      if ( smtpCfg.smtpServer().isEmpty() ) {
          status = Done;
-@@ -541,6 +576,31 @@ void SmtpClient::nextAction(const QString &response)
+@@ -551,6 +586,31 @@ void SmtpClient::nextAction(const QString &response)
          addressComponent = localAddress.toIPv4Address();
  
          // Find the authentication mode to use
@@ -4661,7 +4661,7 @@ index 27893973..7b768e5e 100644
          QByteArray authCmd(SmtpAuthenticator::getAuthentication(config.serviceConfiguration("smtp"), capabilities));
          if (!authCmd.isEmpty()) {
              sendCommand(authCmd);
-@@ -555,14 +615,50 @@ void SmtpClient::nextAction(const QString &response)
+@@ -565,14 +625,50 @@ void SmtpClient::nextAction(const QString &response)
              status = Authenticated;
              nextAction(QString());
          }
@@ -4712,7 +4712,7 @@ index 27893973..7b768e5e 100644
  
              if (!response.isEmpty()) {
                  // Send the response as Base64 encoded, mask the debug output
-@@ -570,8 +666,9 @@ void SmtpClient::nextAction(const QString &response)
+@@ -580,8 +676,9 @@ void SmtpClient::nextAction(const QString &response)
                  bufferedResponse.clear();
                  return;
              } else {
@@ -4724,7 +4724,7 @@ index 27893973..7b768e5e 100644
              }
          } else if (responseCode == 235) {
              // We are now authenticated
-@@ -580,14 +677,29 @@ void SmtpClient::nextAction(const QString &response)
+@@ -590,14 +687,29 @@ void SmtpClient::nextAction(const QString &response)
          } else if (responseCode == 530) {
              operationFailed(QMailServiceAction::Status::ErrConfiguration, response);
          } else {
@@ -4755,7 +4755,7 @@ index 27893973..7b768e5e 100644
          if (mailItr == mailList.end()) {
              // Nothing to send
              status = Quit;
-@@ -841,6 +953,10 @@ void SmtpClient::nextAction(const QString &response)
+@@ -851,6 +963,10 @@ void SmtpClient::nextAction(const QString &response)
  void SmtpClient::cancelTransfer(QMailServiceAction::Status::ErrorCode code, const QString &text)
  {
      operationFailed(code, text);
@@ -4766,7 +4766,7 @@ index 27893973..7b768e5e 100644
  }
  
  void SmtpClient::messageProcessed(const QMailMessageId &id)
-@@ -995,3 +1111,53 @@ void SmtpClient::stopTransferring()
+@@ -1005,3 +1121,53 @@ void SmtpClient::stopTransferring()
          status = Sent;
      }
  }
@@ -5449,5 +5449,5 @@ index 26719daa..84ca9409 100644
      QMailAccount account3(account1.id());
      QCOMPARE(QMailStore::instance()->lastError(), QMailStore::InvalidId);
 -- 
-2.26.2
+2.17.1
 

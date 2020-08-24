@@ -1,7 +1,7 @@
-From 39a360d49653006e951b96315aa0e4587f9a6fcd Mon Sep 17 00:00:00 2001
+From 5e765286bdcf989f5ba68a3230bd88652e8fce43 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Mon, 23 Feb 2015 13:08:24 +0200
-Subject: [PATCH 01/17] Stop _incomingDataTimer when imapprotocol object is
+Subject: [PATCH 01/24] Stop _incomingDataTimer when imapprotocol object is
  destroyed.
 
 A crash occurs in case the timer is active and the object is destroyed.
@@ -10,7 +10,7 @@ A crash occurs in case the timer is active and the object is destroyed.
  1 file changed, 3 insertions(+)
 
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index 4df62a5..984e263 100644
+index 4df62a57..984e2638 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -3019,6 +3019,9 @@ ImapProtocol::ImapProtocol()
@@ -24,5 +24,5 @@ index 4df62a5..984e263 100644
      delete _fsm;
  }
 -- 
-1.8.3-rc3
+2.17.1
 

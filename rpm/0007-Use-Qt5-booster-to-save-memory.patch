@@ -1,7 +1,7 @@
-From 3daf24239f43d5c5ab28a29f70287851e54d8f5c Mon Sep 17 00:00:00 2001
+From 769280d652f4828cbff7c2d0ece3d6fbbb3cf902 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Mon, 27 Oct 2014 09:49:12 +0200
-Subject: [PATCH 07/17] Use Qt5 booster to save memory.
+Subject: [PATCH 07/24] Use Qt5 booster to save memory.
 
 ---
  src/tools/messageserver/main.cpp          | 2 +-
@@ -10,7 +10,7 @@ Subject: [PATCH 07/17] Use Qt5 booster to save memory.
  3 files changed, 10 insertions(+), 4 deletions(-)
 
 diff --git a/src/tools/messageserver/main.cpp b/src/tools/messageserver/main.cpp
-index 9c10762..d9a35c5 100644
+index 9c107629..d9a35c53 100644
 --- a/src/tools/messageserver/main.cpp
 +++ b/src/tools/messageserver/main.cpp
 @@ -41,7 +41,7 @@
@@ -23,7 +23,7 @@ index 9c10762..d9a35c5 100644
  #ifdef USE_HTML_PARSER
      // Need for html parsing by <QTextdocument> in qmailmessage.cpp, but don't need real UI
 diff --git a/src/tools/messageserver/messageserver.pro b/src/tools/messageserver/messageserver.pro
-index f7d9293..a092b8c 100644
+index f7d92931..a092b8ce 100644
 --- a/src/tools/messageserver/messageserver.pro
 +++ b/src/tools/messageserver/messageserver.pro
 @@ -17,6 +17,12 @@ contains(DEFINES, USE_HTML_PARSER) {
@@ -40,7 +40,7 @@ index f7d9293..a092b8c 100644
  target.path += $$QMF_INSTALL_ROOT/bin
  
 diff --git a/src/tools/systemd/messageserver5.service b/src/tools/systemd/messageserver5.service
-index 0d583d1..a5aa05a 100644
+index 0d583d15..a5aa05a9 100644
 --- a/src/tools/systemd/messageserver5.service
 +++ b/src/tools/systemd/messageserver5.service
 @@ -1,13 +1,13 @@
@@ -61,5 +61,5 @@ index 0d583d1..a5aa05a 100644
  RestartSec=1
  
 -- 
-1.8.3-rc3
+2.17.1
 

@@ -1,14 +1,14 @@
-From 2f315e17d074d9a73c010b77958b22638fb412a5 Mon Sep 17 00:00:00 2001
+From 505f4031f439ba3b42358e2d03d29469a798340f Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Mon, 23 Feb 2015 13:31:30 +0200
-Subject: [PATCH 14/17] Prevent push enabled status to go out of sync.
+Subject: [PATCH 14/24] Prevent push enabled status to go out of sync.
 
 ---
- src/plugins/messageservices/imap/imapservice.cpp | 57 ++++++++++++++----------
+ .../messageservices/imap/imapservice.cpp      | 57 +++++++++++--------
  1 file changed, 33 insertions(+), 24 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 157da85..c8300aa 100644
+index 157da852..c8300aa4 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -65,7 +65,10 @@ QString connectionSettings(ImapConfiguration &config)
@@ -131,5 +131,5 @@ index 157da85..c8300aa 100644
      }
  }
 -- 
-1.8.3-rc3
+2.17.1
 

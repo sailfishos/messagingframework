@@ -1,18 +1,18 @@
-From 11f08173dc746f86d94e8352a8f32dc3d1e44053 Mon Sep 17 00:00:00 2001
+From f96179ba4c01e11f58a2197eb5e2fe6e8266c1c1 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Wed, 10 Sep 2014 14:36:13 +0300
-Subject: [PATCH 06/17] Add keepalive timer to IMAP IDLE service
+Subject: [PATCH 06/24] Add keepalive timer to IMAP IDLE service
 
 This commit introduce a dependency on nemo-keepalive via
 DEFINES+=USE_KEEPALIVE
 ---
- src/plugins/messageservices/imap/imap.pro        |  4 ++++
- src/plugins/messageservices/imap/imapservice.cpp | 23 +++++++++++++++++++++++
- src/plugins/messageservices/imap/imapservice.h   | 11 +++++++++++
+ src/plugins/messageservices/imap/imap.pro     |  4 ++++
+ .../messageservices/imap/imapservice.cpp      | 23 +++++++++++++++++++
+ .../messageservices/imap/imapservice.h        | 11 +++++++++
  3 files changed, 38 insertions(+)
 
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
-index 1c0ae6b..1b5742b 100644
+index 1c0ae6bb..1b5742b4 100644
 --- a/src/plugins/messageservices/imap/imap.pro
 +++ b/src/plugins/messageservices/imap/imap.pro
 @@ -5,6 +5,10 @@ load(qt_plugin)
@@ -27,7 +27,7 @@ index 1c0ae6b..1b5742b 100644
      QT += alignedtimer
  }
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index f132dd0..7cc0085 100644
+index f132dd0d..7cc00856 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -1518,6 +1518,12 @@ ImapService::ImapService(const QMailAccountId &accountId)
@@ -69,7 +69,7 @@ index f132dd0..7cc0085 100644
  class ImapConfigurator : public QMailMessageServiceConfigurator
  {
 diff --git a/src/plugins/messageservices/imap/imapservice.h b/src/plugins/messageservices/imap/imapservice.h
-index 00682a8..b3e8dd9 100644
+index 00682a87..b3e8dd97 100644
 --- a/src/plugins/messageservices/imap/imapservice.h
 +++ b/src/plugins/messageservices/imap/imapservice.h
 @@ -38,6 +38,10 @@
@@ -105,5 +105,5 @@ index 00682a8..b3e8dd9 100644
  
  class ImapServicePlugin : public QMailMessageServicePlugin
 -- 
-1.8.3-rc3
+2.17.1
 

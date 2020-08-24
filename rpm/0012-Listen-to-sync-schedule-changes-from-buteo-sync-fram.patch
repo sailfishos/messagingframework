@@ -1,23 +1,23 @@
-From 3b02bcda8d18d3ebc173588db0e5ac3b4ab464aa Mon Sep 17 00:00:00 2001
+From fdfddcefb80e40927e63c40eeca4058c5f62e698 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Mon, 2 Feb 2015 17:03:21 +0200
-Subject: [PATCH 12/17] Listen to sync schedule changes from buteo sync
+Subject: [PATCH 12/24] Listen to sync schedule changes from buteo sync
  framework.
 
 This commit introduces d-bus listeners inside IMAP4 service to
 react to changes in the account schedule related to always-on mode
 and activate/deactivate IMAP IDLE.
 ---
- src/plugins/messageservices/imap/imap.pro        |   1 +
- src/plugins/messageservices/imap/imapclient.cpp  |  64 ++++++++++---
- src/plugins/messageservices/imap/imapclient.h    |   5 +-
- src/plugins/messageservices/imap/imapservice.cpp | 110 ++++++++++++++++++++---
- src/plugins/messageservices/imap/imapservice.h   |   4 +
- src/tools/systemd/messageserver5.service         |   2 +-
+ src/plugins/messageservices/imap/imap.pro     |   1 +
+ .../messageservices/imap/imapclient.cpp       |  64 ++++++++--
+ src/plugins/messageservices/imap/imapclient.h |   5 +-
+ .../messageservices/imap/imapservice.cpp      | 110 +++++++++++++++---
+ .../messageservices/imap/imapservice.h        |   4 +
+ src/tools/systemd/messageserver5.service      |   2 +-
  6 files changed, 160 insertions(+), 26 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
-index 1b5742b..8a2258b 100644
+index 1b5742b4..8a2258bd 100644
 --- a/src/plugins/messageservices/imap/imap.pro
 +++ b/src/plugins/messageservices/imap/imap.pro
 @@ -7,6 +7,7 @@ QT = core network qmfclient qmfclient-private qmfmessageserver
@@ -29,7 +29,7 @@ index 1b5742b..8a2258b 100644
  
  contains(DEFINES,QT_QMF_USE_ALIGNEDTIMER) {
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 949c254..40bbe54 100644
+index 949c254c..40bbe543 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -447,7 +447,8 @@ ImapClient::ImapClient(QObject* parent)
@@ -196,7 +196,7 @@ index 949c254..40bbe54 100644
 -
  #include "imapclient.moc"
 diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
-index bd4b320..d731165 100644
+index bd4b320f..d7311655 100644
 --- a/src/plugins/messageservices/imap/imapclient.h
 +++ b/src/plugins/messageservices/imap/imapclient.h
 @@ -68,7 +68,6 @@ public:
@@ -233,7 +233,7 @@ index bd4b320..d731165 100644
      QMap<QMailMessageId,QString> detachedTempFiles;
  
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index c5c6118..157da85 100644
+index c5c61189..157da852 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -47,6 +47,12 @@
@@ -432,7 +432,7 @@ index c5c6118..157da85 100644
  
  class ImapConfigurator : public QMailMessageServiceConfigurator
 diff --git a/src/plugins/messageservices/imap/imapservice.h b/src/plugins/messageservices/imap/imapservice.h
-index b3e8dd9..9a28814 100644
+index b3e8dd97..9a28814f 100644
 --- a/src/plugins/messageservices/imap/imapservice.h
 +++ b/src/plugins/messageservices/imap/imapservice.h
 @@ -89,6 +89,8 @@ protected slots:
@@ -454,7 +454,7 @@ index b3e8dd9..9a28814 100644
  };
  
 diff --git a/src/tools/systemd/messageserver5.service b/src/tools/systemd/messageserver5.service
-index a5aa05a..9622d70 100644
+index a5aa05a9..9622d701 100644
 --- a/src/tools/systemd/messageserver5.service
 +++ b/src/tools/systemd/messageserver5.service
 @@ -2,7 +2,7 @@
@@ -467,5 +467,5 @@ index a5aa05a..9622d70 100644
  
  [Service]
 -- 
-1.8.3-rc3
+2.17.1
 

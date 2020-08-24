@@ -29,15 +29,15 @@ BuildRequires:  gpgme-devel
 BuildRequires:  systemd
 Requires:       buteo-syncfw-qt5 >= 0.7.16 
 
-Patch1: 0001-Stop-_incomingDataTimer-when-imapprotocol-object-is-.patch
-Patch2: 0002-Introduce-acceptUntrustedCertificates-configuration.patch
-Patch3: 0003-fix-tests-installation-path.patch
-Patch4: 0004-Accounts-qt-integration.patch
-Patch5: 0005-Start-messageserver-on-system-startup-in-case-there-.patch
-Patch6: 0006-Add-keepalive-timer-to-IMAP-IDLE-service.patch
-Patch7: 0007-Use-Qt5-booster-to-save-memory.patch
-Patch8: 0008-Introduce-QMailAccount-HasPersistentConnection-statu.patch
-Patch9: 0009-Introduce-discovery-of-authentication-from-the-anoun.patch
+Patch1:  0001-Stop-_incomingDataTimer-when-imapprotocol-object-is-.patch
+Patch2:  0002-Introduce-acceptUntrustedCertificates-configuration.patch
+Patch3:  0003-fix-tests-installation-path.patch
+Patch4:  0004-Accounts-qt-integration.patch
+Patch5:  0005-Start-messageserver-on-system-startup-in-case-there-.patch
+Patch6:  0006-Add-keepalive-timer-to-IMAP-IDLE-service.patch
+Patch7:  0007-Use-Qt5-booster-to-save-memory.patch
+Patch8:  0008-Introduce-QMailAccount-HasPersistentConnection-statu.patch
+Patch9:  0009-Introduce-discovery-of-authentication-from-the-anoun.patch
 Patch10: 0010-Handle-SMTP-response-504.patch
 Patch11: 0011-Recreate-SSO-identity-for-smtp-in-case-of-failure.patch
 Patch12: 0012-Listen-to-sync-schedule-changes-from-buteo-sync-fram.patch
@@ -48,8 +48,8 @@ Patch16: 0016-Revert-Fix-bundled-zlib-detection.patch
 Patch17: 0017-Add-signature-settings-in-account.patch
 Patch18: 0018-Use-socket-s-local-address-for-HELO-and-EHLO-message.patch
 Patch19: 0019-Use-EightBit-encoding-instead-of-Base64-for-text-typ.patch
-Patch20: 0020-Follow-the-synchronizationEnabled-flag-when-folders.patch
-Patch21: 0021-Set-new-IMAP-folders-to-inherit-SynchronizationEnab.patch
+Patch20: 0020-Follow-the-synchronizationEnabled-flag-when-folders-.patch
+Patch21: 0021-Set-new-IMAP-folders-to-inherit-SynchronizationEnabl.patch
 Patch22: 0022-Set-qmf-accountscheck-to-be-run-by-the-booster.patch
 Patch23: 0023-Retrieve-message-lists-based-on-the-folder-sync-poli.patch
 Patch24: 0024-Apply-folder-policy-to-always-on-connection.patch

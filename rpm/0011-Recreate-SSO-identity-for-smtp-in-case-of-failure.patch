@@ -1,7 +1,7 @@
-From e0b72aea5aa65d271973b33810e8099151fcfd14 Mon Sep 17 00:00:00 2001
+From c9f9d1e64dd30cd28212b3de8d469c064c3e0d6e Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Mon, 19 Jan 2015 11:25:01 +0200
-Subject: [PATCH 11/17] Recreate SSO identity for smtp in case of failure.
+Subject: [PATCH 11/24] Recreate SSO identity for smtp in case of failure.
 
 Similar to what is already done for IMAP.
 ---
@@ -10,7 +10,7 @@ Similar to what is already done for IMAP.
  2 files changed, 12 insertions(+)
 
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 9d8dfbd..19f6988 100644
+index 9d8dfbde..19f69880 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -118,6 +118,8 @@ SmtpClient::SmtpClient(QObject* parent)
@@ -52,7 +52,7 @@ index 9d8dfbd..19f6988 100644
      operationFailed(QMailServiceAction::Status::ErrLoginFailed, error);
  }
 diff --git a/src/plugins/messageservices/smtp/smtpclient.h b/src/plugins/messageservices/smtp/smtpclient.h
-index 96852b2..12003c7 100644
+index 96852b2b..12003c7e 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.h
 +++ b/src/plugins/messageservices/smtp/smtpclient.h
 @@ -175,6 +175,8 @@ private:
@@ -65,5 +65,5 @@ index 96852b2..12003c7 100644
  #endif
  };
 -- 
-1.8.3-rc3
+2.17.1
 
