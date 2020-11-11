@@ -1,8 +1,8 @@
-From 0316bec0142d035837e1ddbc14317ba4d8cc27d0 Mon Sep 17 00:00:00 2001
+From 6d07d9c296e0559580271fbe9e157f47149e6222 Mon Sep 17 00:00:00 2001
 From: Damien Caliste <dcaliste@free.fr>
 Date: Fri, 24 Jan 2020 16:28:37 +0100
-Subject: [PATCH 20/24] Follow the synchronizationEnabled flag when folders are
- not specified
+Subject: [PATCH] Follow the synchronizationEnabled flag when folders are not
+ specified
 
 If the synchronizationEnabled flag is set to false, a variety
 of strategy, like search, folder listing, will not search in
@@ -163,5 +163,5 @@ index 1f418e44..260fd580 100644
      uint _total;
  };
 -- 
-2.17.1
+2.26.2
 

@@ -1,7 +1,7 @@
-From 2585663419f2286b3320439a9930e657a82d64a7 Mon Sep 17 00:00:00 2001
+From b535bf5077ae8a7832943821590b7699dbfd5340 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Fri, 20 Feb 2015 15:06:21 +0200
-Subject: [PATCH 13/24] Do AUTHENTICATE PLAIN in two stages
+Subject: [PATCH] Do AUTHENTICATE PLAIN in two stages
 
 Some servers(e.g yandex.ru) do not support AUTHENTICATE PLAIN in a
 single command, according to RFC4616 this way is optional, so we allways
@@ -53,10 +53,10 @@ index 46de9f49..97d94764 100644
      return QMailAuthenticator::getResponse(svcCfg, challenge);
  #endif
 diff --git a/src/plugins/ssoauth/password/passwordplugin.cpp b/src/plugins/ssoauth/password/passwordplugin.cpp
-index 20d2cf57..279f9721 100644
+index 88db5298..00ad7e73 100644
 --- a/src/plugins/ssoauth/password/passwordplugin.cpp
 +++ b/src/plugins/ssoauth/password/passwordplugin.cpp
-@@ -94,20 +94,22 @@ QMap<QString, QList<QByteArray> > SSOPasswordPlugin::getIMAPAuthentication(const
+@@ -99,20 +99,22 @@ QMap<QString, QList<QByteArray> > SSOPasswordPlugin::getIMAPAuthentication(const
      QMap<QString, QList<QByteArray> > result;
  
      // Add PLAIN auth
@@ -86,7 +86,7 @@ index 20d2cf57..279f9721 100644
      result.insert(QString::fromLatin1("CRAM-MD5"), cramAuth);
  
      return result;
-@@ -120,8 +122,8 @@ QMap<QString, QList<QByteArray> > SSOPasswordPlugin::getPOPAuthentication(const
+@@ -125,8 +127,8 @@ QMap<QString, QList<QByteArray> > SSOPasswordPlugin::getPOPAuthentication(const
  
      // Add PLAIN auth
      QList<QByteArray> plainAuth;
@@ -98,5 +98,5 @@ index 20d2cf57..279f9721 100644
  
      // Currently pop account does not have any auth settings, so only plain can be used
 -- 
-2.17.1
+2.26.2
 

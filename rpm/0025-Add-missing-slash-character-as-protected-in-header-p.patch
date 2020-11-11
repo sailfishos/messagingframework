@@ -1,4 +1,4 @@
-From a5191e0ebbbbf6b8f3636394f24499bd34f3fba6 Mon Sep 17 00:00:00 2001
+From 0b9ed226a501ce7ae67c1923335221ab9d22f3ce Mon Sep 17 00:00:00 2001
 From: Damien Caliste <dcaliste@free.fr>
 Date: Wed, 2 Sep 2020 16:58:12 +0200
 Subject: [PATCH] Add missing slash character as protected in header parameters
@@ -16,10 +16,10 @@ Change-Id: Id9d43b883187317ec152eea56819822612bfe307
  2 files changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index 71491f1a..38d1eee3 100644
+index d7678678..f51e8c02 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
-@@ -1956,7 +1956,8 @@ void QMailMessageHeaderFieldPrivate::setParameterEncoded(const QByteArray& name)
+@@ -1960,7 +1960,8 @@ void QMailMessageHeaderFieldPrivate::setParameterEncoded(const QByteArray& name)
  static QByteArray protectedParameter(const QByteArray& value)
  {
      QRegExp whitespace(QLatin1String("\\s+"));

@@ -1,8 +1,8 @@
-From 4372ae2417889a38fd2352d1608cee8435150638 Mon Sep 17 00:00:00 2001
+From 071b29984213918dfee0b375caa82757901b6ba2 Mon Sep 17 00:00:00 2001
 From: Evgeny Karpov <evgeny.karpov@oss.tieto.com>
 Date: Thu, 24 Oct 2013 09:37:30 +0000
-Subject: [PATCH 05/24] Start messageserver on system startup in case there are
- email accounts present
+Subject: [PATCH] Start messageserver on system startup in case there are email
+ accounts present
 
 Squashed:
 Do not try to restart messageserver when there are no accounts. Fixes: JB#12100
@@ -172,5 +172,5 @@ index d05c3377..689ad320 100644
 +    SUBDIRS += accountscheck
 +}
 -- 
-2.17.1
+2.26.2
 

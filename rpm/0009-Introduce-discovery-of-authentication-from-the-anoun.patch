@@ -1,7 +1,7 @@
-From 9906e81a475c705655248b955bb05d2d316e3d03 Mon Sep 17 00:00:00 2001
+From 275994691f0f2c292437800d413dc4fd159f4a0c Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
 Date: Wed, 15 Aug 2018 11:26:49 +0300
-Subject: [PATCH 09/24] Introduce discovery of authentication from the anounced
+Subject: [PATCH] Introduce discovery of authentication from the anounced
  capabilities(IMAP/SMTP)
 
 Squashed oneliner:
@@ -1221,10 +1221,10 @@ index ed115d53..7e03e956 100644
  };
  
 diff --git a/src/plugins/ssoauth/password/passwordplugin.cpp b/src/plugins/ssoauth/password/passwordplugin.cpp
-index 1d2304c1..20d2cf57 100644
+index 4eac2d1b..88db5298 100644
 --- a/src/plugins/ssoauth/password/passwordplugin.cpp
 +++ b/src/plugins/ssoauth/password/passwordplugin.cpp
-@@ -88,52 +88,80 @@ SSOPasswordPlugin::~SSOPasswordPlugin()
+@@ -93,52 +93,80 @@ SSOPasswordPlugin::~SSOPasswordPlugin()
  {
  }
  
@@ -1339,7 +1339,7 @@ index 1d2304c1..20d2cf57 100644
      return result;
  }
  
-@@ -146,8 +174,9 @@ QString SSOPasswordPlugin::key() const
+@@ -151,8 +179,9 @@ QString SSOPasswordPlugin::key() const
  {
      return "password";
  }
@@ -1351,7 +1351,7 @@ index 1d2304c1..20d2cf57 100644
  {
      QString password = sessionData.Secret();
      QString username = sessionData.UserName();
-@@ -156,13 +185,13 @@ QList<QByteArray> SSOPasswordPlugin::authentication(const SignOn::SessionData &s
+@@ -161,13 +190,13 @@ QList<QByteArray> SSOPasswordPlugin::authentication(const SignOn::SessionData &s
          username = userName;
  
      if (serviceType == "imap4") {
@@ -1370,10 +1370,10 @@ index 1d2304c1..20d2cf57 100644
  }
  
 diff --git a/src/plugins/ssoauth/password/passwordplugin.h b/src/plugins/ssoauth/password/passwordplugin.h
-index 1ae046d8..a7a25676 100644
+index 8603694e..a2f66cd9 100644
 --- a/src/plugins/ssoauth/password/passwordplugin.h
 +++ b/src/plugins/ssoauth/password/passwordplugin.h
-@@ -57,16 +57,16 @@ public:
+@@ -62,16 +62,16 @@ public:
      ~SSOPasswordPlugin();
  
      virtual QString key() const;
@@ -1392,9 +1392,9 @@ index 1ae046d8..a7a25676 100644
 +    QMap<QString, QList<QByteArray> > getIMAPAuthentication(const QString &password, const QString &username) const;
 +    QMap<QString, QList<QByteArray> > getPOPAuthentication(const QString &password, const QString &username) const;
 +    QMap<QString, QList<QByteArray> > getSMTPAuthentication(const QString &password, const QString &username) const;
+     Accounts::Manager *m_accountManager;
  };
  
- #endif // PASSWORDPLUGIN_H
 -- 
-2.17.1
+2.26.2
 

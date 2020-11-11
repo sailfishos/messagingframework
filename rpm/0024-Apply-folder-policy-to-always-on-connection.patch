@@ -1,7 +1,7 @@
-From b40310c55a1d555c9e9fbe486ecc89b58ca9e7f6 Mon Sep 17 00:00:00 2001
+From 5639df7e29b112a53ad1b8ff9ada906897bfab95 Mon Sep 17 00:00:00 2001
 From: David Llewellyn-Jones <david.llewellyn-jones@jolla.com>
 Date: Wed, 22 Jul 2020 11:08:24 +0000
-Subject: [PATCH 24/24] Apply folder policy to always on connection
+Subject: [PATCH] Apply folder policy to always on connection
 
 Changes the configuration so that the push folders are generated from
 the the policy and folder flags, rather than a separate configuration
@@ -124,5 +124,5 @@ index 07289a1c..c8dc7b9e 100644
  
  int ImapConfiguration::checkInterval() const
 -- 
-2.17.1
+2.26.2
 
