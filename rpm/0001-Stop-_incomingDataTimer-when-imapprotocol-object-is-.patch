@@ -1,7 +1,7 @@
-From 5e765286bdcf989f5ba68a3230bd88652e8fce43 Mon Sep 17 00:00:00 2001
+From f2d4bba3b0e068ae45b7b76c2e1abad6f9f498c0 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Mon, 23 Feb 2015 13:08:24 +0200
-Subject: [PATCH 01/24] Stop _incomingDataTimer when imapprotocol object is
+Subject: [PATCH] Stop _incomingDataTimer when imapprotocol object is
  destroyed.
 
 A crash occurs in case the timer is active and the object is destroyed.
@@ -24,5 +24,5 @@ index 4df62a57..984e2638 100644
      delete _fsm;
  }
 -- 
-2.17.1
+2.26.2
 

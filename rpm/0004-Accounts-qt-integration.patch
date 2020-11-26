@@ -1,7 +1,7 @@
-From 0a0fa3662eb6c99bf70994e858eb5380d37a0619 Mon Sep 17 00:00:00 2001
+From 1ac228490d30ad5902b608a6d74a947e68ddc4d6 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Wed, 29 May 2013 09:44:20 +0300
-Subject: [PATCH 04/24] Accounts-qt integration.
+Subject: [PATCH] Accounts-qt integration.
 
 Squashed commits, either one line description or block comment:
 
@@ -116,6 +116,18 @@ Auth in one step introduced by this commit, better to reduce communication with 
 
 c: AUTH PLAIN <UserName and password encoded in base64>
 S: 235 2.7.0 Authentication successful
+
+----
+
+Trigger notification if account credentials are incorrect
+
+For accounts that use passwords, if the credentials are incorrect this
+change will cause the "CredentialsNeedUpdate = true" property to be set
+on the account, triggering signond to show a notification to the user.
+
+This mirrors the behavour of qmf-oauth2-plugin. See
+SSOOauth2Plugin::credentialsNeedUpdate() in
+base-qmf-oauth2-plugin/oauth2plugin.cpp
 ---
  common.pri                                    |    6 +
  .../qmfclient/qmailaccountlistmodel.cpp       |   44 +-
@@ -156,11 +168,11 @@ S: 235 2.7.0 Authentication successful
  .../messageservices/smtp/smtpservice.cpp      |    8 +
  src/plugins/plugins.pro                       |    3 +
  src/plugins/ssoauth/password/password.pro     |   21 +
- .../ssoauth/password/passwordplugin.cpp       |  185 +++
- src/plugins/ssoauth/password/passwordplugin.h |   72 +
+ .../ssoauth/password/passwordplugin.cpp       |  200 +++
+ src/plugins/ssoauth/password/passwordplugin.h |   78 +
  src/tools/messageserver/servicehandler.cpp    |   13 +
  tests/tst_qmailstore/tst_qmailstore.cpp       |   85 ++
- 43 files changed, 3651 insertions(+), 65 deletions(-)
+ 43 files changed, 3672 insertions(+), 65 deletions(-)
  create mode 100644 src/libraries/qmfclient/share/email.provider
  create mode 100644 src/libraries/qmfclient/share/email.service
  create mode 100644 src/libraries/qmfclient/ssoaccountmanager.cpp
@@ -4959,14 +4971,14 @@ index 00000000..f41e80ad
 +
 diff --git a/src/plugins/ssoauth/password/passwordplugin.cpp b/src/plugins/ssoauth/password/passwordplugin.cpp
 new file mode 100644
-index 00000000..1d2304c1
+index 00000000..4eac2d1b
 --- /dev/null
 +++ b/src/plugins/ssoauth/password/passwordplugin.cpp
-@@ -0,0 +1,185 @@
+@@ -0,0 +1,200 @@
 +/****************************************************************************
 +**
-+** Copyright (C) 2013 Jolla Ltd.
-+** Contact: Valério Valério <valerio.valerio@jollamobile.com>
++** Copyright (c) 2013-2020 Jolla Ltd.
++** Copyright (c) 2020 Open Mobile Platform LLC.
 +**
 +** This file is part of the Qt Messaging Framework.
 +**
@@ -5007,6 +5019,10 @@ index 00000000..1d2304c1
 +#include "passwordplugin.h"
 +#include "qmailnamespace.h"
 +
++// libaccounts-qt
++#include <Accounts/Manager>
++#include <Accounts/Account>
++
 +// From Qt Messaging Framework IMAP plugin
 +// Ensure a string is quoted, if required for IMAP transmission
 +// As per IMAP4 rfc 2060 section 4.2
@@ -5046,6 +5062,7 @@ index 00000000..1d2304c1
 +
 +SSOPasswordPlugin::SSOPasswordPlugin(QObject *parent)
 +    : SSOAuthService(parent)
++    , m_accountManager(new Accounts::Manager(this))
 +{
 +}
 +
@@ -5133,9 +5150,19 @@ index 00000000..1d2304c1
 +
 +void SSOPasswordPlugin::credentialsNeedUpdate(int accountId)
 +{
-+    // For the password method we don't do anything, messageserver
-+    // already informs the clients about login failed.
-+    Q_UNUSED(accountId);
++    // Mirrors the functionality of SSOOauth2Plugin::credentialsNeedUpdate
++    // See base-qmf-oauth2-plugin/oauth2plugin.cpp
++    Accounts::Account *account = Accounts::Account::fromId(m_accountManager, accountId, this);
++    Accounts::Service srv(m_accountManager->service(QStringLiteral("email")));
++    if (srv.isValid()) {
++        qWarning() << "password-plugin: setting CredentialsNeedUpdate on account:" << account->id();
++        account->selectService(srv);
++        account->setValue("CredentialsNeedUpdate", QVariant::fromValue<bool>(true));
++        account->setValue("CredentialsNeedUpdateFrom", QVariant::fromValue<QString>(QString::fromLatin1("messageserver5")));
++        account->selectService(Accounts::Service());
++        account->syncAndBlock();
++    }
++    account->deleteLater();
 +}
 +
 +SignOn::SessionData SSOPasswordPlugin::sessionData(const QString &accountProvider,  QVariantMap authParameters) const
@@ -5150,14 +5177,14 @@ index 00000000..1d2304c1
 +
 diff --git a/src/plugins/ssoauth/password/passwordplugin.h b/src/plugins/ssoauth/password/passwordplugin.h
 new file mode 100644
-index 00000000..1ae046d8
+index 00000000..8603694e
 --- /dev/null
 +++ b/src/plugins/ssoauth/password/passwordplugin.h
-@@ -0,0 +1,72 @@
+@@ -0,0 +1,78 @@
 +/****************************************************************************
 +**
-+** Copyright (C) 2013 Jolla Ltd.
-+** Contact: Valério Valério <valerio.valerio@jollamobile.com>
++** Copyright (c) 2013-2020 Jolla Ltd.
++** Copyright (c) 2020 Open Mobile Platform LLC.
 +**
 +** This file is part of the Qt Messaging Framework.
 +**
@@ -5203,6 +5230,11 @@ index 00000000..1ae046d8
 +#include <QVariantMap>
 +#include <SignOn/SessionData>
 +
++namespace Accounts {
++    class Manager;
++    class Account;
++}
++
 +class SSOPasswordPlugin : public SSOAuthService
 +{
 +    Q_OBJECT
@@ -5223,6 +5255,7 @@ index 00000000..1ae046d8
 +    QList<QByteArray> getIMAPAuthentication(const QString &password, const QString &username, int serviceAuthentication) const;
 +    QList<QByteArray> getPOPAuthentication(const QString &password, const QString &username, int serviceAuthentication) const;
 +    QList<QByteArray> getSMTPAuthentication(const QString &password, const QString &username, int serviceAuthentication) const;
++    Accounts::Manager *m_accountManager;
 +};
 +
 +#endif // PASSWORDPLUGIN_H
@@ -5449,5 +5482,5 @@ index 26719daa..84ca9409 100644
      QMailAccount account3(account1.id());
      QCOMPARE(QMailStore::instance()->lastError(), QMailStore::InvalidId);
 -- 
-2.17.1
+2.26.2
 

@@ -1,7 +1,7 @@
-From c9f9d1e64dd30cd28212b3de8d469c064c3e0d6e Mon Sep 17 00:00:00 2001
+From e846fbd37877440a5a13dee50a5ed2cd7d17f781 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Mon, 19 Jan 2015 11:25:01 +0200
-Subject: [PATCH 11/24] Recreate SSO identity for smtp in case of failure.
+Subject: [PATCH] Recreate SSO identity for smtp in case of failure.
 
 Similar to what is already done for IMAP.
 ---
@@ -65,5 +65,5 @@ index 96852b2b..12003c7e 100644
  #endif
  };
 -- 
-2.17.1
+2.26.2
 
