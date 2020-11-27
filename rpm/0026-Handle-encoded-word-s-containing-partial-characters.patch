@@ -1,0 +1,121 @@
+From ecd5ca0b6b1178f2ab2e1ccf10f037718690da61 Mon Sep 17 00:00:00 2001
+From: Slava Monich <slava.monich@jolla.com>
+Date: Sun, 26 Jul 2020 03:03:44 +0300
+Subject: [PATCH] Handle encoded-word's containing partial characters
+
+That's actually a violation of the spec (RFC 2047):
+
+  https://tools.ietf.org/html/rfc2047#section-5
+
+  Each 'encoded-word' MUST represent an integral number of characters.
+  A multi-octet character may not be split across adjacent 'encoded-
+  word's.
+
+but if charsets match, the data can be concatenated first and then
+converted to characters. Which is what all other email clients seem
+to be doing - I haven't found a single one which wouldn't handle it.
+
+Change-Id: I5bbb785343ad60459fa6e52f5728fd796c7e5961
+---
+ src/libraries/qmfclient/qmailmessage.cpp | 52 +++++++++++++++++++++-----------
+ 1 file changed, 34 insertions(+), 18 deletions(-)
+
+diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
+index 71491f1..35ef6a3 100644
+--- a/src/libraries/qmfclient/qmailmessage.cpp
++++ b/src/libraries/qmfclient/qmailmessage.cpp
+@@ -329,9 +329,10 @@ static QMailCodec* codecForEncoding(QMailMessageBody::TransferEncoding te, const
+ }
+ 
+ //  Needs an encoded word of the form =?charset?q?word?=
+-static QString decodeWord(const QByteArray& encodedWord)
++//  Returns text and charset as QPair<QByteArray, QByteArray>
++static QPair<QByteArray, QByteArray> encodedText(const QByteArray& encodedWord)
+ {
+-    QString result;
++    QPair<QByteArray, QByteArray> result;
+     int index[4];
+ 
+     // Find the parts of the input
+@@ -352,12 +353,12 @@ static QString decodeWord(const QByteArray& encodedWord)
+                 if (encoding == "Q")
+                 {
+                     QMailQuotedPrintableCodec codec(QMailQuotedPrintableCodec::Text, QMailQuotedPrintableCodec::Rfc2047);
+-                    return codec.decode(encoded, charset);
++                    result = qMakePair(codec.decode(encoded), charset);
+                 }
+                 else if (encoding == "B")
+                 {
+                     QMailBase64Codec codec(QMailBase64Codec::Binary);
+-                    return codec.decode(encoded, charset);
++                    result = qMakePair(codec.decode(encoded), charset);
+                 }
+             }
+         }
+@@ -501,6 +502,17 @@ static QByteArray encodeWord(const QString &text, const QByteArray& cs, bool* en
+     return to7BitAscii(text);
+ }
+ 
++static void convertAndAppend(QString& str, const QByteArray& bytes, const QByteArray& charset)
++{
++    if (!bytes.isEmpty()) {
++        QTextCodec* codec = QMailCodec::codecForName(charset);
++        if (!codec) {
++            codec = QTextCodec::codecForUtfText(bytes, QMailCodec::codecForName("UTF-8"));
++        }
++        str.append(codec->toUnicode(bytes));
++    }
++}
++
+ static QString decodeWordSequence(const QByteArray& str)
+ {
+     QRegExp whitespace(QLatin1String("^\\s+$"));
+@@ -514,27 +526,31 @@ static QString decodeWordSequence(const QByteArray& str)
+     int pos = 0;
+     int lastPos = 0;
+     QString latin1Str(QString::fromLatin1(str.constData(), str.length()));
++    QByteArray lastCharset;
++    QByteArray encodedBuf;
+ 
+-    while (pos != -1) {
+-        pos = encodedWord.indexIn(latin1Str, pos);
+-        if (pos != -1) {
+-            int endPos = pos + encodedWord.matchedLength();
+-
+-            QString preceding(QString::fromLatin1(str.mid(lastPos, (pos - lastPos))));
+-            QString decoded = decodeWord(str.mid(pos, (endPos - pos)));
++    while ((pos = encodedWord.indexIn(latin1Str, pos)) != -1) {
++        int endPos = pos + encodedWord.matchedLength();
+ 
+-            // If there is only whitespace between two encoded words, it should not be included
+-            if (!whitespace.exactMatch(preceding))
+-                out.append(preceding);
++        QPair<QByteArray, QByteArray> textAndCharset(encodedText(str.mid(pos, (endPos - pos))));
++        QString preceding(QString::fromLatin1(str.mid(lastPos, (pos - lastPos))));
+ 
+-            out.append(decoded);
+-
+-            pos = endPos;
+-            lastPos = pos;
++        // If there is only whitespace between two encoded words, it should not be included
++        bool precedingWhitespaceOrEmpty = (preceding.isEmpty() || whitespace.exactMatch(preceding));
++        if ((lastCharset.isEmpty() || lastCharset == textAndCharset.second) && precedingWhitespaceOrEmpty) {
++            encodedBuf.append(textAndCharset.first);
++        } else {
++            convertAndAppend(out, encodedBuf, textAndCharset.second);
++            out.append(preceding);
++            encodedBuf = textAndCharset.first;
+         }
++        lastCharset = textAndCharset.second;
++        pos = endPos;
++        lastPos = pos;
+     }
+ 
+     // Copy anything left
++    convertAndAppend(out, encodedBuf, lastCharset);
+     out.append(QString::fromLatin1(str.mid(lastPos)));
+     return out;
+ }
+-- 
+1.9.1
+
