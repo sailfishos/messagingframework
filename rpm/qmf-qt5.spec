@@ -54,6 +54,7 @@ Patch22: 0022-Set-qmf-accountscheck-to-be-run-by-the-booster.patch
 Patch23: 0023-Retrieve-message-lists-based-on-the-folder-sync-poli.patch
 Patch24: 0024-Apply-folder-policy-to-always-on-connection.patch
 Patch25: 0025-Add-missing-slash-character-as-protected-in-header-p.patch
+Patch26: 0026-Handle-encoded-word-s-containing-partial-characters.patch
 
 %description
 The Qt Messaging Framework, QMF, consists of a C++ library and daemon server
