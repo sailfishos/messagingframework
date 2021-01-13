@@ -1,6 +1,6 @@
 Name: qmf-qt5
 Summary:    Qt Messaging Framework (QMF) Qt5
-Version:    4.0.4+git63
+Version:    4.0.4+git127
 Release:    1
 License:    LGPLv2.1 with exception or GPLv3
 URL:        https://code.qt.io/qt-labs/messagingframework.git
@@ -56,6 +56,7 @@ Patch24: 0024-Apply-folder-policy-to-always-on-connection.patch
 Patch25: 0025-Add-missing-slash-character-as-protected-in-header-p.patch
 Patch26: 0026-Handle-encoded-word-s-containing-partial-characters.patch
 Patch27: 0027-Allow-a-service-provided-folder-to-be-set-as-the-sta.patch
+Patch28: 0028-Add-QMailMessage-CalendarCancellation-flag.patch
 
 %description
 The Qt Messaging Framework, QMF, consists of a C++ library and daemon server
