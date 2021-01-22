@@ -1,0 +1,102 @@
+From 998ad664e26424ac0dbb7f3383f3d5d8110a354d Mon Sep 17 00:00:00 2001
+From: Chris Adams <chris.adams@jolla.com>
+Date: Tue, 19 Jan 2021 16:29:41 +1000
+Subject: [PATCH] Use a queued connection to handle accountsUpdated signal
+
+If a socket read results in a change to an accounts' settings (e.g.
+available folders) then we need to handle the accountsUpdated signal
+asynchronously to avoid deleting the socket out from underneath the
+code which caused the database change, otherwise crashes can result
+(specifically, in the ImapProtocol::incomingData method).
+---
+ src/plugins/messageservices/imap/imapclient.cpp  | 3 ++-
+ src/plugins/messageservices/imap/imapservice.cpp | 2 +-
+ src/plugins/messageservices/pop/popclient.cpp    | 3 ++-
+ src/plugins/messageservices/pop/popservice.cpp   | 2 +-
+ src/plugins/messageservices/smtp/smtpclient.cpp  | 2 +-
+ src/plugins/messageservices/smtp/smtpservice.cpp | 2 +-
+ 6 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
+index 2ed9f5ed..4a31bfdc 100644
+--- a/src/plugins/messageservices/imap/imapclient.cpp
++++ b/src/plugins/messageservices/imap/imapclient.cpp
+@@ -505,7 +505,8 @@ ImapClient::ImapClient(QObject* parent)
+ 
+     connect(QMailMessageBuffer::instance(), SIGNAL(flushed()), this, SLOT(messageBufferFlushed()));
+ #ifdef USE_ACCOUNTS_QT
+-    connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)), this, SLOT(onAccountsUpdated(QMailAccountIdList)));
++    connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)),
++            this, SLOT(onAccountsUpdated(QMailAccountIdList)), Qt::QueuedConnection);
+ #endif
+ }
+ 
+diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
+index 3050abb3..103b67d8 100644
+--- a/src/plugins/messageservices/imap/imapservice.cpp
++++ b/src/plugins/messageservices/imap/imapservice.cpp
+@@ -1557,7 +1557,7 @@ ImapService::ImapService(const QMailAccountId &accountId)
+     }
+     connect(_restartPushEmailTimer, SIGNAL(timeout()), this, SLOT(restartPushEmail()));
+     connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
+-            this, SLOT(accountsUpdated(const QMailAccountIdList&)));
++            this, SLOT(accountsUpdated(const QMailAccountIdList&)), Qt::QueuedConnection);
+     connect(_initiatePushEmailTimer, SIGNAL(timeout()), this, SLOT(initiatePushEmail()));
+ 
+ #ifdef USE_KEEPALIVE
+diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
+index b4f64d91..967e74b6 100644
+--- a/src/plugins/messageservices/pop/popclient.cpp
++++ b/src/plugins/messageservices/pop/popclient.cpp
+@@ -86,7 +86,8 @@ PopClient::PopClient(QObject* parent)
+     connect(&inactiveTimer, SIGNAL(timeout()), this, SLOT(connectionInactive()));
+     connect(QMailMessageBuffer::instance(), SIGNAL(flushed()), this, SLOT(messageBufferFlushed()));
+ #ifdef USE_ACCOUNTS_QT
+-    connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)), this, SLOT(onAccountsUpdated(QMailAccountIdList)));
++    connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)),
++            this, SLOT(onAccountsUpdated(QMailAccountIdList)), Qt::QueuedConnection);
+ #endif
+ }
+ 
+diff --git a/src/plugins/messageservices/pop/popservice.cpp b/src/plugins/messageservices/pop/popservice.cpp
+index 7b6492ab..45197adf 100644
+--- a/src/plugins/messageservices/pop/popservice.cpp
++++ b/src/plugins/messageservices/pop/popservice.cpp
+@@ -341,7 +341,7 @@ PopService::PopService(const QMailAccountId &accountId)
+     connect(&_client, SIGNAL(errorOccurred(QMailServiceAction::Status::ErrorCode, QString)), this, SLOT(errorOccurred(QMailServiceAction::Status::ErrorCode, QString)));
+     connect(&_client, SIGNAL(updateStatus(QString)), this, SLOT(updateStatus(QString)));
+     connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
+-            this, SLOT(accountsUpdated(const QMailAccountIdList&)));
++            this, SLOT(accountsUpdated(const QMailAccountIdList&)), Qt::QueuedConnection);
+ 
+     _client.setAccount(accountId);
+     QMailAccountConfiguration accountCfg(accountId);
+diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
+index 0300dcf1..1f2d0881 100644
+--- a/src/plugins/messageservices/smtp/smtpclient.cpp
++++ b/src/plugins/messageservices/smtp/smtpclient.cpp
+@@ -126,7 +126,7 @@ SmtpClient::SmtpClient(QObject* parent)
+ #endif
+ {
+     connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
+-            this, SLOT(accountsUpdated(const QMailAccountIdList&)));
++            this, SLOT(accountsUpdated(const QMailAccountIdList&)), Qt::QueuedConnection);
+ }
+ 
+ SmtpClient::~SmtpClient()
+diff --git a/src/plugins/messageservices/smtp/smtpservice.cpp b/src/plugins/messageservices/smtp/smtpservice.cpp
+index 9da2f7b8..6f8b4518 100644
+--- a/src/plugins/messageservices/smtp/smtpservice.cpp
++++ b/src/plugins/messageservices/smtp/smtpservice.cpp
+@@ -204,7 +204,7 @@ void SmtpService::onCapabilityFetchingActivityChanged(QMailServiceAction::Activi
+                            << "Disconnect and reconnect the network connection or"
+                            << "update the account to try again";
+             connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)),
+-                    this, SLOT(onAccountsUpdated(QMailAccountIdList)));
++                    this, SLOT(onAccountsUpdated(QMailAccountIdList)), Qt::QueuedConnection);
+         }
+     }
+ }
+-- 
+2.17.1
+
