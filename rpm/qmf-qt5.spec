@@ -2,7 +2,7 @@ Name: qmf-qt5
 Summary:    Qt Messaging Framework (QMF) Qt5
 Version:    4.0.4+git127
 Release:    1
-License:    LGPLv2.1 with exception or GPLv3
+License:    (LGPLv2 or LGPLv3) with exception or Qt Commercial
 URL:        https://code.qt.io/qt-labs/messagingframework.git
 Source0:    %{name}-%{version}.tar.bz2
 Source1:    %{name}.privileges
@@ -232,6 +232,7 @@ install -m 644 -p %{SOURCE2} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 
 %files -n libqmfclient1-qt5
 %defattr(-,root,root,-)
+%license LICENSE.LGPLv* LGPL_EXCEPTION.txt
 %{_libdir}/libQmfClient.so.*
 %{_libdir}/qt5/plugins/contentmanagers
 %{_libdir}/qt5/plugins/ssoauth
