@@ -1,4 +1,4 @@
-From 275994691f0f2c292437800d413dc4fd159f4a0c Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
 Date: Wed, 15 Aug 2018 11:26:49 +0300
 Subject: [PATCH] Introduce discovery of authentication from the anounced
@@ -1396,5 +1396,5 @@ index 8603694e..a2f66cd9 100644
  };
  
 -- 
-2.26.2
+2.29.2
 

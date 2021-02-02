@@ -1,4 +1,4 @@
-From 5639df7e29b112a53ad1b8ff9ada906897bfab95 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: David Llewellyn-Jones <david.llewellyn-jones@jolla.com>
 Date: Wed, 22 Jul 2020 11:08:24 +0000
 Subject: [PATCH] Apply folder policy to always on connection
@@ -124,5 +124,5 @@ index 07289a1c..c8dc7b9e 100644
  
  int ImapConfiguration::checkInterval() const
 -- 
-2.26.2
+2.29.2
 

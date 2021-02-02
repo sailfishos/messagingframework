@@ -1,4 +1,4 @@
-From 69205cb598d6db0c5edeb184ec90de745ddbf51b Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
 Date: Mon, 13 Aug 2018 15:45:24 +0300
 Subject: [PATCH] Introduce acceptUntrustedCertificates() configuration.
@@ -441,5 +441,5 @@ index e8b28a6b..ed115d53 100644
      void setSmtpPassword(const QString& password);
      void setSmtpAuthentication(int t);
 -- 
-2.26.2
+2.29.2
 

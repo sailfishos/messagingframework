@@ -1,4 +1,4 @@
-From 48d083a0845681f379fd8072e811152895f40784 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Mon, 2 Feb 2015 17:03:21 +0200
 Subject: [PATCH] Listen to sync schedule changes from buteo sync framework.
@@ -466,5 +466,5 @@ index a5aa05a9..9622d701 100644
  
  [Service]
 -- 
-2.26.2
+2.29.2
 

@@ -1,4 +1,4 @@
-From 3678112efc4311f9a7720576b7ee59cba5b54891 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Mon, 23 Feb 2015 13:31:30 +0200
 Subject: [PATCH] Prevent push enabled status to go out of sync.
@@ -131,5 +131,5 @@ index 157da852..c8300aa4 100644
      }
  }
 -- 
-2.26.2
+2.29.2
 

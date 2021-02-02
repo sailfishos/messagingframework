@@ -1,4 +1,4 @@
-From 071b29984213918dfee0b375caa82757901b6ba2 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Evgeny Karpov <evgeny.karpov@oss.tieto.com>
 Date: Thu, 24 Oct 2013 09:37:30 +0000
 Subject: [PATCH] Start messageserver on system startup in case there are email
@@ -172,5 +172,5 @@ index d05c3377..689ad320 100644
 +    SUBDIRS += accountscheck
 +}
 -- 
-2.26.2
+2.29.2
 

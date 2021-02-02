@@ -1,4 +1,4 @@
-From 492bd281990970b6e37514507c3c27dd3e4a9b4b Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Mon, 11 May 2015 15:12:07 +0300
 Subject: [PATCH] Check if IDLE connection needs to be established after login.
@@ -33,5 +33,5 @@ index 40bbe543..d78d897e 100644
              bool compressCapable(_protocol.capabilities().contains("COMPRESS=DEFLATE", Qt::CaseInsensitive));
              if (!_protocol.encrypted() && QMFALLOWCOMPRESS && compressCapable && !_protocol.compress()) {
 -- 
-2.26.2
+2.29.2
 

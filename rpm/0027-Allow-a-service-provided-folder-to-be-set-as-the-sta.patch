@@ -1,4 +1,4 @@
-From 03f36b882f2034157043d697368a58b544bc1ea3 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Andrew den Exter <andrew.den.exter@jolla.com>
 Date: Mon, 2 Nov 2020 06:18:17 +0000
 Subject: [PATCH] Allow a service provided folder to be set as the standard
@@ -33,5 +33,5 @@ index 79025c6e..48baaf37 100644
  }
  
 -- 
-2.25.0
+2.29.2
 

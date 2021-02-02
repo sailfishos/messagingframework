@@ -1,4 +1,4 @@
-From f2d4bba3b0e068ae45b7b76c2e1abad6f9f498c0 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
 Date: Mon, 23 Feb 2015 13:08:24 +0200
 Subject: [PATCH] Stop _incomingDataTimer when imapprotocol object is
@@ -24,5 +24,5 @@ index 4df62a57..984e2638 100644
      delete _fsm;
  }
 -- 
-2.26.2
+2.29.2
 

@@ -1,4 +1,4 @@
-From 9c1464707679de152568f6257079828c3c466265 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: David Llewellyn-Jones <david.llewellyn-jones@jolla.com>
 Date: Fri, 7 Feb 2020 19:29:59 +0200
 Subject: [PATCH] Set new IMAP folders to inherit SynchronizationEnabled flag
@@ -36,5 +36,5 @@ index d78d897e..cfb11519 100644
              // The reported flags pertain to the listed folder only
              QString folderFlags;
 -- 
-2.26.2
+2.29.2
 

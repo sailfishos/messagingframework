@@ -1,4 +1,4 @@
-From 4f228ab04d182f22253bb66756e3111a57d45ffe Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Mon, 27 Oct 2014 09:49:12 +0200
 Subject: [PATCH] Use Qt5 booster to save memory.
@@ -61,5 +61,5 @@ index 0d583d15..a5aa05a9 100644
  RestartSec=1
  
 -- 
-2.26.2
+2.29.2
 
