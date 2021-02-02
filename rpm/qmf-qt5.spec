@@ -58,6 +58,7 @@ Patch26: 0026-Handle-encoded-word-s-containing-partial-characters.patch
 Patch27: 0027-Allow-a-service-provided-folder-to-be-set-as-the-sta.patch
 Patch28: 0028-Add-QMailMessage-CalendarCancellation-flag.patch
 Patch29: 0029-Use-a-queued-connection-to-handle-accountsUpdated-si.patch
+Patch23: 0030-Support-as-specifier-for-log-file-paths.patch
 
 %description
 The Qt Messaging Framework, QMF, consists of a C++ library and daemon server
