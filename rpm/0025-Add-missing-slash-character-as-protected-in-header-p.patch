@@ -1,4 +1,4 @@
-From 0b9ed226a501ce7ae67c1923335221ab9d22f3ce Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Damien Caliste <dcaliste@free.fr>
 Date: Wed, 2 Sep 2020 16:58:12 +0200
 Subject: [PATCH] Add missing slash character as protected in header parameters
@@ -49,5 +49,5 @@ index 34d8ae63..7f3f0eef 100644
  
  void tst_QMailMessageHeaderField::isParameterEncoded()
 -- 
-2.26.2
+2.29.2
 

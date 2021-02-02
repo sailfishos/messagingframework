@@ -1,4 +1,4 @@
-From cdb7272f21c278479ccc640bfb29126251d076d6 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Damien Caliste <dcaliste@free.fr>
 Date: Mon, 5 Nov 2018 16:11:29 +0100
 Subject: [PATCH] Add signature settings in account
@@ -184,5 +184,5 @@ index ab509afd..a6913276 100644
          ssoAccount->setValue("fullName", account->fromAddress().name());
          if (account->lastSynchronized().isValid()) {
 -- 
-2.26.2
+2.29.2
 

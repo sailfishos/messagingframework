@@ -1,4 +1,4 @@
-From b8ee070cbaa3a1960407101108a80bd481836230 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
 Date: Tue, 14 Aug 2018 14:04:19 +0300
 Subject: [PATCH] Revert "Fix bundled zlib detection"
@@ -37,5 +37,5 @@ index 8a2258bd..e4897df9 100644
  }
  
 -- 
-2.26.2
+2.29.2
 

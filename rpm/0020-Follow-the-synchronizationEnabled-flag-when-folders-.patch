@@ -1,4 +1,4 @@
-From 6d07d9c296e0559580271fbe9e157f47149e6222 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Damien Caliste <dcaliste@free.fr>
 Date: Fri, 24 Jan 2020 16:28:37 +0100
 Subject: [PATCH] Follow the synchronizationEnabled flag when folders are not
@@ -163,5 +163,5 @@ index 1f418e44..260fd580 100644
      uint _total;
  };
 -- 
-2.26.2
+2.29.2
 

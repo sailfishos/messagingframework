@@ -1,4 +1,4 @@
-From 45fb98f4a669025e104121cb81eada87d7b01a3d Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: David Llewellyn-Jones <david.llewellyn-jones@jolla.com>
 Date: Mon, 4 Jan 2021 15:21:12 +0000
 Subject: [PATCH] Add QMailMessage::CalendarCancellation flag
@@ -197,5 +197,5 @@ index f44528fd..b4f64d91 100644
  
      // Special case to handle spurious hotmail messages. Hide in UI, but do not delete from server
 -- 
-2.26.2
+2.29.2
 

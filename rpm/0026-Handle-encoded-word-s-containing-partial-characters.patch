@@ -1,4 +1,4 @@
-From ecd5ca0b6b1178f2ab2e1ccf10f037718690da61 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Slava Monich <slava.monich@jolla.com>
 Date: Sun, 26 Jul 2020 03:03:44 +0300
 Subject: [PATCH] Handle encoded-word's containing partial characters
@@ -17,11 +17,11 @@ to be doing - I haven't found a single one which wouldn't handle it.
 
 Change-Id: I5bbb785343ad60459fa6e52f5728fd796c7e5961
 ---
- src/libraries/qmfclient/qmailmessage.cpp | 52 +++++++++++++++++++++-----------
+ src/libraries/qmfclient/qmailmessage.cpp | 52 ++++++++++++++++--------
  1 file changed, 34 insertions(+), 18 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index 71491f1..35ef6a3 100644
+index f51e8c02..ecfe9d41 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
 @@ -329,9 +329,10 @@ static QMailCodec* codecForEncoding(QMailMessageBody::TransferEncoding te, const
@@ -117,5 +117,5 @@ index 71491f1..35ef6a3 100644
      return out;
  }
 -- 
-1.9.1
+2.29.2
 

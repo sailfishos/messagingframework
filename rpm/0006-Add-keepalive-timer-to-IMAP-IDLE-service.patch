@@ -1,4 +1,4 @@
-From 15d35e73cd6bc3b1128aa23b7c30b8ce26ab9ba3 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Wed, 10 Sep 2014 14:36:13 +0300
 Subject: [PATCH] Add keepalive timer to IMAP IDLE service
@@ -105,5 +105,5 @@ index 00682a87..b3e8dd97 100644
  
  class ImapServicePlugin : public QMailMessageServicePlugin
 -- 
-2.26.2
+2.29.2
 

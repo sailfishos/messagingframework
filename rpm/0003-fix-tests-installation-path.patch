@@ -1,4 +1,4 @@
-From fba75e39c44bdb971387ec74c228dc8af7739cbd Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Tue, 30 Apr 2013 14:38:17 +0300
 Subject: [PATCH] fix tests installation path.
@@ -2935,5 +2935,5 @@ index 4cde1fe3..204ecd5a 100644
  
  INSTALLS += testdata
 -- 
-2.26.2
+2.29.2
 

@@ -1,4 +1,4 @@
-From e846fbd37877440a5a13dee50a5ed2cd7d17f781 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Valerio Valerio <valerio.valerio@jollamobile.com>
 Date: Mon, 19 Jan 2015 11:25:01 +0200
 Subject: [PATCH] Recreate SSO identity for smtp in case of failure.
@@ -65,5 +65,5 @@ index 96852b2b..12003c7e 100644
  #endif
  };
 -- 
-2.26.2
+2.29.2
 
