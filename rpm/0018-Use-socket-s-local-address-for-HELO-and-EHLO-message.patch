@@ -3,16 +3,19 @@ From: Raine Makelainen <raine.makelainen@jolla.com>
 Date: Tue, 23 Jul 2019 11:44:27 +0300
 Subject: [PATCH] Use socket's local address for HELO and EHLO messages
 
-Signed-off-by: Raine Makelainen <raine.makelainen@jolla.com>
+Prefer first local domain name if we have one. After that
+if we have host address that is valid for any interface, then use it.
+
+Change-Id: I91acc9329b68f2146a7158eedc49d7a506b48376
 ---
- src/plugins/messageservices/smtp/smtpclient.cpp | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ src/plugins/messageservices/smtp/smtpclient.cpp | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 19f69880..0300dcf1 100644
+index 19f69880..a9432ab9 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
-@@ -81,11 +81,14 @@ static QByteArray messageId(const QByteArray& domainName, quint32 addressCompone
+@@ -81,11 +81,16 @@ static QByteArray messageId(const QByteArray& domainName, quint32 addressCompone
              '>').toLatin1();
  }
  
@@ -23,12 +26,14 @@ index 19f69880..0300dcf1 100644
      QByteArray result(QHostInfo::localDomainName().toLatin1());
      if (!result.isEmpty())
          return result;
-+    if (!hostAddress.isNull())
++    if (hostAddress.protocol() == QAbstractSocket::IPv6Protocol)
++        return "[IPv6:" + hostAddress.toString().toLatin1() + "]";
++    else if (!hostAddress.isNull())
 +        return "[" + hostAddress.toString().toLatin1() + "]";
      QList<QHostAddress> addresses(QNetworkInterface::allAddresses());
      if (addresses.isEmpty())
          return "localhost.localdomain";
-@@ -317,7 +320,7 @@ void SmtpClient::connected(QMailTransport::EncryptType encryptType)
+@@ -317,7 +322,7 @@ void SmtpClient::connected(QMailTransport::EncryptType encryptType)
  #ifndef QT_NO_SSL
      if ((smtpCfg.smtpEncryption() == QMailTransport::Encrypt_TLS) && (status == TLS)) {
          // We have entered TLS mode - restart the SMTP dialog
@@ -37,7 +42,7 @@ index 19f69880..0300dcf1 100644
          sendCommand(ehlo);
          status = Helo;
      }
-@@ -460,7 +463,7 @@ void SmtpClient::nextAction(const QString &response)
+@@ -460,7 +465,7 @@ void SmtpClient::nextAction(const QString &response)
              capabilities.clear();
  
              // We need to know if extensions are supported
@@ -46,7 +51,7 @@ index 19f69880..0300dcf1 100644
              sendCommand(ehlo);
              status = Helo;
          } else {
-@@ -472,7 +475,7 @@ void SmtpClient::nextAction(const QString &response)
+@@ -472,7 +477,7 @@ void SmtpClient::nextAction(const QString &response)
      {
          if (responseCode == 500) {
              // EHLO is not implemented by this server - fallback to HELO
@@ -55,7 +60,7 @@ index 19f69880..0300dcf1 100644
              sendCommand(ehlo);
          } else if (responseCode == 250) {
              if (domainName.isEmpty()) {
-@@ -703,7 +706,7 @@ void SmtpClient::nextAction(const QString &response)
+@@ -703,7 +708,7 @@ void SmtpClient::nextAction(const QString &response)
                      operationFailed(QMailServiceAction::Status::ErrConfiguration, response);
                  }
                  // Restart the authentication process
