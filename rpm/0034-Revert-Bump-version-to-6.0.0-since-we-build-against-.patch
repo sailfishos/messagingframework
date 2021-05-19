@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Damien Caliste <dcaliste@free.fr>
+Date: Tue, 29 Jun 2021 17:09:56 +0200
+Subject: [PATCH] Revert "Bump version to 6.0.0 since we build against Qt6 now"
+
+This reverts commit d484bfeac786713a26c60048d605cbf20d54b527.
+---
+ .qmake.conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.qmake.conf b/.qmake.conf
+index 3b53ef03..50d567b3 100644
+--- a/.qmake.conf
++++ b/.qmake.conf
+@@ -1,4 +1,4 @@
+ load(qt_build_config)
+ CONFIG += qt_example_installs
+ 
+-MODULE_VERSION = 6.0.0
++MODULE_VERSION = 5.0.0
+-- 
+2.30.2
+

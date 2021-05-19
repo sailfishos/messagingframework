@@ -1,0 +1,102 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Val=C3=A9rio=20Val=C3=A9rio?= <valerio.valerio@jolla.com>
+Date: Fri, 20 Feb 2015 15:06:21 +0200
+Subject: [PATCH] Do AUTHENTICATE PLAIN in two stages
+
+Some servers(e.g yandex.ru) do not support AUTHENTICATE PLAIN in a
+single command, according to RFC4616 this way is optional, so we allways
+perform the authentication in two stages that is gurantee to be supported
+by all implementations of the protocol.
+---
+ .../imap/imapauthenticator.cpp                | 11 +++++++---
+ .../ssoauth/password/passwordplugin.cpp       | 20 ++++++++++---------
+ 2 files changed, 19 insertions(+), 12 deletions(-)
+
+diff --git a/src/plugins/messageservices/imap/imapauthenticator.cpp b/src/plugins/messageservices/imap/imapauthenticator.cpp
+index 46de9f49..97d94764 100644
+--- a/src/plugins/messageservices/imap/imapauthenticator.cpp
++++ b/src/plugins/messageservices/imap/imapauthenticator.cpp
+@@ -44,11 +44,11 @@
+ 
+ namespace {
+ 
+-QMap<QMailAccountId, QList<QByteArray> > gResponses;
+ 
+ #ifdef USE_ACCOUNTS_QT
+ QString authPassword;
+ QMail::SaslMechanism responseAuthType;
++QByteArray gResponse;
+ #endif
+ }
+ 
+@@ -119,7 +119,9 @@ static QByteArray authenticationResponses(QList<QByteArray> &authList, const QMa
+                 authPassword = QString::fromLatin1(authList.takeFirst());
+                 responseAuthType = QMail::CramMd5Mechanism;
+             } else {
+-                gResponses[id] = authList;
++                gResponse = authList.first();
++                // We need to clean this state, both the other auths available will work the same way
++                responseAuthType = QMail::PlainMechanism;
+             }
+         }
+     } else {
+@@ -203,7 +205,10 @@ QByteArray ImapAuthenticator::getAuthentication(const QMailAccountConfiguration:
+ QByteArray ImapAuthenticator::getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge)
+ {
+ #ifdef USE_ACCOUNTS_QT
+-    return QMailAuthenticator::getResponse(svcCfg, challenge, responseAuthType, authPassword);
++    if (responseAuthType == QMail::CramMd5Mechanism) {
++        return QMailAuthenticator::getResponse(svcCfg, challenge, responseAuthType, authPassword);
++    }
++    return gResponse;
+ #else
+     return QMailAuthenticator::getResponse(svcCfg, challenge);
+ #endif
+diff --git a/src/plugins/ssoauth/password/passwordplugin.cpp b/src/plugins/ssoauth/password/passwordplugin.cpp
+index 88db5298..00ad7e73 100644
+--- a/src/plugins/ssoauth/password/passwordplugin.cpp
++++ b/src/plugins/ssoauth/password/passwordplugin.cpp
+@@ -99,20 +99,22 @@ QMap<QString, QList<QByteArray> > SSOPasswordPlugin::getIMAPAuthentication(const
+     QMap<QString, QList<QByteArray> > result;
+ 
+     // Add PLAIN auth
+-    QByteArray user(username.toLatin1());
+-    QByteArray pass(password.toLatin1());
++    QByteArray user(username.toUtf8());
++    QByteArray pass(password.toUtf8());
+ 
+-    result.insert(QString::fromLatin1("PLAIN"), QList<QByteArray>() << QByteArray("AUTHENTICATE PLAIN ")
+-                  + QByteArray(user + '\0' + user + '\0' + pass).toBase64());
++    QList<QByteArray> plainAuth;
++    plainAuth.append(QByteArray("AUTHENTICATE PLAIN"));
++    plainAuth.append(QByteArray(user + '\0' + user + '\0' + pass));
++    result.insert(QString::fromLatin1("PLAIN"), plainAuth);
+ 
+     // Add LOGIN auth
+-    result.insert(QString::fromLatin1("LOGIN"), QList<QByteArray>() << QByteArray("LOGIN") + ' ' + quoteIMAPString(username.toLatin1())
+-                  + ' ' + quoteIMAPString(password.toLatin1()));
++    result.insert(QString::fromLatin1("LOGIN"), QList<QByteArray>() << QByteArray("LOGIN") + ' ' + quoteIMAPString(username.toUtf8())
++                  + ' ' + quoteIMAPString(password.toUtf8()));
+ 
+     // Add CRAM_MD5
+     QList<QByteArray> cramAuth;
+     cramAuth.append(QByteArray("AUTHENTICATE CRAM-MD5"));
+-    cramAuth.append(QByteArray(password.toLatin1()));
++    cramAuth.append(QByteArray(password.toUtf8()));
+     result.insert(QString::fromLatin1("CRAM-MD5"), cramAuth);
+ 
+     return result;
+@@ -125,8 +127,8 @@ QMap<QString, QList<QByteArray> > SSOPasswordPlugin::getPOPAuthentication(const
+ 
+     // Add PLAIN auth
+     QList<QByteArray> plainAuth;
+-    plainAuth.append(QByteArray("USER ") + username.toLatin1());
+-    plainAuth.append(QByteArray("PASS ") + password.toLatin1());
++    plainAuth.append(QByteArray("USER ") + username.toUtf8());
++    plainAuth.append(QByteArray("PASS ") + password.toUtf8());
+     result.insert(QString::fromLatin1("PLAIN"), plainAuth);
+ 
+     // Currently pop account does not have any auth settings, so only plain can be used
+-- 
+2.30.2
+

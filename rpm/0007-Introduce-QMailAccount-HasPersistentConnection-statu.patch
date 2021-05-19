@@ -1,0 +1,63 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Pekka Vuorela <pekka.vuorela@jolla.com>
+Date: Mon, 13 Aug 2018 17:24:36 +0300
+Subject: [PATCH] Introduce QMailAccount::HasPersistentConnection status flag
+
+Use QMailAccount::HasPersistentConnection status flag for IMAP idle instead of
+updating last sync time every minute, this reduces accounts db writes(they
+trigger notifications to other processes) and also make use of a linger
+keepalive(less state transitions).
+---
+ src/libraries/qmfclient/qmailstore_p.cpp | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
+index b1d3b428..f384fa1c 100644
+--- a/src/libraries/qmfclient/qmailstore_p.cpp
++++ b/src/libraries/qmfclient/qmailstore_p.cpp
+@@ -2675,6 +2675,10 @@ bool SSOAccountSatisfyTheProperty(Accounts::Account* ssoAccount, const QMailAcco
+             status &= (~QMailAccount::AppendSignature);
+             status |= appendSignature?(QMailAccount::AppendSignature):0;
+ 
++            bool hasPersistentConnection = ssoAccount->valueAsBool("hasPersistentConnection", false);
++            status &= (~QMailAccount::HasPersistentConnection);
++            status |= hasPersistentConnection?(QMailAccount::HasPersistentConnection):0;
++
+             return SSOAccountCompareProperty<quint64>(ssoAccount,
+                                                       status,
+                                                       argument.op, argument.valueList);
+@@ -3717,11 +3721,13 @@ QMailAccount QMailStorePrivate::extractAccount(const QSharedPointer<Accounts::Ac
+     const bool& isDefault = ssoAccount->valueAsBool("email/default");
+     const bool& canTransmit = ssoAccount->valueAsBool("canTransmit", true);
+     const bool& appendSignature = ssoAccount->valueAsBool("signatureEnabled", true);
++    const bool& hasPersistentConnection = ssoAccount->valueAsBool("hasPersistentConnection", false);
+ 
+     result.setStatus(QMailAccount::Enabled, enabled);
+     result.setStatus(QMailAccount::PreferredSender, isDefault);
+     result.setStatus(QMailAccount::CanTransmit, canTransmit);
+     result.setStatus(QMailAccount::AppendSignature, appendSignature);
++    result.setStatus(QMailAccount::HasPersistentConnection, hasPersistentConnection);
+ 
+     result.setSignature(ssoAccount->valueAsString("signature"));
+     result.setFromAddress(ssoAccount->contains("fullName")?
+@@ -6226,6 +6232,8 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddAccount(QMailAccou
+     ssoAccount->setValue("status", account->status());
+     const bool appendSignature = (account->status() & QMailAccount::AppendSignature);
+     ssoAccount->setValue("signatureEnabled", appendSignature);
++    const bool hasPersistentConnection = (account->status() & QMailAccount::HasPersistentConnection);
++    ssoAccount->setValue("hasPersistentConnection", hasPersistentConnection);
+     ssoAccount->setValue("signature", account->signature());
+     ssoAccount->setValue("emailaddress", account->fromAddress().address());
+     ssoAccount->setValue("fullName", account->fromAddress().name());
+@@ -7028,6 +7036,8 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
+         ssoAccount->setValue("status", account->status());
+         bool signatureEnabled = account->status() & QMailAccount::AppendSignature;
+         ssoAccount->setValue("signatureEnabled", signatureEnabled);
++        bool hasPersistentConnection = account->status() & QMailAccount::HasPersistentConnection;
++        ssoAccount->setValue("hasPersistentConnection", hasPersistentConnection);
+         ssoAccount->setValue("signature", account->signature());
+         ssoAccount->setValue("emailaddress", account->fromAddress().address());
+         ssoAccount->setValue("fullName", account->fromAddress().name());
+-- 
+2.30.2
+

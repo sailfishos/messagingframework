@@ -1,0 +1,128 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: David Llewellyn-Jones <david.llewellyn-jones@jolla.com>
+Date: Wed, 22 Jul 2020 11:08:24 +0000
+Subject: [PATCH] Apply folder policy to always on connection
+
+Changes the configuration so that the push folders are generated from
+the the policy and folder flags, rather than a separate configuration
+setting.
+---
+ src/libraries/qmfclient/qmailaccount.cpp      | 53 +++++++++++++++++++
+ src/libraries/qmfclient/qmailaccount.h        |  2 +
+ .../imap/imapconfiguration.cpp                | 19 ++++++-
+ 3 files changed, 73 insertions(+), 1 deletion(-)
+
+diff --git a/src/libraries/qmfclient/qmailaccount.cpp b/src/libraries/qmfclient/qmailaccount.cpp
+index 5163e370..79025c6e 100644
+--- a/src/libraries/qmfclient/qmailaccount.cpp
++++ b/src/libraries/qmfclient/qmailaccount.cpp
+@@ -790,3 +790,56 @@ void QMailAccount::setFolderSyncPolicy(QMailAccount::FolderSyncPolicy policy)
+ {
+     d->_folderSyncPolicy = policy;
+ }
++
++const QList<QMailFolderId> QMailAccount::foldersToSync() const
++{
++    QList<QMailFolderId> folders;
++    QMailFolderKey filterKey(QMailFolderKey::parentAccountId(d->_id));
++
++    QMailFolderId inbox;
++    if ((d->_folderSyncPolicy == QMailAccount::SyncInboxOnly)
++            || (d->_folderSyncPolicy == QMailAccount::SyncInboxAndSubfolders)) {
++        // Find the inbox if we're going to need it
++        inbox = standardFolder(QMailFolder::InboxFolder);
++    }
++
++    switch (d->_folderSyncPolicy) {
++    default:
++    case QMailAccount::SyncInboxOnly:
++        if (inbox.isValid()) {
++            folders << inbox;
++        }
++        break;
++    case QMailAccount::SyncInboxAndSubfolders: {
++            // Add only folders with the inbox in their ancestry
++            QMailFolderIdList folderIds = QMailStore::instance()->queryFolders(filterKey, QMailFolderSortKey::id(Qt::AscendingOrder));
++            for (QMailFolderId folderId : folderIds) {
++                bool result = false;
++                QMailFolderId checkId = folderId;
++                while (!result && checkId.isValid()) {
++                    if (checkId == inbox) {
++                        folders << folderId;
++                        result = true;
++                    }
++                    else {
++                        checkId = QMailFolder(checkId).parentFolderId();
++                    }
++                }
++            }
++        }
++        break;
++    case QMailAccount::SyncSelectedFolders:
++        filterKey &= QMailFolderKey(QMailFolderKey::status(QMailFolder::SynchronizationEnabled));
++        // Fallthrough
++    case QMailAccount::SyncEverything:
++        QMailFolderIdList folderIds = QMailStore::instance()->queryFolders(filterKey, QMailFolderSortKey::id(Qt::AscendingOrder));
++        for (QMailFolderId folderId : folderIds) {
++            if (folderId.isValid()) {
++                folders << folderId;
++            }
++        }
++        break;
++    }
++
++    return folders;
++}
+diff --git a/src/libraries/qmfclient/qmailaccount.h b/src/libraries/qmfclient/qmailaccount.h
+index 933cfa0c..9ee1a6ce 100644
+--- a/src/libraries/qmfclient/qmailaccount.h
++++ b/src/libraries/qmfclient/qmailaccount.h
+@@ -145,6 +145,8 @@ public:
+ 
+     const QMap<QString, QString> &customFields() const;
+ 
++    const QList<QMailFolderId> foldersToSync() const;
++
+ private:
+     friend class QMailAccountPrivate;
+     friend class QMailStore;
+diff --git a/src/plugins/messageservices/imap/imapconfiguration.cpp b/src/plugins/messageservices/imap/imapconfiguration.cpp
+index 75009809..a5663fdf 100644
+--- a/src/plugins/messageservices/imap/imapconfiguration.cpp
++++ b/src/plugins/messageservices/imap/imapconfiguration.cpp
+@@ -31,6 +31,8 @@
+ **
+ ****************************************************************************/
+ 
++#include "qmailaccount.h"
++
+ #include "imapconfiguration.h"
+ #include <QStringList>
+ 
+@@ -112,7 +114,22 @@ QString ImapConfiguration::baseFolder() const
+ 
+ QStringList ImapConfiguration::pushFolders() const
+ {
+-    return value("pushFolders").split(QChar('\x0A'), Qt::SkipEmptyParts);
++    QStringList result;
++
++    // Settings adds "INBOX" to the pushFolders on activation;
++    // we use this as a trigger, to avoid activating folders too early
++    if (!this->isValid() || !this->id().isValid() || !pushCapable() || value("pushFolders").isEmpty()) {
++        return QStringList();
++    }
++
++    const QList<QMailFolderId> folders = QMailAccount(this->id()).foldersToSync();
++
++    // Convert to folder paths
++    for (QMailFolderId folderId : folders) {
++        result << QMailFolder(folderId).path();
++    }
++
++    return result;
+ }
+ 
+ int ImapConfiguration::checkInterval() const
+-- 
+2.30.2
+

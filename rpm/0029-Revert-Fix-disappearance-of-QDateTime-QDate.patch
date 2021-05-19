@@ -1,0 +1,575 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Damien Caliste <dcaliste@free.fr>
+Date: Wed, 19 May 2021 09:19:24 +0200
+Subject: [PATCH] Revert "Fix disappearance of QDateTime(QDate)"
+
+This reverts commit a8db671f00ebf5aa56e57d1bdf1511d9af22c809.
+---
+ .../tst_qmail_listmodels.cpp                  |  8 ++---
+ .../tst_qmail_sortkeys/tst_qmail_sortkeys.cpp | 20 ++++++------
+ .../tst_qmaildisconnected.cpp                 | 20 ++++++------
+ .../tst_qmailmessageset.cpp                   | 20 ++++++------
+ .../tst_qmailserviceaction.cpp                | 20 ++++++------
+ .../tst_qmailstorageaction.cpp                | 32 +++++++++----------
+ tests/tst_qmailstore/tst_qmailstore.cpp       |  4 +--
+ .../tst_qmailstorekeys/tst_qmailstorekeys.cpp | 24 +++++++-------
+ tests/tst_qmailthread/tst_qmailthread.cpp     | 20 ++++++------
+ .../tst_storagemanager/tst_storagemanager.cpp | 16 +++++-----
+ 10 files changed, 92 insertions(+), 92 deletions(-)
+
+diff --git a/tests/tst_qmail_listmodels/tst_qmail_listmodels.cpp b/tests/tst_qmail_listmodels/tst_qmail_listmodels.cpp
+index 7d55aa9a..521e0d91 100644
+--- a/tests/tst_qmail_listmodels/tst_qmail_listmodels.cpp
++++ b/tests/tst_qmail_listmodels/tst_qmail_listmodels.cpp
+@@ -144,8 +144,8 @@ void tst_QMail_ListModels::initTestCase()
+     msg1.setFrom(QMailAddress("0404404040"));
+     msg1.setTo(QMailAddress("0404040404"));
+     msg1.setSubject("Where are you?");
+-    msg1.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-    msg1.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++    msg1.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++    msg1.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+     msg1.setStatus(QMailMessage::Incoming, true);
+     msg1.setStatus(QMailMessage::New, false);
+     msg1.setStatus(QMailMessage::Read, true);
+@@ -163,8 +163,8 @@ void tst_QMail_ListModels::initTestCase()
+     msg2.setTo(QMailAddress("old@example.org"));
+     msg2.setCc(QMailAddressList() << QMailAddress("anotherguy@example.org"));
+     msg2.setSubject("email message test");
+-    msg2.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-    msg2.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++    msg2.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++    msg2.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+     msg2.setStatus(QMailMessage::Incoming, true);
+     msg2.setStatus(QMailMessage::New, true);
+     msg2.setStatus(QMailMessage::Read, false);
+diff --git a/tests/tst_qmail_sortkeys/tst_qmail_sortkeys.cpp b/tests/tst_qmail_sortkeys/tst_qmail_sortkeys.cpp
+index 1266d68f..0761f315 100644
+--- a/tests/tst_qmail_sortkeys/tst_qmail_sortkeys.cpp
++++ b/tests/tst_qmail_sortkeys/tst_qmail_sortkeys.cpp
+@@ -265,8 +265,8 @@ void tst_QMail_SortKeys::initTestCase()
+         message.setFrom(QMailAddress("0404404040"));
+         message.setTo(QMailAddress("0404040404"));
+         message.setSubject("Where are you?");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Read, true);
+@@ -289,8 +289,8 @@ void tst_QMail_SortKeys::initTestCase()
+         message.setFrom(QMailAddress("account2@example.org"));
+         message.setTo(QMailAddress("account1@example.org"));
+         message.setSubject("inboxMessage1");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, true);
+         message.setStatus(QMailMessage::Read, false);
+@@ -313,8 +313,8 @@ void tst_QMail_SortKeys::initTestCase()
+         message.setFrom(QMailAddress("account1@example.org"));
+         message.setTo(QMailAddress("fred@example.net"));
+         message.setSubject("archivedMessage1");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().addDays(-1).startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().addDays(-1).startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-1))));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-1))));
+         message.setStatus(QMailMessage::Outgoing, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Sent, true);
+@@ -342,8 +342,8 @@ void tst_QMail_SortKeys::initTestCase()
+         message.setFrom(QMailAddress("account1@example.org"));
+         message.setTo(QMailAddress("account2@example.org"));
+         message.setSubject("Fwd:inboxMessage2");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, true);
+         message.setStatus(QMailMessage::Read, true);
+@@ -369,8 +369,8 @@ void tst_QMail_SortKeys::initTestCase()
+         message.setFrom(QMailAddress("fred@example.net"));
+         message.setTo(QMailAddressList() << QMailAddress("account2@example.org") << QMailAddress("testing@test"));
+         message.setSubject("Re:savedMessage2");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().addDays(-7).startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().addDays(-7).startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-7))));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-7))));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Read, false);
+diff --git a/tests/tst_qmaildisconnected/tst_qmaildisconnected.cpp b/tests/tst_qmaildisconnected/tst_qmaildisconnected.cpp
+index 60a9369a..bc6f10ed 100644
+--- a/tests/tst_qmaildisconnected/tst_qmaildisconnected.cpp
++++ b/tests/tst_qmaildisconnected/tst_qmaildisconnected.cpp
+@@ -265,8 +265,8 @@ void tst_QMailDisconnected::initTestCase()
+         message.setFrom(QMailAddress("0404404040"));
+         message.setTo(QMailAddress("0404040404"));
+         message.setSubject("Where are you?");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Read, true);
+@@ -289,8 +289,8 @@ void tst_QMailDisconnected::initTestCase()
+         message.setFrom(QMailAddress("account2@example.org"));
+         message.setTo(QMailAddress("account1@example.org"));
+         message.setSubject("inboxMessage1");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, true);
+         message.setStatus(QMailMessage::Read, false);
+@@ -313,8 +313,8 @@ void tst_QMailDisconnected::initTestCase()
+         message.setFrom(QMailAddress("account1@example.org"));
+         message.setTo(QMailAddress("fred@example.net"));
+         message.setSubject("archivedMessage1");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().addDays(-1).startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().addDays(-1).startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-1))));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-1))));
+         message.setStatus(QMailMessage::Outgoing, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Sent, true);
+@@ -342,8 +342,8 @@ void tst_QMailDisconnected::initTestCase()
+         message.setFrom(QMailAddress("account1@example.org"));
+         message.setTo(QMailAddress("account2@example.org"));
+         message.setSubject("Fwd:inboxMessage2");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, true);
+         message.setStatus(QMailMessage::Read, true);
+@@ -369,8 +369,8 @@ void tst_QMailDisconnected::initTestCase()
+         message.setFrom(QMailAddress("fred@example.net"));
+         message.setTo(QMailAddressList() << QMailAddress("account2@example.org") << QMailAddress("testing@test"));
+         message.setSubject("Re:savedMessage2");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().addDays(-7).startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().addDays(-7).startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-7))));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-7))));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Read, false);
+diff --git a/tests/tst_qmailmessageset/tst_qmailmessageset.cpp b/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
+index b3bccba9..168fb891 100644
+--- a/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
++++ b/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
+@@ -271,8 +271,8 @@ void tst_QMailMessageSet::initTestCase()
+         message.setFrom(QMailAddress("0404404040"));
+         message.setTo(QMailAddress("0404040404"));
+         message.setSubject("Where are you?");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Read, true);
+@@ -295,8 +295,8 @@ void tst_QMailMessageSet::initTestCase()
+         message.setFrom(QMailAddress("account2@example.org"));
+         message.setTo(QMailAddress("account1@example.org"));
+         message.setSubject("inboxMessage1");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, true);
+         message.setStatus(QMailMessage::Read, false);
+@@ -319,8 +319,8 @@ void tst_QMailMessageSet::initTestCase()
+         message.setFrom(QMailAddress("account1@example.org"));
+         message.setTo(QMailAddress("fred@example.net"));
+         message.setSubject("archivedMessage1");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().addDays(-1).startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().addDays(-1).startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-1))));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-1))));
+         message.setStatus(QMailMessage::Outgoing, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Sent, true);
+@@ -348,8 +348,8 @@ void tst_QMailMessageSet::initTestCase()
+         message.setFrom(QMailAddress("account1@example.org"));
+         message.setTo(QMailAddress("account2@example.org"));
+         message.setSubject("Fwd:inboxMessage2");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, true);
+         message.setStatus(QMailMessage::Read, true);
+@@ -375,8 +375,8 @@ void tst_QMailMessageSet::initTestCase()
+         message.setFrom(QMailAddress("fred@example.net"));
+         message.setTo(QMailAddressList() << QMailAddress("account2@example.org") << QMailAddress("testing@test"));
+         message.setSubject("Re:savedMessage2");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().addDays(-7).startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().addDays(-7).startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-7))));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-7))));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Read, false);
+diff --git a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
+index d48e73be..e206479f 100644
+--- a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
++++ b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
+@@ -269,8 +269,8 @@ void tst_QMailServiceAction::initTestCase()
+         message.setFrom(QMailAddress("0404404040"));
+         message.setTo(QMailAddress("0404040404"));
+         message.setSubject("Where are you?");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Read, true);
+@@ -293,8 +293,8 @@ void tst_QMailServiceAction::initTestCase()
+         message.setFrom(QMailAddress("account2@example.org"));
+         message.setTo(QMailAddress("account1@example.org"));
+         message.setSubject("inboxMessage1");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, true);
+         message.setStatus(QMailMessage::Read, false);
+@@ -317,8 +317,8 @@ void tst_QMailServiceAction::initTestCase()
+         message.setFrom(QMailAddress("account1@example.org"));
+         message.setTo(QMailAddress("fred@example.net"));
+         message.setSubject("archivedMessage1");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().addDays(-1).startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().addDays(-1).startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-1))));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-1))));
+         message.setStatus(QMailMessage::Outgoing, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Sent, true);
+@@ -346,8 +346,8 @@ void tst_QMailServiceAction::initTestCase()
+         message.setFrom(QMailAddress("account1@example.org"));
+         message.setTo(QMailAddress("account2@example.org"));
+         message.setSubject("Fwd:inboxMessage2");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, true);
+         message.setStatus(QMailMessage::Read, true);
+@@ -373,8 +373,8 @@ void tst_QMailServiceAction::initTestCase()
+         message.setFrom(QMailAddress("fred@example.net"));
+         message.setTo(QMailAddressList() << QMailAddress("account2@example.org") << QMailAddress("testing@test"));
+         message.setSubject("Re:savedMessage2");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().addDays(-7).startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().addDays(-7).startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-7))));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-7))));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Read, false);
+diff --git a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
+index 72cd1570..2248ce0e 100644
+--- a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
++++ b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
+@@ -357,8 +357,8 @@ void tst_QMailStorageAction::initTestCase()
+         message.setFrom(QMailAddress("0404404040"));
+         message.setTo(QMailAddress("0404040404"));
+         message.setSubject("Where are you?");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Read, true);
+@@ -381,8 +381,8 @@ void tst_QMailStorageAction::initTestCase()
+         message.setFrom(QMailAddress("account2@example.org"));
+         message.setTo(QMailAddress("account1@example.org"));
+         message.setSubject("inboxMessage1");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, true);
+         message.setStatus(QMailMessage::Read, false);
+@@ -405,8 +405,8 @@ void tst_QMailStorageAction::initTestCase()
+         message.setFrom(QMailAddress("account1@example.org"));
+         message.setTo(QMailAddress("fred@example.net"));
+         message.setSubject("archivedMessage1");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().addDays(-1).startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().addDays(-1).startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-1))));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-1))));
+         message.setStatus(QMailMessage::Outgoing, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Sent, true);
+@@ -434,8 +434,8 @@ void tst_QMailStorageAction::initTestCase()
+         message.setFrom(QMailAddress("account1@example.org"));
+         message.setTo(QMailAddress("account2@example.org"));
+         message.setSubject("Fwd:inboxMessage2");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, true);
+         message.setStatus(QMailMessage::Read, true);
+@@ -461,8 +461,8 @@ void tst_QMailStorageAction::initTestCase()
+         message.setFrom(QMailAddress("fred@example.net"));
+         message.setTo(QMailAddressList() << QMailAddress("account2@example.org") << QMailAddress("testing@test"));
+         message.setSubject("Re:savedMessage2");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().addDays(-7).startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().addDays(-7).startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-7))));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-7))));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Read, false);
+@@ -506,8 +506,8 @@ void tst_QMailStorageAction::test_storageaction_add()
+     message.setFrom(QMailAddress("wilma@example.net"));
+     message.setTo(QMailAddressList() << QMailAddress("account2@example.org") << QMailAddress("testing@test"));
+     message.setSubject("Simple test message");
+-    message.setDate(QMailTimeStamp(QDate::currentDate().addDays(-100).startOfDay()));
+-    message.setReceivedDate(QMailTimeStamp(QDate::currentDate().addDays(-100).startOfDay()));
++    message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-100))));
++    message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-100))));
+     message.setStatus(QMailMessage::Incoming, true);
+     message.setStatus(QMailMessage::New, false);
+     message.setStatus(QMailMessage::Read, false);
+@@ -758,8 +758,8 @@ void tst_QMailStorageAction::test_storageaction_rollBackUpdates()
+     message.setFrom(QMailAddress("barney@example.net"));
+     message.setTo(QMailAddressList() << QMailAddress("account3@example.org") << QMailAddress("testing@test"));
+     message.setSubject("Rollback test message");
+-    message.setDate(QMailTimeStamp(QDate::currentDate().addDays(-98).startOfDay()));
+-    message.setReceivedDate(QMailTimeStamp(QDate::currentDate().addDays(-98).startOfDay()));
++    message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-98))));
++    message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-98))));
+     message.setStatus(QMailMessage::Incoming, true);
+     message.setStatus(QMailMessage::New, false);
+     message.setStatus(QMailMessage::Read, false);
+@@ -855,8 +855,8 @@ void tst_QMailStorageAction::test_storageaction_discardMessages()
+     message.setFrom(QMailAddress("barney@example.net"));
+     message.setTo(QMailAddressList() << QMailAddress("account2@example.org") << QMailAddress("testing@test"));
+     message.setSubject("Another test message");
+-    message.setDate(QMailTimeStamp(QDate::currentDate().addDays(-99).startOfDay()));
+-    message.setReceivedDate(QMailTimeStamp(QDate::currentDate().addDays(-99).startOfDay()));
++    message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-99))));
++    message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-99))));
+     message.setStatus(QMailMessage::Incoming, true);
+     message.setStatus(QMailMessage::New, false);
+     message.setStatus(QMailMessage::Read, false);
+diff --git a/tests/tst_qmailstore/tst_qmailstore.cpp b/tests/tst_qmailstore/tst_qmailstore.cpp
+index cd4fe210..0c4e2648 100644
+--- a/tests/tst_qmailstore/tst_qmailstore.cpp
++++ b/tests/tst_qmailstore/tst_qmailstore.cpp
+@@ -1822,8 +1822,8 @@ void tst_QMailStore::message()
+     msg2.setParentAccountId(account2.id());
+     msg2.setParentFolderId(QMailFolder::LocalStorageFolderId);
+     msg2.setSubject("email message test");
+-    msg2.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-    msg2.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++    msg2.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++    msg2.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+     msg2.setStatus(QMailMessage::Incoming, true);
+     msg2.setStatus(QMailMessage::New, true);
+     msg2.setStatus(QMailMessage::Read, false);
+diff --git a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
+index 2c0650a0..cd8c1709 100644
+--- a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
++++ b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
+@@ -343,8 +343,8 @@ void tst_QMailStoreKeys::initTestCase()
+         message.setFrom(QMailAddress("0404404040"));
+         message.setTo(QMailAddress("0404040404"));
+         message.setSubject("Where are you?");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Read, true);
+@@ -367,8 +367,8 @@ void tst_QMailStoreKeys::initTestCase()
+         message.setFrom(QMailAddress("account2@example.org"));
+         message.setTo(QMailAddress("account1@example.org"));
+         message.setSubject("inboxMessage1");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, true);
+         message.setStatus(QMailMessage::Read, false);
+@@ -391,8 +391,8 @@ void tst_QMailStoreKeys::initTestCase()
+         message.setFrom(QMailAddress("account1@example.org"));
+         message.setTo(QMailAddress("fred@example.net"));
+         message.setSubject("archivedMessage1");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().addDays(-1).startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().addDays(-1).startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-1))));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-1))));
+         message.setStatus(QMailMessage::Outgoing, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Sent, true);
+@@ -420,8 +420,8 @@ void tst_QMailStoreKeys::initTestCase()
+         message.setFrom(QMailAddress("account1@example.org"));
+         message.setTo(QMailAddress("account2@example.org"));
+         message.setSubject("Fwd:inboxMessage2");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, true);
+         message.setStatus(QMailMessage::Read, true);
+@@ -447,8 +447,8 @@ void tst_QMailStoreKeys::initTestCase()
+         message.setFrom(QMailAddress("fred@example.net"));
+         message.setTo(QMailAddressList() << QMailAddress("account2@example.org") << QMailAddress("testing@test"));
+         message.setSubject("Re:savedMessage2");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().addDays(-7).startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().addDays(-7).startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-7))));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-7))));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Read, false);
+@@ -1631,7 +1631,7 @@ void tst_QMailStoreKeys::messageSubject()
+ 
+ void tst_QMailStoreKeys::messageTimeStamp()
+ {
+-    QDateTime today(QDate::currentDate().startOfDay()), yesterday(QDate::currentDate().addDays(-1).startOfDay()), lastWeek(QDate::currentDate().addDays(-7).startOfDay());
++    QDateTime today(QDate::currentDate()), yesterday(QDate::currentDate().addDays(-1)), lastWeek(QDate::currentDate().addDays(-7));
+     today = today.toUTC();
+     yesterday = yesterday.toUTC();
+     lastWeek = lastWeek.toUTC();
+@@ -1691,7 +1691,7 @@ void tst_QMailStoreKeys::messageTimeStamp()
+ 
+ void tst_QMailStoreKeys::messageReceptionTimeStamp()
+ {
+-    QDateTime today(QDate::currentDate().startOfDay()), yesterday(QDate::currentDate().addDays(-1).startOfDay()), lastWeek(QDate::currentDate().addDays(-7).startOfDay());
++    QDateTime today(QDate::currentDate()), yesterday(QDate::currentDate().addDays(-1)), lastWeek(QDate::currentDate().addDays(-7));
+     today = today.toUTC();
+     yesterday = yesterday.toUTC();
+     lastWeek = lastWeek.toUTC();
+diff --git a/tests/tst_qmailthread/tst_qmailthread.cpp b/tests/tst_qmailthread/tst_qmailthread.cpp
+index 830912d4..e5fc657a 100644
+--- a/tests/tst_qmailthread/tst_qmailthread.cpp
++++ b/tests/tst_qmailthread/tst_qmailthread.cpp
+@@ -289,8 +289,8 @@ void tst_qmailthread::initTestCase()
+         message.setFrom(QMailAddress("0404404040"));
+         message.setTo(QMailAddress("0404040404"));
+         message.setSubject("Where are you?");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Read, true);
+@@ -313,8 +313,8 @@ void tst_qmailthread::initTestCase()
+         message.setFrom(QMailAddress("account2@example.org"));
+         message.setTo(QMailAddress("account1@example.org"));
+         message.setSubject("inboxMessage1");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, true);
+         message.setStatus(QMailMessage::Read, false);
+@@ -337,8 +337,8 @@ void tst_qmailthread::initTestCase()
+         message.setFrom(QMailAddress("account1@example.org"));
+         message.setTo(QMailAddress("fred@example.net"));
+         message.setSubject("archivedMessage1");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().addDays(-1).startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().addDays(-1).startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-1))));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-1))));
+         message.setStatus(QMailMessage::Outgoing, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Sent, true);
+@@ -366,8 +366,8 @@ void tst_qmailthread::initTestCase()
+         message.setFrom(QMailAddress("account1@example.org"));
+         message.setTo(QMailAddress("account2@example.org"));
+         message.setSubject("Fwd:inboxMessage2");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, true);
+         message.setStatus(QMailMessage::Read, true);
+@@ -393,8 +393,8 @@ void tst_qmailthread::initTestCase()
+         message.setFrom(QMailAddress("fred@example.net"));
+         message.setTo(QMailAddressList() << QMailAddress("account2@example.org") << QMailAddress("testing@test"));
+         message.setSubject("Re:savedMessage2");
+-        message.setDate(QMailTimeStamp(QDate::currentDate().addDays(-7).startOfDay()));
+-        message.setReceivedDate(QMailTimeStamp(QDate::currentDate().addDays(-7).startOfDay()));
++        message.setDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-7))));
++        message.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate().addDays(-7))));
+         message.setStatus(QMailMessage::Incoming, true);
+         message.setStatus(QMailMessage::New, false);
+         message.setStatus(QMailMessage::Read, false);
+diff --git a/tests/tst_storagemanager/tst_storagemanager.cpp b/tests/tst_storagemanager/tst_storagemanager.cpp
+index 6247f02a..1d5ea7cf 100644
+--- a/tests/tst_storagemanager/tst_storagemanager.cpp
++++ b/tests/tst_storagemanager/tst_storagemanager.cpp
+@@ -157,8 +157,8 @@ void tst_StorageManager::initTestCase()
+     msg1.setFrom(QMailAddress("0404404040"));
+     msg1.setTo(QMailAddress("0404040404"));
+     msg1.setSubject("Where are you?");
+-    msg1.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-    msg1.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++    msg1.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++    msg1.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+     msg1.setStatus(QMailMessage::Incoming, true);
+     msg1.setStatus(QMailMessage::New, false);
+     msg1.setStatus(QMailMessage::Read, true);
+@@ -176,8 +176,8 @@ void tst_StorageManager::initTestCase()
+     msg2.setTo(QMailAddress("old@example.org"));
+     msg2.setCc(QMailAddressList() << QMailAddress("anotherguy@example.org"));
+     msg2.setSubject("email message test");
+-    msg2.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-    msg2.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++    msg2.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++    msg2.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+     msg2.setStatus(QMailMessage::Incoming, true);
+     msg2.setStatus(QMailMessage::New, true);
+     msg2.setStatus(QMailMessage::Read, false);
+@@ -216,8 +216,8 @@ void tst_StorageManager::test_add()
+     msg3.setTo(QMailAddress("old@example.org"));
+     msg3.setCc(QMailAddressList() << QMailAddress("anotherguy@example.org"));
+     msg3.setSubject("email message test");
+-    msg3.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-    msg3.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++    msg3.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++    msg3.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+     msg3.setStatus(QMailMessage::Incoming, true);
+     msg3.setStatus(QMailMessage::New, true);
+     msg3.setStatus(QMailMessage::Read, false);
+@@ -240,8 +240,8 @@ void tst_StorageManager::test_remove()
+     msg4.setTo(QMailAddress("old@example.org"));
+     msg4.setCc(QMailAddressList() << QMailAddress("anotherguy@example.org"));
+     msg4.setSubject("email message test");
+-    msg4.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
+-    msg4.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
++    msg4.setDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
++    msg4.setReceivedDate(QMailTimeStamp(QDateTime(QDate::currentDate())));
+     msg4.setStatus(QMailMessage::Incoming, true);
+     msg4.setStatus(QMailMessage::New, true);
+     msg4.setStatus(QMailMessage::Read, false);
+-- 
+2.30.2
+

@@ -1,0 +1,127 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Damien Caliste <dcaliste@free.fr>
+Date: Wed, 19 May 2021 08:58:39 +0200
+Subject: [PATCH] Revert "Use QRandomGenerator instead of qrand"
+
+This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
+---
+ src/libraries/qmfclient/qmailmessage.cpp      | 27 ++++++++++++++-----
+ .../qmfstoragemanager/qmfstoragemanager.cpp   |  3 +--
+ .../messageservices/smtp/smtpclient.cpp       | 12 +++++++--
+ 3 files changed, 31 insertions(+), 11 deletions(-)
+
+diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
+index 72555037..659343be 100644
+--- a/src/libraries/qmfclient/qmailmessage.cpp
++++ b/src/libraries/qmfclient/qmailmessage.cpp
+@@ -53,7 +53,6 @@
+ #include <qfile.h>
+ #include <qfileinfo.h>
+ #include <QRegularExpression>
+-#include <QRandomGenerator>
+ #include <qtextstream.h>
+ #include <QTextCodec>
+ #include <QtDebug>
+@@ -6313,11 +6312,6 @@ void QMailMessagePart::setReferenceResolution(const QString &uri)
+     impl(this)->setReferenceResolution(uri);
+ }
+ 
+-static int randomNumber()
+-{
+-    return QRandomGenerator::global()->generate();
+-}
+-
+ static QString randomString(int length)
+ {
+     if (length <= 0) 
+@@ -6328,7 +6322,7 @@ static QString randomString(int length)
+ 
+     int i = 0;
+     while (length--){
+-        int r=randomNumber() % 62;
++        int r=qrand() % 62;
+         r+=48;
+         if (r>57) r+=7;
+         if (r>90) r+=6;
+@@ -7962,6 +7956,25 @@ uint QMailMessagePrivate::indicativeSize() const
+     return (size + 1);
+ }
+ 
++static uint currentTimeValue()
++{
++    return QDateTime::currentDateTime().toTime_t();
++}
++
++static bool seedRng()
++{
++    qsrand(currentTimeValue());
++    return true;
++}
++
++static int randomNumber()
++{
++    static bool initialised = seedRng();
++    Q_UNUSED(initialised)
++
++    return qrand();
++}
++
+ static QByteArray gBoundaryString;
+ 
+ void QMF_EXPORT setQMailMessageBoundaryString(const QByteArray &boundary)
+diff --git a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
+index 60def58c..d5043ea5 100644
+--- a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
++++ b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
+@@ -42,7 +42,6 @@
+ #include <QFile>
+ #include <QtPlugin>
+ #include <QUrl>
+-#include <QRandomGenerator>
+ #if defined(Q_OS_WIN)
+ #include <windows.h>
+ #include <io.h>
+@@ -77,7 +76,7 @@ QString randomString(int length)
+ 
+     int i = 0;
+     while (length--) {
+-        int r=QRandomGenerator::global()->generate() % 62;
++        int r=qrand() % 62;
+         r+=48;
+         if (r>57) r+=7;
+         if (r>90) r+=6;
+diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
+index ff985fc7..fa182c54 100644
+--- a/src/plugins/messageservices/smtp/smtpclient.cpp
++++ b/src/plugins/messageservices/smtp/smtpclient.cpp
+@@ -43,7 +43,6 @@
+ #include <QDir>
+ #include <QHostInfo>
+ #include <QNetworkInterface>
+-#include <QRandomGenerator>
+ #include <QRegExp>
+ #ifndef QT_NO_SSL
+ #include <QSslSocket>
+@@ -58,9 +57,18 @@
+ // Only this many bytes is queued to be sent at a time.
+ #define SENDING_BUFFER_SIZE 5000
+ 
++static bool initialiseRng()
++{
++    qsrand(QDateTime::currentDateTime().toUTC().toTime_t());
++    return true;
++}
++
+ static QByteArray messageId(const QByteArray& domainName, quint32 addressComponent)
+ {
+-    quint32 randomComponent(QRandomGenerator::global()->generate());
++    static bool rngInitialised(initialiseRng());
++    Q_UNUSED(rngInitialised)
++
++    quint32 randomComponent(static_cast<quint32>(qrand()));
+     quint32 timeComponent(QDateTime::currentDateTimeUtc().toMSecsSinceEpoch() / 1000);
+ 
+     return ('<' +
+-- 
+2.30.2
+

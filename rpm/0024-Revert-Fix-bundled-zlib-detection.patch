@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Pekka Vuorela <pekka.vuorela@jolla.com>
+Date: Tue, 14 Aug 2018 14:04:19 +0300
+Subject: [PATCH] Revert "Fix bundled zlib detection"
+
+This reverts commit 7e2579c1fbfc077f3d95eceed5c79236752acb87.
+
+qtConfig() not available before 5.8.0 so reverting the change until
+qt gets updated.
+---
+ src/plugins/messageservices/imap/imap.pro | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
+index 6a4e9adf..a67092c7 100644
+--- a/src/plugins/messageservices/imap/imap.pro
++++ b/src/plugins/messageservices/imap/imap.pro
+@@ -61,9 +61,17 @@ SOURCES += imapclient.cpp \
+     RESOURCES += imap.qrc
+ }
+ 
+-qtConfig(system-zlib) {
+-    QMAKE_USE_PRIVATE += zlib
++!contains(QT_CONFIG, system-zlib) {
++    INCLUDEPATH += $$[QT_INSTALL_HEADERS]/QtZlib
++    DEFINES += QT_QMF_HAVE_ZLIB
++} else:packagesExist(zlib) {
++    CONFIG += link_pkgconfig
++    PKGCONFIG += zlib
++    DEFINES += QT_QMF_HAVE_ZLIB
++} else:macx:exists("/usr/include/zlib.h") {
++    LIBS += -lz
++    DEFINES += QT_QMF_HAVE_ZLIB
+ } else {
+-    QT_PRIVATE += zlib-private
++    warning("IMAP COMPRESS capability requires zlib")
+ }
+ 
+-- 
+2.30.2
+

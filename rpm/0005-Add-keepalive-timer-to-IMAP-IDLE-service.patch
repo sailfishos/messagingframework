@@ -1,0 +1,109 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerio Valerio <valerio.valerio@jollamobile.com>
+Date: Wed, 10 Sep 2014 14:36:13 +0300
+Subject: [PATCH] Add keepalive timer to IMAP IDLE service
+
+This commit introduce a dependency on nemo-keepalive via
+DEFINES+=USE_KEEPALIVE
+---
+ src/plugins/messageservices/imap/imap.pro     |  4 ++++
+ .../messageservices/imap/imapservice.cpp      | 23 +++++++++++++++++++
+ .../messageservices/imap/imapservice.h        | 11 +++++++++
+ 3 files changed, 38 insertions(+)
+
+diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
+index 6c161169..be6ca85a 100644
+--- a/src/plugins/messageservices/imap/imap.pro
++++ b/src/plugins/messageservices/imap/imap.pro
+@@ -6,6 +6,10 @@ load(qt_plugin)
+ 
+ QT = core network qmfclient qmfclient-private qmfmessageserver
+ 
++contains(DEFINES, USE_KEEPALIVE) {
++    PKGCONFIG += keepalive
++}
++
+ contains(DEFINES,QT_QMF_USE_ALIGNEDTIMER) {
+     QT += alignedtimer
+ }
+diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
+index 4edae55f..4ce5a6c2 100644
+--- a/src/plugins/messageservices/imap/imapservice.cpp
++++ b/src/plugins/messageservices/imap/imapservice.cpp
+@@ -1520,6 +1520,12 @@ ImapService::ImapService(const QMailAccountId &accountId)
+       _networkSession(0),
+       _networkSessionTimer(new QTimer(this))
+ {
++#ifdef USE_KEEPALIVE
++    _backgroundActivity = new BackgroundActivity(this);
++    _backgroundActivity->setWakeupFrequency(BackgroundActivity::ThirtySeconds);
++    connect(_backgroundActivity, SIGNAL(running()), this, SLOT(startStopBackgroundActivity()));
++#endif
++
+     QMailAccount account(accountId);
+     if (!(account.status() & QMailAccount::CanSearchOnServer)) {
+         account.setStatus(QMailAccount::CanSearchOnServer, true);
+@@ -1919,7 +1925,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
+         }
+     }
+     _idling = status;
++#ifdef USE_KEEPALIVE
++    startStopBackgroundActivity();
++#endif
++}
++
++#ifdef USE_KEEPALIVE
++void ImapService::startStopBackgroundActivity()
++{
++    // start timer again if still in idle mode
++    if (_idling) {
++        qMailLog(Messaging) << Q_FUNC_INFO <<  "Starting keepalive";
++        _backgroundActivity->wait();
++    } else if (_backgroundActivity->isRunning()){
++        qMailLog(Messaging) << Q_FUNC_INFO << "Stopping keepalive";
++        _backgroundActivity->stop();
++    }
+ }
++#endif
+ 
+ class ImapConfigurator : public QMailMessageServiceConfigurator
+ {
+diff --git a/src/plugins/messageservices/imap/imapservice.h b/src/plugins/messageservices/imap/imapservice.h
+index cb0f3976..21eac44a 100644
+--- a/src/plugins/messageservices/imap/imapservice.h
++++ b/src/plugins/messageservices/imap/imapservice.h
+@@ -38,6 +38,10 @@
+ #include "idlenetworksession.h"
+ #include <qmailmessageservice.h>
+ 
++#ifdef USE_KEEPALIVE
++#include <keepalive/backgroundactivity.h>
++#endif
++
+ class ImapService : public QMailMessageService
+ {
+     Q_OBJECT
+@@ -77,6 +81,10 @@ protected slots:
+     void openIdleSession();
+     void closeIdleSession();
+ 
++#ifdef USE_KEEPALIVE
++    void startStopBackgroundActivity();
++#endif
++
+ private slots:
+     void onOnlineStateChanged(bool isOnline);
+     void onSessionOpened();
+@@ -107,6 +115,9 @@ private:
+     QTimer *_initiatePushEmailTimer;
+     IdleNetworkSession              *_networkSession;          // IDLE network session
+     QTimer                          *_networkSessionTimer;
++#ifdef USE_KEEPALIVE
++    BackgroundActivity* _backgroundActivity;
++#endif
+ };
+ 
+ class ImapServicePlugin : public QMailMessageServicePlugin
+-- 
+2.30.2
+

@@ -1,0 +1,470 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerio Valerio <valerio.valerio@jollamobile.com>
+Date: Mon, 2 Feb 2015 17:03:21 +0200
+Subject: [PATCH] Listen to sync schedule changes from buteo sync framework.
+
+This commit introduces d-bus listeners inside IMAP4 service to
+react to changes in the account schedule related to always-on mode
+and activate/deactivate IMAP IDLE.
+---
+ src/plugins/messageservices/imap/imap.pro     |   1 +
+ .../messageservices/imap/imapclient.cpp       |  64 ++++++++--
+ src/plugins/messageservices/imap/imapclient.h |   5 +-
+ .../messageservices/imap/imapservice.cpp      | 110 +++++++++++++++---
+ .../messageservices/imap/imapservice.h        |   4 +
+ src/tools/systemd/messageserver5.service      |   2 +-
+ 6 files changed, 160 insertions(+), 26 deletions(-)
+
+diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
+index be6ca85a..6a4e9adf 100644
+--- a/src/plugins/messageservices/imap/imap.pro
++++ b/src/plugins/messageservices/imap/imap.pro
+@@ -8,6 +8,7 @@ QT = core network qmfclient qmfclient-private qmfmessageserver
+ 
+ contains(DEFINES, USE_KEEPALIVE) {
+     PKGCONFIG += keepalive
++    QT += dbus
+ }
+ 
+ contains(DEFINES,QT_QMF_USE_ALIGNEDTIMER) {
+diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
+index 5595a296..8b7e4bed 100644
+--- a/src/plugins/messageservices/imap/imapclient.cpp
++++ b/src/plugins/messageservices/imap/imapclient.cpp
+@@ -447,7 +447,8 @@ ImapClient::ImapClient(QObject* parent)
+       _requestRapidClose(false),
+       _rapidClosing(false),
+       _idleRetryDelay(InitialIdleRetryDelay),
+-      _pushConnectionsReserved(0)
++      _pushConnectionsReserved(0),
++      _pushEnabled(0)
+ #ifdef USE_ACCOUNTS_QT
+     , _ssoSessionManager(0),
+       _loginFailed(false),
+@@ -699,7 +700,6 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
+             }
+ 
+             // We are now connected
+-            ImapConfiguration imapCfg(_config);            
+             _waitingForIdleFolderIds = configurationIdleFolderIds();
+ 
+             if (!_idlesEstablished
+@@ -708,9 +708,17 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
+                 && _pushConnectionsReserved) {
+                 _waitingForIdle = true;
+                 emit updateStatus( tr("Logging in idle connection" ) );
++#ifdef USE_ACCOUNTS_QT
++                if (_ssoSessionManager) {
++                    ssoProcessLogin();
++                } else {
++                   monitor(_waitingForIdleFolderIds);
++                }
++#else
+                 monitor(_waitingForIdleFolderIds);
++#endif
+             } else {
+-                if (!imapCfg.pushEnabled()) {
++                if (!pushEnabled()) {
+                     foreach(const QMailFolderId &id, _monitored.keys()) {
+                         IdleProtocol *protocol = _monitored.take(id);
+                         protocol->close();
+@@ -1793,8 +1801,7 @@ bool ImapClient::loggingIn() const
+ 
+ bool ImapClient::idlesEstablished()
+ {
+-    ImapConfiguration imapCfg(_config);
+-    if (!imapCfg.pushEnabled())
++    if (!pushEnabled())
+         return true;
+ 
+     return _idlesEstablished;
+@@ -1817,8 +1824,9 @@ QMailFolderIdList ImapClient::configurationIdleFolderIds()
+ {
+     ImapConfiguration imapCfg(_config);            
+     QMailFolderIdList folderIds;
+-    if (!imapCfg.pushEnabled())
++    if (!pushEnabled()) {
+         return folderIds;
++    }
+     foreach(QString folderName, imapCfg.pushFolders()) {
+         QMailFolderId idleFolderId(mailboxId(folderName));
+         if (idleFolderId.isValid()) {
+@@ -1834,7 +1842,7 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
+     
+     ImapConfiguration imapCfg(_config);
+     if (!_protocol.supportsCapability("IDLE")
+-        || !imapCfg.pushEnabled()) {
++        || !pushEnabled()) {
+         return;
+     }
+     
+@@ -1922,6 +1930,26 @@ void ImapClient::removeAllFromBuffer(QMailMessage *message)
+     }
+ }
+ 
++bool ImapClient::pushEnabled()
++{
++    bool pushEnabled;
++#ifdef USE_KEEPALIVE
++    pushEnabled = _pushEnabled;
++#else
++    ImapConfiguration imapCfg(_config);
++    pushEnabled = imapCfg.pushEnabled();
++#endif
++    return pushEnabled;
++}
++
++void ImapClient::setPushEnabled(bool state)
++{
++    if (pushEnabled() != state) {
++        qMailLog(Messaging) << Q_FUNC_INFO << "Setting push enabled state to " << state;
++        _pushEnabled = state;
++    }
++}
++
+ #ifdef USE_ACCOUNTS_QT
+ void ImapClient::removeSsoIdentity(const QMailAccountId &accountId)
+ {
+@@ -1937,7 +1965,7 @@ void ImapClient::removeSsoIdentity(const QMailAccountId &accountId)
+ 
+ void ImapClient::ssoProcessLogin()
+ {
+-    if (_loginFailed && _recreateIdentity) {
++    if ((_loginFailed && _recreateIdentity) || _waitingForIdle) {
+         // if account was updated try to recreate
+         // identity without asking the user for new
+         // credentials
+@@ -1978,6 +2006,8 @@ void ImapClient::onSsoSessionResponse(const QMap<QString,QList<QByteArray> > &ss
+     }
+     if (_sendLogin) {
+         _protocol.sendLogin(_config, _ssoLogin);
++    } else if (_waitingForIdle) {
++        monitor(_waitingForIdleFolderIds);
+     }
+ }
+ 
+@@ -2010,6 +2040,14 @@ void ImapClient::onAccountsUpdated(const QMailAccountIdList &list)
+         }
+ 
+         qMailLog(IMAP) << Q_FUNC_INFO << imapCfg1.mailUserName() ;
++#ifdef USE_KEEPALIVE
++        // compare config modified by the User
++        const bool& notEqual = (imapCfg1.mailUserName() != imapCfg2.mailUserName()) ||
++                               (imapCfg1.mailPassword() != imapCfg2.mailPassword()) ||
++                               (imapCfg1.mailServer() != imapCfg2.mailServer()) ||
++                               (imapCfg1.mailPort() != imapCfg2.mailPort()) ||
++                               (imapCfg1.mailEncryption() != imapCfg2.mailEncryption());
++#else
+         // compare config modified by the User
+         const bool& notEqual = (imapCfg1.mailUserName() != imapCfg2.mailUserName()) ||
+                                (imapCfg1.mailPassword() != imapCfg2.mailPassword()) ||
+@@ -2017,15 +2055,19 @@ void ImapClient::onAccountsUpdated(const QMailAccountIdList &list)
+                                (imapCfg1.mailPort() != imapCfg2.mailPort()) ||
+                                (imapCfg1.mailEncryption() != imapCfg2.mailEncryption()) ||
+                                (imapCfg1.pushEnabled() != imapCfg2.pushEnabled());
++#endif
+         if (notEqual)
+             closeIdleConnections();
+ 
++#ifndef USE_KEEPALIVE
+         if (imapCfg1.pushEnabled() != imapCfg2.pushEnabled()) {
+             if (imapCfg2.pushEnabled())
+                 emit restartPushEmail();
+         }
++#endif
+     }
+ }
++#endif
+ 
+ void ImapClient::closeIdleConnections()
+ {
+@@ -2035,12 +2077,12 @@ void ImapClient::closeIdleConnections()
+     // closing idle connections
+     foreach(const QMailFolderId &id, _monitored.keys()) {
+         IdleProtocol *protocol = _monitored.take(id);
+-        protocol->close();
++        if (protocol->inUse()) {
++            protocol->close();
++        }
+         delete protocol;
+     }
+     _idlesEstablished = false;
+ }
+ 
+-#endif
+-
+ #include "imapclient.moc"
+diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
+index f29335c6..b04660ed 100644
+--- a/src/plugins/messageservices/imap/imapclient.h
++++ b/src/plugins/messageservices/imap/imapclient.h
+@@ -68,7 +68,6 @@ public:
+     void setAccount(const QMailAccountId& accountId);
+ #ifdef USE_ACCOUNTS_QT
+     void removeSsoIdentity(const QMailAccountId& accountId);
+-    void closeIdleConnections();
+ #endif
+     QMailAccountId account() const;
+     void requestRapidClose() { _requestRapidClose = true; } // Close connection ASAP, unless interactive checking occurred recently
+@@ -76,6 +75,7 @@ public:
+     void newConnection();
+     void cancelTransfer(QMailServiceAction::Status::ErrorCode code, const QString &text);
+     void closeConnection();
++    void closeIdleConnections();
+ 
+     ImapStrategyContext *strategyContext();
+ 
+@@ -102,6 +102,8 @@ public:
+     void setPushConnectionsReserved(int reserved) { _pushConnectionsReserved = reserved; }
+     int idleRetryDelay() const { return _idleRetryDelay; }
+     void setIdleRetryDelay(int delay) { _idleRetryDelay = delay; }
++    bool pushEnabled();
++    void setPushEnabled(bool state);
+ 
+ signals:
+     void errorOccurred(int, const QString &);
+@@ -197,6 +199,7 @@ private:
+     QList<QMailMessageBufferFlushCallback*> callbacks;
+     QVector<QMailMessage*> _bufferedMessages;
+     int _pushConnectionsReserved;
++    bool _pushEnabled;
+ 
+     QMultiMap<QMailMessageId,QString> detachedTempFiles;
+ 
+diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
+index 9591fa65..12fb8b39 100644
+--- a/src/plugins/messageservices/imap/imapservice.cpp
++++ b/src/plugins/messageservices/imap/imapservice.cpp
+@@ -46,6 +46,12 @@
+ #include <QCoreApplication>
+ #include <typeinfo>
+ 
++#ifdef USE_KEEPALIVE
++#include <QDBusConnection>
++#include <QtDBus>
++#include <QDBusArgument>
++#endif
++
+ namespace { 
+ 
+ const QString serviceKey("imap4");
+@@ -1520,12 +1526,6 @@ ImapService::ImapService(const QMailAccountId &accountId)
+       _networkSession(0),
+       _networkSessionTimer(new QTimer(this))
+ {
+-#ifdef USE_KEEPALIVE
+-    _backgroundActivity = new BackgroundActivity(this);
+-    _backgroundActivity->setWakeupFrequency(BackgroundActivity::ThirtySeconds);
+-    connect(_backgroundActivity, SIGNAL(running()), this, SLOT(startStopBackgroundActivity()));
+-#endif
+-
+     QMailAccount account(accountId);
+     if (!(account.status() & QMailAccount::CanSearchOnServer)) {
+         account.setStatus(QMailAccount::CanSearchOnServer, true);
+@@ -1540,6 +1540,24 @@ ImapService::ImapService(const QMailAccountId &accountId)
+     connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
+             this, SLOT(accountsUpdated(const QMailAccountIdList&)));
+     connect(_initiatePushEmailTimer, SIGNAL(timeout()), this, SLOT(initiatePushEmail()));
++
++#ifdef USE_KEEPALIVE
++    _backgroundActivity = new BackgroundActivity(this);
++    _backgroundActivity->setWakeupFrequency(BackgroundActivity::ThirtySeconds);
++    connect(_backgroundActivity, SIGNAL(running()), this, SLOT(startStopBackgroundActivity()));
++
++    // Connect to dbus signals emitted by buteo notifying schedule changes
++    QDBusConnection m_dBusConnection(QDBusConnection::sessionBus());
++    _accountPushEnabled = false;
++    _buteoReplyReceived = false;
++
++    if(!m_dBusConnection.isConnected()) {
++        qWarning() << Q_FUNC_INFO << "Cannot connect to Dbus";
++    }
++
++    m_dBusConnection.connect("com.meego.msyncd", "/synchronizer", "com.meego.msyncd", "syncedExternallyStatus",
++                             this, SLOT(pushEnabledStatus(uint,QString,bool)));
++#endif
+ }
+ 
+ void ImapService::enable()
+@@ -1559,15 +1577,32 @@ void ImapService::enable()
+ 
+     QMailAccountConfiguration accountCfg(_accountId);
+     ImapConfiguration imapCfg(accountCfg);
+-    _accountWasPushEnabled = imapCfg.pushEnabled();
++    bool pushEnabled = accountPushEnabled();
++#ifdef USE_KEEPALIVE
++    _client->setPushEnabled(_accountPushEnabled);
++    // When account is enabled or account state changes, request push status from buteo scheduler
++    if (imapCfg.pushCapable() && !_buteoReplyReceived) {
++        _accountWasPushEnabled = false;
++        pushEnabled = false;
++        QDBusMessage message = QDBusMessage::createMethodCall("com.meego.msyncd", "/synchronizer", "com.meego.msyncd",
++                                                              "isSyncedExternally");
++        uint acct = _accountId.toULongLong();
++        message.setArguments(QVariantList() << acct << "syncemail");
++        QDBusConnection::sessionBus().asyncCall(message);
++    } else {
++        _accountWasPushEnabled = _accountPushEnabled;
++    }
++#else
++    _accountWasPushEnabled = pushEnabled;
++#endif
+     _previousPushFolders = imapCfg.pushFolders();
+     _previousConnectionSettings = connectionSettings(imapCfg);
+     
+-    if (imapCfg.pushEnabled() && imapCfg.pushFolders().count()) {
++    if (pushEnabled && imapCfg.pushFolders().count()) {
+         _client->setPushConnectionsReserved(reservePushConnections(imapCfg.pushFolders().count()));
+     }
+     
+-    if (imapCfg.pushEnabled() && _client->pushConnectionsReserved()) {
++    if (pushEnabled && _client->pushConnectionsReserved()) {
+         if (!_initiatePushDelay.contains(_accountId)) {
+             _initiatePushDelay.insert(_accountId, 0);
+         } else if (_initiatePushDelay[_accountId] == 0) {
+@@ -1593,7 +1628,7 @@ void ImapService::disable()
+     _initiatePushEmailTimer->stop();
+     setPersistentConnectionStatus(false);
+     _accountWasEnabled = false;
+-    _accountWasPushEnabled = imapCfg.pushEnabled();
++    _accountWasPushEnabled = accountPushEnabled();
+     _previousPushFolders = imapCfg.pushFolders();
+     _previousConnectionSettings = connectionSettings(imapCfg);
+     _source->setIntervalTimer(0);
+@@ -1615,7 +1650,7 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
+     QMailAccountConfiguration accountCfg(_accountId);
+     ImapConfiguration imapCfg(accountCfg);
+     bool isEnabled(account.status() & QMailAccount::Enabled);
+-    bool isPushEnabled(imapCfg.pushEnabled());
++    bool isPushEnabled = accountPushEnabled();
+     QStringList pushFolders(imapCfg.pushFolders());
+     QString newConnectionSettings(connectionSettings(imapCfg));
+     bool loggingIn = false;
+@@ -1650,7 +1685,7 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
+         }
+     } else {
+         // Update the settings
+-        _accountWasPushEnabled = imapCfg.pushEnabled();
++        _accountWasPushEnabled = accountPushEnabled();
+         _previousPushFolders = imapCfg.pushFolders();
+         _previousConnectionSettings = connectionSettings(imapCfg);
+     }
+@@ -1731,6 +1766,12 @@ void ImapService::initiatePushEmail()
+ 
+     qMailLog(Messaging) << "Attempting to establish push email for account" << _accountId
+                         << QMailAccount(_accountId).name();
++#ifdef USE_KEEPALIVE
++    QMailAccountConfiguration accountCfg(_accountId);
++    ImapConfiguration imapCfg(accountCfg);
++    _accountWasPushEnabled = _accountPushEnabled;
++    _previousPushFolders = imapCfg.pushFolders();
++#endif
+     QMailFolderIdList ids(_client->configurationIdleFolderIds());
+     if (ids.count()) {
+         _establishingPushEmail = true;
+@@ -1783,6 +1824,18 @@ void ImapService::updateStatus(const QString &text)
+     updateStatus(QMailServiceAction::Status::ErrNoError, text, _accountId);
+ }
+ 
++#ifdef USE_KEEPALIVE
++void ImapService::stopPushEmail()
++{
++    qMailLog(Messaging) << "Stopping push email for account" << _accountId
++                        << QMailAccount(_accountId).name();
++    _restartPushEmailTimer->stop();
++    _initiatePushEmailTimer->stop();
++    setPersistentConnectionStatus(false);
++    destroyIdleSession();
++}
++#endif
++
+ void ImapService::createIdleSession()
+ {
+     // Fail after 10 sec if no network reply is received
+@@ -1918,9 +1971,15 @@ void ImapService::onSessionConnectionTimeout()
+ 
+ bool ImapService::accountPushEnabled()
+ {
++    bool pushEnabled;
++#ifdef USE_KEEPALIVE
++    pushEnabled = _accountPushEnabled;
++#else
+     QMailAccountConfiguration accountCfg(_accountId);
+     ImapConfiguration imapCfg(accountCfg);
+-    return imapCfg.pushEnabled();
++    pushEnabled = imapCfg.pushEnabled();
++#endif
++    return pushEnabled;
+ }
+ 
+ void ImapService::setPersistentConnectionStatus(bool status)
+@@ -1955,6 +2014,31 @@ void ImapService::startStopBackgroundActivity()
+         _backgroundActivity->stop();
+     }
+ }
++
++void ImapService::pushEnabledStatus(uint accountId, const QString &profileType, bool state)
++{
++    qMailLog(Messaging) << "Received new idleState for account: " << accountId << "state: " << state << "profile type: " << profileType;
++    if (accountId == _accountId.toULongLong() && profileType == QLatin1String("syncemail")) {
++        _buteoReplyReceived = true;
++        if (state != _accountPushEnabled) {
++            qMailLog(Messaging) << Q_FUNC_INFO << "Changing push enabled state to: " << state;
++            _accountPushEnabled = state;
++            if (_accountPushEnabled) {
++                if (_accountWasEnabled) {
++                    disable();
++                }
++                enable();
++                restartPushEmail();
++            } else {
++                // When it changes to true, this state is set inside "enable()"
++                // since a new client is created
++                _client->closeIdleConnections();
++                _client->setPushEnabled(state);
++                stopPushEmail();
++            }
++        }
++    }
++}
+ #endif
+ 
+ class ImapConfigurator : public QMailMessageServiceConfigurator
+diff --git a/src/plugins/messageservices/imap/imapservice.h b/src/plugins/messageservices/imap/imapservice.h
+index 21eac44a..11b593ed 100644
+--- a/src/plugins/messageservices/imap/imapservice.h
++++ b/src/plugins/messageservices/imap/imapservice.h
+@@ -83,6 +83,8 @@ protected slots:
+ 
+ #ifdef USE_KEEPALIVE
+     void startStopBackgroundActivity();
++    void pushEnabledStatus(uint accountId, const QString &profileType, bool state);
++    void stopPushEmail();
+ #endif
+ 
+ private slots:
+@@ -117,6 +119,8 @@ private:
+     QTimer                          *_networkSessionTimer;
+ #ifdef USE_KEEPALIVE
+     BackgroundActivity* _backgroundActivity;
++    bool _accountPushEnabled;
++    bool _buteoReplyReceived;
+ #endif
+ };
+ 
+diff --git a/src/tools/systemd/messageserver5.service b/src/tools/systemd/messageserver5.service
+index a5aa05a9..9622d701 100644
+--- a/src/tools/systemd/messageserver5.service
++++ b/src/tools/systemd/messageserver5.service
+@@ -2,7 +2,7 @@
+ Description=messageserver5
+ Requires=messageserver5-accounts-check.service
+ Requires=booster-qt5.service
+-After=booster-qt5.service
++After=msyncd.service
+ After=messageserver5-accounts-check.service
+ 
+ [Service]
+-- 
+2.30.2
+

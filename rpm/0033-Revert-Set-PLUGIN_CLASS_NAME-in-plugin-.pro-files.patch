@@ -1,0 +1,103 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Damien Caliste <dcaliste@free.fr>
+Date: Tue, 29 Jun 2021 15:43:27 +0200
+Subject: [PATCH] Revert "Set PLUGIN_CLASS_NAME in plugin .pro files"
+
+This reverts commit 2051e62107bb25c43d228241a2e054c02d440d2f.
+---
+ .../contentmanagers/qmfstoragemanager/qmfstoragemanager.pro      | 1 -
+ src/plugins/crypto/gpgme/gpgme.pro                               | 1 -
+ src/plugins/crypto/smime/smime.pro                               | 1 -
+ src/plugins/messageservices/imap/imap.pro                        | 1 -
+ src/plugins/messageservices/pop/pop.pro                          | 1 -
+ src/plugins/messageservices/qmfsettings/qmfsettings.pro          | 1 -
+ src/plugins/messageservices/smtp/smtp.pro                        | 1 -
+ 7 files changed, 7 deletions(-)
+
+diff --git a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.pro b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.pro
+index a60b7ac4..d7720127 100644
+--- a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.pro
++++ b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.pro
+@@ -1,7 +1,6 @@
+ TEMPLATE = lib 
+ TARGET = qmfstoragemanager
+ PLUGIN_TYPE = contentmanagers
+-PLUGIN_CLASS_NAME = QmfStorageManagerPlugin
+ load(qt_plugin)
+ QT = core qmfclient
+ 
+diff --git a/src/plugins/crypto/gpgme/gpgme.pro b/src/plugins/crypto/gpgme/gpgme.pro
+index 90b3435f..8c8c4156 100644
+--- a/src/plugins/crypto/gpgme/gpgme.pro
++++ b/src/plugins/crypto/gpgme/gpgme.pro
+@@ -1,7 +1,6 @@
+ TEMPLATE = lib
+ TARGET = gpgme
+ PLUGIN_TYPE = crypto
+-PLUGIN_CLASS_NAME = QMailCryptoGpgmePlugin
+ load(qt_plugin)
+ QT = core qmfclient
+ 
+diff --git a/src/plugins/crypto/smime/smime.pro b/src/plugins/crypto/smime/smime.pro
+index 80e9d53d..257549b5 100644
+--- a/src/plugins/crypto/smime/smime.pro
++++ b/src/plugins/crypto/smime/smime.pro
+@@ -1,7 +1,6 @@
+ TEMPLATE = lib
+ TARGET = smime
+ PLUGIN_TYPE = crypto
+-PLUGIN_CLASS_NAME = QMailCryptoSmimePlugin
+ load(qt_plugin)
+ QT = core qmfclient
+ 
+diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
+index a67092c7..34fc4e92 100644
+--- a/src/plugins/messageservices/imap/imap.pro
++++ b/src/plugins/messageservices/imap/imap.pro
+@@ -1,7 +1,6 @@
+ TEMPLATE = lib
+ TARGET = imap
+ PLUGIN_TYPE = messageservices
+-PLUGIN_CLASS_NAME = QmfImapPlugin
+ load(qt_plugin)
+ 
+ QT = core network qmfclient qmfclient-private qmfmessageserver
+diff --git a/src/plugins/messageservices/pop/pop.pro b/src/plugins/messageservices/pop/pop.pro
+index 798a7079..eb96f74d 100644
+--- a/src/plugins/messageservices/pop/pop.pro
++++ b/src/plugins/messageservices/pop/pop.pro
+@@ -1,7 +1,6 @@
+ TEMPLATE = lib
+ TARGET = pop
+ PLUGIN_TYPE = messageservices
+-PLUGIN_CLASS_NAME = QmfPopPlugin
+ load(qt_plugin)
+ 
+ QT = core network qmfclient qmfclient-private qmfmessageserver
+diff --git a/src/plugins/messageservices/qmfsettings/qmfsettings.pro b/src/plugins/messageservices/qmfsettings/qmfsettings.pro
+index fd535849..9ff2cfcc 100644
+--- a/src/plugins/messageservices/qmfsettings/qmfsettings.pro
++++ b/src/plugins/messageservices/qmfsettings/qmfsettings.pro
+@@ -1,7 +1,6 @@
+ TEMPLATE = lib
+ TARGET = qmfsettings
+ PLUGIN_TYPE = messageservices
+-PLUGIN_CLASS_NAME = QmfSettingsPlugin
+ load(qt_plugin)
+ 
+ QT = core network qmfclient qmfmessageserver
+diff --git a/src/plugins/messageservices/smtp/smtp.pro b/src/plugins/messageservices/smtp/smtp.pro
+index c736842b..7663a28a 100644
+--- a/src/plugins/messageservices/smtp/smtp.pro
++++ b/src/plugins/messageservices/smtp/smtp.pro
+@@ -1,7 +1,6 @@
+ TEMPLATE = lib 
+ TARGET = smtp 
+ PLUGIN_TYPE = messageservices
+-PLUGIN_CLASS_NAME = QmfSmtpPlugin
+ load(qt_plugin)
+ 
+ QT = core network qmfclient qmfmessageserver
+-- 
+2.30.2
+

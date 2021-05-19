@@ -29,37 +29,41 @@ BuildRequires:  gpgme-devel
 BuildRequires:  systemd
 Requires:       buteo-syncfw-qt5 >= 0.7.16 
 
-Patch1:  0001-Stop-_incomingDataTimer-when-imapprotocol-object-is-.patch
-Patch2:  0002-Introduce-acceptUntrustedCertificates-configuration.patch
-Patch3:  0003-fix-tests-installation-path.patch
-Patch4:  0004-Accounts-qt-integration.patch
-Patch5:  0005-Start-messageserver-on-system-startup-in-case-there-.patch
-Patch6:  0006-Add-keepalive-timer-to-IMAP-IDLE-service.patch
-Patch7:  0007-Use-Qt5-booster-to-save-memory.patch
-Patch8:  0008-Introduce-QMailAccount-HasPersistentConnection-statu.patch
-Patch9:  0009-Introduce-discovery-of-authentication-from-the-anoun.patch
-Patch10: 0010-Handle-SMTP-response-504.patch
-Patch11: 0011-Recreate-SSO-identity-for-smtp-in-case-of-failure.patch
-Patch12: 0012-Listen-to-sync-schedule-changes-from-buteo-sync-fram.patch
-Patch13: 0013-Do-AUTHENTICATE-PLAIN-in-two-stages.patch
-Patch14: 0014-Prevent-push-enabled-status-to-go-out-of-sync.patch
-Patch15: 0015-Check-if-IDLE-connection-needs-to-be-established-aft.patch
-Patch16: 0016-Revert-Fix-bundled-zlib-detection.patch
-Patch17: 0017-Add-signature-settings-in-account.patch
-Patch18: 0018-Use-socket-s-local-address-for-HELO-and-EHLO-message.patch
-Patch19: 0019-Use-EightBit-encoding-instead-of-Base64-for-text-typ.patch
-Patch20: 0020-Follow-the-synchronizationEnabled-flag-when-folders-.patch
-Patch21: 0021-Set-new-IMAP-folders-to-inherit-SynchronizationEnabl.patch
-Patch22: 0022-Set-qmf-accountscheck-to-be-run-by-the-booster.patch
-Patch23: 0023-Retrieve-message-lists-based-on-the-folder-sync-poli.patch
-Patch24: 0024-Apply-folder-policy-to-always-on-connection.patch
-Patch25: 0025-Add-missing-slash-character-as-protected-in-header-p.patch
-Patch26: 0026-Handle-encoded-word-s-containing-partial-characters.patch
-Patch27: 0027-Allow-a-service-provided-folder-to-be-set-as-the-sta.patch
-Patch28: 0028-Add-QMailMessage-CalendarCancellation-flag.patch
-Patch29: 0029-Use-a-queued-connection-to-handle-accountsUpdated-si.patch
-Patch30: 0030-Support-as-specifier-for-log-file-paths.patch
-Patch31: 0031-Store-socket-in-RuntimeLocation.patch
+Patch1:  0001-Introduce-acceptUntrustedCertificates-configuration.patch
+Patch2:  0002-fix-tests-installation-path.patch
+Patch3:  0003-Accounts-qt-integration.patch
+Patch4:  0004-Start-messageserver-on-system-startup-in-case-there-.patch
+Patch5:  0005-Add-keepalive-timer-to-IMAP-IDLE-service.patch
+Patch6:  0006-Use-Qt5-booster-to-save-memory.patch
+Patch7:  0007-Introduce-QMailAccount-HasPersistentConnection-statu.patch
+Patch8:  0008-Introduce-discovery-of-authentication-from-the-anoun.patch
+Patch9:  0009-Handle-SMTP-response-504.patch
+Patch10: 0010-Recreate-SSO-identity-for-smtp-in-case-of-failure.patch
+Patch11: 0011-Listen-to-sync-schedule-changes-from-buteo-sync-fram.patch
+Patch12: 0012-Do-AUTHENTICATE-PLAIN-in-two-stages.patch
+Patch13: 0013-Prevent-push-enabled-status-to-go-out-of-sync.patch
+Patch14: 0014-Add-signature-settings-in-account.patch
+Patch15: 0015-Use-EightBit-encoding-instead-of-Base64-for-text-typ.patch
+Patch16: 0016-Set-qmf-accountscheck-to-be-run-by-the-booster.patch
+Patch17: 0017-Retrieve-message-lists-based-on-the-folder-sync-poli.patch
+Patch18: 0018-Apply-folder-policy-to-always-on-connection.patch
+Patch19: 0019-Allow-a-service-provided-folder-to-be-set-as-the-sta.patch
+Patch20: 0020-Add-QMailMessage-CalendarCancellation-flag.patch
+Patch21: 0021-Use-a-queued-connection-to-handle-accountsUpdated-si.patch
+Patch22: 0022-Store-socket-in-RuntimeLocation.patch
+Patch23: 0023-Handle-encoded-word-s-containing-partial-characters.patch
+Patch24: 0024-Revert-Fix-bundled-zlib-detection.patch
+Patch25: 0025-Revert-Use-QRandomGenerator-instead-of-qrand.patch
+Patch26: 0026-Revert-Use-range-constructors-for-lists-and-sets.patch
+Patch27: 0027-Revert-Adjust-to-Qt6-QMetaType-API-changes.patch
+Patch28: 0028-Revert-Replace-deprecated-QString-SplitBehavior.patch
+Patch29: 0029-Revert-Fix-disappearance-of-QDateTime-QDate.patch
+Patch30: 0030-Revert-core5compat-addition.patch
+Patch31: 0031-Adjust-qmflist-for-missing-bits-in-5.6.patch
+Patch32: 0032-Revert-loadRelax.patch
+Patch33: 0033-Revert-Set-PLUGIN_CLASS_NAME-in-plugin-.pro-files.patch
+Patch34: 0034-Revert-Bump-version-to-6.0.0-since-we-build-against-.patch
+
 
 %description
 The Qt Messaging Framework, QMF, consists of a C++ library and daemon server
