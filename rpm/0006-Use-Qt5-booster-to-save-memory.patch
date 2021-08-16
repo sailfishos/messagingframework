@@ -1,0 +1,65 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerio Valerio <valerio.valerio@jollamobile.com>
+Date: Mon, 27 Oct 2014 09:49:12 +0200
+Subject: [PATCH] Use Qt5 booster to save memory.
+
+---
+ src/tools/messageserver/main.cpp          | 2 +-
+ src/tools/messageserver/messageserver.pro | 6 ++++++
+ src/tools/systemd/messageserver5.service  | 6 +++---
+ 3 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/src/tools/messageserver/main.cpp b/src/tools/messageserver/main.cpp
+index 9c107629..d9a35c53 100644
+--- a/src/tools/messageserver/main.cpp
++++ b/src/tools/messageserver/main.cpp
+@@ -41,7 +41,7 @@
+ #include <QtGui>
+ #endif
+ 
+-int main(int argc, char** argv)
++Q_DECL_EXPORT int main(int argc, char** argv)
+ {
+ #ifdef USE_HTML_PARSER
+     // Need for html parsing by <QTextdocument> in qmailmessage.cpp, but don't need real UI
+diff --git a/src/tools/messageserver/messageserver.pro b/src/tools/messageserver/messageserver.pro
+index f7d92931..a092b8ce 100644
+--- a/src/tools/messageserver/messageserver.pro
++++ b/src/tools/messageserver/messageserver.pro
+@@ -17,6 +17,12 @@ contains(DEFINES, USE_HTML_PARSER) {
+     QT += gui widgets
+ }
+ 
++packagesExist(qt5-boostable) {
++    PKGCONFIG += qt5-boostable
++} else {
++    warning("qt5-boostable not available; startup times will be slower")
++}
++
+ CONFIG -= app_bundle
+ target.path += $$QMF_INSTALL_ROOT/bin
+ 
+diff --git a/src/tools/systemd/messageserver5.service b/src/tools/systemd/messageserver5.service
+index 0d583d15..a5aa05a9 100644
+--- a/src/tools/systemd/messageserver5.service
++++ b/src/tools/systemd/messageserver5.service
+@@ -1,13 +1,13 @@
+ [Unit]
+ Description=messageserver5
+ Requires=messageserver5-accounts-check.service
+-Requires=booster-generic.service
+-After=booster-generic.service
++Requires=booster-qt5.service
++After=booster-qt5.service
+ After=messageserver5-accounts-check.service
+ 
+ [Service]
+ Type=simple
+-ExecStart=/usr/bin/invoker -o --type=generic --global-syms /usr/bin/messageserver5
++ExecStart=/usr/bin/invoker -o --type=qt5 --global-syms /usr/bin/messageserver5
+ Restart=on-failure
+ RestartSec=1
+ 
+-- 
+2.30.2
+

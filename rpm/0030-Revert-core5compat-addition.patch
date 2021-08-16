@@ -1,0 +1,51 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Damien Caliste <dcaliste@free.fr>
+Date: Wed, 19 May 2021 09:22:42 +0200
+Subject: [PATCH] Revert core5compat addition
+
+---
+ src/libraries/qmfclient/qmfclient.pro     | 2 +-
+ src/plugins/messageservices/pop/pop.pro   | 2 +-
+ src/plugins/messageservices/smtp/smtp.pro | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/libraries/qmfclient/qmfclient.pro b/src/libraries/qmfclient/qmfclient.pro
+index ac71587c..ebb08fcf 100644
+--- a/src/libraries/qmfclient/qmfclient.pro
++++ b/src/libraries/qmfclient/qmfclient.pro
+@@ -1,5 +1,5 @@
+ TARGET     = QmfClient
+-QT         = core sql network core5compat
++QT         = core sql network
+ CONFIG    += warn_on
+ 
+ # FIXME this will result in prl file having explicit linkage against qt-xml and accounts+signon.
+diff --git a/src/plugins/messageservices/pop/pop.pro b/src/plugins/messageservices/pop/pop.pro
+index bdef288d..798a7079 100644
+--- a/src/plugins/messageservices/pop/pop.pro
++++ b/src/plugins/messageservices/pop/pop.pro
+@@ -4,7 +4,7 @@ PLUGIN_TYPE = messageservices
+ PLUGIN_CLASS_NAME = QmfPopPlugin
+ load(qt_plugin)
+ 
+-QT = core core5compat network qmfclient qmfclient-private qmfmessageserver
++QT = core network qmfclient qmfclient-private qmfmessageserver
+ 
+ contains(DEFINES,USE_ACCOUNTS_QT) {
+     CONFIG += link_pkgconfig
+diff --git a/src/plugins/messageservices/smtp/smtp.pro b/src/plugins/messageservices/smtp/smtp.pro
+index 62f60541..c736842b 100644
+--- a/src/plugins/messageservices/smtp/smtp.pro
++++ b/src/plugins/messageservices/smtp/smtp.pro
+@@ -4,7 +4,7 @@ PLUGIN_TYPE = messageservices
+ PLUGIN_CLASS_NAME = QmfSmtpPlugin
+ load(qt_plugin)
+ 
+-QT = core core5compat network qmfclient qmfmessageserver
++QT = core network qmfclient qmfmessageserver
+ 
+ contains(DEFINES,USE_ACCOUNTS_QT) {
+     CONFIG += link_pkgconfig
+-- 
+2.30.2
+

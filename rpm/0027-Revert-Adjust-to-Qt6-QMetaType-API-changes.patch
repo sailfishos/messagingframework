@@ -1,0 +1,120 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Damien Caliste <dcaliste@free.fr>
+Date: Wed, 19 May 2021 09:05:11 +0200
+Subject: [PATCH] Revert "Adjust to Qt6 QMetaType API changes"
+
+This reverts commit f53c2885bff3408bf6aa8d89a9cb913980f51e9b.
+---
+ src/libraries/qmfclient/qmailstore_p.cpp        |  4 ++--
+ src/libraries/qmfclient/support/qcopadaptor.cpp | 14 +++++++++-----
+ src/libraries/qmfclient/support/qmailipc.h      |  8 ++++++--
+ 3 files changed, 17 insertions(+), 9 deletions(-)
+
+diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
+index cadc4172..97f5020d 100644
+--- a/src/libraries/qmfclient/qmailstore_p.cpp
++++ b/src/libraries/qmfclient/qmailstore_p.cpp
+@@ -3394,7 +3394,7 @@ static QString queryText(const QString &query, const QList<QVariant> &values)
+     int index = result.indexOf(marker);
+     while ((index != -1) && (it != end)) {
+         QString substitute((*it).toString());
+-        if ((*it).metaType() == QMetaType::fromType<QString>())
++        if ((*it).type() == QVariant::String)
+             substitute.prepend(quote).append(quote);
+ 
+         result.replace(index, 1, substitute);
+@@ -3409,7 +3409,7 @@ static QString queryText(const QString &query, const QList<QVariant> &values)
+ static QString queryText(const QSqlQuery &query)
+ {
+     // Note: we currently only handle positional parameters
+-    return queryText(query.lastQuery().simplified(), query.boundValues());
++    return queryText(query.lastQuery().simplified(), query.boundValues().values());
+ }
+ 
+ QSqlQuery QMailStorePrivate::prepare(const QString& sql)
+diff --git a/src/libraries/qmfclient/support/qcopadaptor.cpp b/src/libraries/qmfclient/support/qcopadaptor.cpp
+index 3abc0729..30879238 100644
+--- a/src/libraries/qmfclient/support/qcopadaptor.cpp
++++ b/src/libraries/qmfclient/support/qcopadaptor.cpp
+@@ -194,13 +194,17 @@ QCopAdaptorPrivate::~QCopAdaptorPrivate()
+ // Get the QVariant type number for a type name.
+ int QCopAdaptorPrivate::typeFromName( const QByteArray& type )
+ {
++    int id;
+     if (type.endsWith('*'))
+         return QMetaType::VoidStar;
+     else if ( type.size() == 0 || type == "void" )
+         return QMetaType::Void;
+     else if ( type == "QVariant" )
+         return QCopAdaptorPrivate::QVariantId;
+-    return QMetaType::fromName(type).id();
++    id = QMetaType::type( type.constData() );
++    if ( id != (int)QMetaType::Void )
++        return id;
++    return QVariant::nameToType(type);
+ }
+ 
+ // Returns the connection types associated with a signal or slot member.
+@@ -257,7 +261,7 @@ int QCopAdaptorPrivate::qt_metacall(QMetaObject::Call c, int id, void **a)
+                     QList<QVariant> args;
+                     for (int i = 0; i < info->numArgs; ++i) {
+                         if (info->types[i] != QCopAdaptorPrivate::QVariantId) {
+-                            QVariant arg(QMetaType(info->types[i]), a[i + 1]);
++                            QVariant arg(info->types[i], a[i + 1]);
+                             args.append(arg);
+                         } else {
+                             args.append(*((const QVariant *)(a[i + 1])));
+@@ -292,12 +296,12 @@ public:
+         clear();
+         create(typeOrMetaType, 0);
+         d.is_null = false;
+-        d.type().load(stream, const_cast<void *>(constData()));
++        QMetaType::load(stream, d.type, const_cast<void *>(constData()));
+     }
+ 
+     void save(QDataStream& stream) const
+     {
+-        d.type().save(stream, constData());
++        QMetaType::save(stream, d.type, constData());
+     }
+ };
+ 
+@@ -607,7 +611,7 @@ void QCopAdaptor::received(const QString& msg, const QByteArray& data)
+         QVariant returnValue;
+         QVarLengthArray<void *, 32> a(info->numArgs + 1);
+         if (info->returnType != (int)QVariant::Invalid && info->returnType != (int)QMetaType::Void) {
+-            returnValue = QVariant(QMetaType(info->returnType), (const void *)0);
++            returnValue = QVariant(info->returnType, (const void *)0);
+             a[0] = returnValue.data();
+         } else {
+             a[0] = 0;
+diff --git a/src/libraries/qmfclient/support/qmailipc.h b/src/libraries/qmfclient/support/qmailipc.h
+index 0f9f2dd5..00a8f963 100644
+--- a/src/libraries/qmfclient/support/qmailipc.h
++++ b/src/libraries/qmfclient/support/qmailipc.h
+@@ -57,9 +57,12 @@ struct QMetaTypeRegister
+     template<> \
+     struct QMetaTypeRegister< TYPE > \
+     { \
+-        static int registerType() { \
++        static int registerType() \
++        { \
+             _QATOMIC_ONCE(); \
+-            qRegisterMetaType<TYPE>( #TYPE ); \
++            int id = qMetaTypeId<TYPE>(); \
++            if ( id >= static_cast<int>(QMetaType::User) ) \
++                qRegisterMetaTypeStreamOperators< TYPE >( #TYPE ); \
+             return 1; \
+         } \
+         static int __init_variable__; \
+@@ -80,6 +83,7 @@ struct QMetaTypeRegister
+         static int registerType() { \
+             _QATOMIC_ONCE(); \
+             qRegisterMetaType< TYPE >( #TYPE ); \
++            qRegisterMetaTypeStreamOperators< TYPE >( #TYPE ); \
+             return 1; \
+         } \
+         static int __init_variable__; \
+-- 
+2.30.2
+

@@ -1,0 +1,139 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Damien Caliste <dcaliste@free.fr>
+Date: Wed, 19 May 2021 09:09:59 +0200
+Subject: [PATCH] Revert "Replace deprecated QString::SplitBehavior"
+
+This reverts commit faf30f7544c7a1f5ec07ac68d1f0b4fbf4ed855d.
+---
+ src/libraries/qmfclient/qmailtimestamp.cpp           |  2 +-
+ src/libraries/qmfclient/support/qmailnamespace.cpp   | 12 ++++++------
+ .../messageservices/imap/imapconfiguration.cpp       |  2 +-
+ src/plugins/messageservices/imap/imapprotocol.cpp    | 10 +++++-----
+ src/plugins/messageservices/imap/integerregion.cpp   |  2 +-
+ 5 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/src/libraries/qmfclient/qmailtimestamp.cpp b/src/libraries/qmfclient/qmailtimestamp.cpp
+index c7173949..f93f39e1 100644
+--- a/src/libraries/qmfclient/qmailtimestamp.cpp
++++ b/src/libraries/qmfclient/qmailtimestamp.cpp
+@@ -120,7 +120,7 @@ QMailTimeStampPrivate::QMailTimeStampPrivate(const QString& timeText)
+ 
+     // Extract the date/time elements
+     uncommented = uncommented.trimmed();
+-    QStringList tokens = uncommented.split(QChar::Space, Qt::SkipEmptyParts);
++    QStringList tokens = uncommented.split(QChar::Space, QString::SkipEmptyParts);
+ 
+     int tokenCount = tokens.count();
+     if ( tokenCount > 0 ) {
+diff --git a/src/libraries/qmfclient/support/qmailnamespace.cpp b/src/libraries/qmfclient/support/qmailnamespace.cpp
+index 1031a096..2c40b20d 100644
+--- a/src/libraries/qmfclient/support/qmailnamespace.cpp
++++ b/src/libraries/qmfclient/support/qmailnamespace.cpp
+@@ -618,28 +618,28 @@ QMap<QByteArray, QStringList> standardFolderTranslations()
+     QTextStream in(&file);
+     while (!in.atEnd()) {
+         QString line = in.readLine();
+-        QStringList list = line.split(QLatin1Char('='), Qt::SkipEmptyParts);
++        QStringList list = line.split(QLatin1Char('='), QString::SkipEmptyParts);
+         QString folderName = list.at(0);
+         QString transList = list.at(1);
+ 
+         if (folderName == QLatin1String("inbox")) {
+-            QStringList inboxList = transList.split(QLatin1Char(','), Qt::SkipEmptyParts);
++            QStringList inboxList = transList.split(QLatin1Char(','), QString::SkipEmptyParts);
+             folderTranslations.insert("inbox", inboxList);
+         }
+         else if (folderName == QLatin1String("drafts")) {
+-            QStringList draftsList = transList.split(QLatin1Char(','), Qt::SkipEmptyParts);
++            QStringList draftsList = transList.split(QLatin1Char(','), QString::SkipEmptyParts);
+             folderTranslations.insert("drafts", draftsList);
+         }
+         else if (folderName == QLatin1String("trash")) {
+-            QStringList trashList = transList.split(QLatin1Char(','), Qt::SkipEmptyParts);
++            QStringList trashList = transList.split(QLatin1Char(','), QString::SkipEmptyParts);
+             folderTranslations.insert("trash", trashList);
+         }
+         else if (folderName == QLatin1String("sent")) {
+-            QStringList sentList = transList.split(QLatin1Char(','), Qt::SkipEmptyParts);
++            QStringList sentList = transList.split(QLatin1Char(','), QString::SkipEmptyParts);
+             folderTranslations.insert("sent", sentList);
+         }
+         else if (folderName == QLatin1String("spam")) {
+-            QStringList spamList = transList.split(QLatin1Char(','), Qt::SkipEmptyParts);
++            QStringList spamList = transList.split(QLatin1Char(','), QString::SkipEmptyParts);
+             folderTranslations.insert("spam", spamList);
+         }
+     }
+diff --git a/src/plugins/messageservices/imap/imapconfiguration.cpp b/src/plugins/messageservices/imap/imapconfiguration.cpp
+index a5663fdf..c8dc7b9e 100644
+--- a/src/plugins/messageservices/imap/imapconfiguration.cpp
++++ b/src/plugins/messageservices/imap/imapconfiguration.cpp
+@@ -144,7 +144,7 @@ bool ImapConfiguration::intervalCheckRoamingEnabled() const
+ 
+ QStringList ImapConfiguration::capabilities() const
+ {
+-    return value("capabilities").split(QChar(' '), Qt::SkipEmptyParts);
++    return value("capabilities").split(QChar(' '), QString::SkipEmptyParts);
+ }
+ 
+ void ImapConfiguration::setCapabilities(const QStringList &s)
+diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
+index 369abdae..557ceade 100644
+--- a/src/plugins/messageservices/imap/imapprotocol.cpp
++++ b/src/plugins/messageservices/imap/imapprotocol.cpp
+@@ -409,10 +409,10 @@ void ImapState::untaggedResponse(ImapContext *c, const QString &line)
+     } else if (line.indexOf("[CAPABILITY", 0) != -1) {
+         int start = 0;
+         QString temp = token(line, '[', ']', &start);
+-        QStringList capabilities = temp.mid(12).trimmed().split(' ', Qt::SkipEmptyParts);
++        QStringList capabilities = temp.mid(12).trimmed().split(' ', QString::SkipEmptyParts);
+         c->protocol()->setCapabilities(capabilities);
+     } else if (line.indexOf("* CAPABILITY ", 0) != -1) {
+-        QStringList capabilities = line.mid(13).trimmed().split(' ', Qt::SkipEmptyParts);
++        QStringList capabilities = line.mid(13).trimmed().split(' ', QString::SkipEmptyParts);
+         c->protocol()->setCapabilities(capabilities);
+     }
+ 
+@@ -518,7 +518,7 @@ void CapabilityState::untaggedResponse(ImapContext *c, const QString &line)
+ {
+     QStringList capabilities;
+     if (line.startsWith(QLatin1String("* CAPABILITY"))) {
+-        capabilities = line.mid(12).trimmed().split(' ', Qt::SkipEmptyParts);
++        capabilities = line.mid(12).trimmed().split(' ', QString::SkipEmptyParts);
+         c->protocol()->setCapabilities(capabilities);
+     } else {
+         ImapState::untaggedResponse(c, line);
+@@ -634,7 +634,7 @@ void LoginState::taggedResponse(ImapContext *c, const QString &line)
+     if (line.indexOf("[CAPABILITY", Qt::CaseInsensitive) != -1) {
+         int start = 0;
+         QString temp = token(line, '[', ']', &start);
+-        QStringList capabilities = temp.mid(12).trimmed().split(' ', Qt::SkipEmptyParts);
++        QStringList capabilities = temp.mid(12).trimmed().split(' ', QString::SkipEmptyParts);
+         c->protocol()->setCapabilities(capabilities);
+     }
+ 
+@@ -1427,7 +1427,7 @@ void SelectedState::untaggedResponse(ImapContext *c, const QString &line)
+     } else if (line.indexOf("PERMANENTFLAGS", 0, Qt::CaseInsensitive) != -1) {
+         int start = 0;
+         QString temp = token(line, '(', ')', &start);
+-        c->setPermanentFlags(temp.split(' ', Qt::SkipEmptyParts));
++        c->setPermanentFlags(temp.split(' ', QString::SkipEmptyParts));
+     } else if (line.indexOf("EXPUNGE", 0, Qt::CaseInsensitive) != -1) {
+         quint32 exists = c->exists();
+         if (exists > 0) {
+diff --git a/src/plugins/messageservices/imap/integerregion.cpp b/src/plugins/messageservices/imap/integerregion.cpp
+index 346dd7d3..7ef0989f 100644
+--- a/src/plugins/messageservices/imap/integerregion.cpp
++++ b/src/plugins/messageservices/imap/integerregion.cpp
+@@ -87,7 +87,7 @@ IntegerRegion::IntegerRegion(const QString &uidString)
+ {
+     // Performance note currently O(n^2), n = uids.count()
+     // TODO: sort uids in uidString if they are not already sorted
+-    QStringList rangeList = uidString.split(",", Qt::SkipEmptyParts);
++    QStringList rangeList = uidString.split(",", QString::SkipEmptyParts);
+     foreach(const QString &s, rangeList) {
+         bool ok = false;
+         int index = s.indexOf(":");
+-- 
+2.30.2
+
