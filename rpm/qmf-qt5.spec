@@ -63,7 +63,7 @@ Patch31: 0031-Adjust-qmflist-for-missing-bits-in-5.6.patch
 Patch32: 0032-Revert-loadRelax.patch
 Patch33: 0033-Revert-Set-PLUGIN_CLASS_NAME-in-plugin-.pro-files.patch
 Patch34: 0034-Revert-Bump-version-to-6.0.0-since-we-build-against-.patch
-
+Patch35: 0035-Fix-bug-when-detecting-HEADER-BODY-substrings.patch
 
 %description
 The Qt Messaging Framework, QMF, consists of a C++ library and daemon server

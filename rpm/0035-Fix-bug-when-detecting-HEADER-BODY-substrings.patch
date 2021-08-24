@@ -1,0 +1,32 @@
+From a4968309971eb1dd59a6fc8ffd6e76459339a254 Mon Sep 17 00:00:00 2001
+From: Chris Adams <chris.adams@jolla.com>
+Date: Tue, 24 Aug 2021 14:35:19 +1000
+Subject: [PATCH] Fix bug when detecting HEADER / BODY substrings
+
+The behaviour should be equivalent to old QRegExp::lastIndexIn(str).
+
+Without this fix, we never hit the "detach" which causes a variety
+of further issues when creating the QMailMessage.
+---
+ src/plugins/messageservices/imap/imapprotocol.cpp | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
+index 557ceade..f3c96bf3 100644
+--- a/src/plugins/messageservices/imap/imapprotocol.cpp
++++ b/src/plugins/messageservices/imap/imapprotocol.cpp
+@@ -2491,8 +2491,9 @@ bool UidFetchState::appendLiteralData(ImapContext *c, const QString &preceding)
+             pattern = QRegularExpression("BODY\\[\\S*\\] ", QRegularExpression::CaseInsensitiveOption);
+         }
+ 
+-        const QRegularExpressionMatch match = pattern.match(preceding);
+-        int index = match.lastCapturedIndex();
++        QRegularExpressionMatch match;
++        preceding.lastIndexOf(pattern, -1, &match);
++        int index = match.capturedStart(0);
+         if (index != -1) {
+             if ((index + match.captured(0).length()) == preceding.length()) {
+                 // Detach the retrieved data to a file we have ownership of
+-- 
+2.17.1
+
