@@ -20,13 +20,13 @@ BuildRequires:  pkgconfig(accounts-qt5) >= 1.13
 BuildRequires:  pkgconfig(libsignon-qt5)
 BuildRequires:  pkgconfig(keepalive)
 BuildRequires:  pkgconfig(qt5-boostable)
+BuildRequires:  pkgconfig(systemd)
 #Needed for qhelpgenerator
 BuildRequires:  qt5-qttools-qthelp-devel
 BuildRequires:  qt5-plugin-platform-minimal
 BuildRequires:  qt5-plugin-sqldriver-sqlite
 BuildRequires:  fdupes
 BuildRequires:  gpgme-devel
-BuildRequires:  systemd
 Requires:       buteo-syncfw-qt5 >= 0.7.16 
 
 Patch1:  0001-Introduce-acceptUntrustedCertificates-configuration.patch
