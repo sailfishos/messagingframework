@@ -3,7 +3,7 @@ Summary:    Qt Messaging Framework (QMF) Qt5
 Version:    4.0.4+git127
 Release:    1
 License:    (LGPLv2 or LGPLv3) with exception or Qt Commercial
-URL:        https://code.qt.io/qt-labs/messagingframework.git
+URL:        https://github.com/sailfishos/messagingframework
 Source0:    %{name}-%{version}.tar.bz2
 Source1:    %{name}.privileges
 Source2:    qmf-accountscheck.privileges
