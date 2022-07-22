@@ -1,0 +1,119 @@
+From 615735459148b8f29857bb1fd7564380cf681e6c Mon Sep 17 00:00:00 2001
+From: Boris Shmarin <b.shmarin@omp.ru>
+Date: Tue, 2 Nov 2021 20:55:47 +0300
+Subject: [PATCH] Add OriginalSubject message sort key for sort by subject
+ without Re: and Fwd: prefixes
+
+!!! WARNING !!!
+Don't upstream this patch to the QTC due to lacking a CLA.
+---
+ .../qmfclient/qmailmessagesortkey.cpp         | 10 ++++++
+ src/libraries/qmfclient/qmailmessagesortkey.h |  4 ++-
+ src/libraries/qmfclient/qmailstore_p.cpp      | 34 +++++++++++++++++--
+ 3 files changed, 44 insertions(+), 4 deletions(-)
+
+diff --git a/src/libraries/qmfclient/qmailmessagesortkey.cpp b/src/libraries/qmfclient/qmailmessagesortkey.cpp
+index 661cdef6..776355c8 100644
+--- a/src/libraries/qmfclient/qmailmessagesortkey.cpp
++++ b/src/libraries/qmfclient/qmailmessagesortkey.cpp
+@@ -272,6 +272,16 @@ QMailMessageSortKey QMailMessageSortKey::subject(Qt::SortOrder order)
+     return QMailMessageSortKey(Subject, order);
+ }
+ 
++/*!
++    Returns a key that sorts messages by their subject without Re:, Fw: and Fwd: prefixes, according to \a order.
++
++    \sa QMailMessage::originalSubject()
++*/
++QMailMessageSortKey QMailMessageSortKey::originalSubject(Qt::SortOrder order)
++{
++    return QMailMessageSortKey(OriginalSubject, order);
++}
++
+ /*!
+     Returns a key that sorts messages by their origination timestamp, according to \a order.
+ 
+diff --git a/src/libraries/qmfclient/qmailmessagesortkey.h b/src/libraries/qmfclient/qmailmessagesortkey.h
+index cfe9b82d..449452c8 100644
+--- a/src/libraries/qmfclient/qmailmessagesortkey.h
++++ b/src/libraries/qmfclient/qmailmessagesortkey.h
+@@ -66,7 +66,8 @@ public:
+         ListId,
+         RestoreFolderId,
+         RfcId,
+-        ParentThreadId
++        ParentThreadId,
++        OriginalSubject
+     };
+ 
+     typedef QMailSortKeyArgument<Property> ArgumentType;
+@@ -97,6 +98,7 @@ public:
+     static QMailMessageSortKey sender(Qt::SortOrder order = Qt::AscendingOrder);
+     static QMailMessageSortKey recipients(Qt::SortOrder order = Qt::AscendingOrder);
+     static QMailMessageSortKey subject(Qt::SortOrder order = Qt::AscendingOrder);
++    static QMailMessageSortKey originalSubject(Qt::SortOrder order = Qt::AscendingOrder);
+     static QMailMessageSortKey timeStamp(Qt::SortOrder order = Qt::AscendingOrder);
+     static QMailMessageSortKey receptionTimeStamp(Qt::SortOrder order = Qt::AscendingOrder);
+     static QMailMessageSortKey serverUid(Qt::SortOrder order = Qt::AscendingOrder);
+diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
+index 97f5020d..bc077f7c 100644
+--- a/src/libraries/qmfclient/qmailstore_p.cpp
++++ b/src/libraries/qmfclient/qmailstore_p.cpp
+@@ -632,6 +632,7 @@ static QMap<QMailMessageSortKey::Property, QMailMessageKey::Property> messageSor
+     map.insert(QMailMessageSortKey::Sender, QMailMessageKey::Sender);
+     map.insert(QMailMessageSortKey::Recipients, QMailMessageKey::Recipients);
+     map.insert(QMailMessageSortKey::Subject, QMailMessageKey::Subject);
++    map.insert(QMailMessageSortKey::OriginalSubject, QMailMessageKey::TimeStamp);
+     map.insert(QMailMessageSortKey::TimeStamp, QMailMessageKey::TimeStamp);
+     map.insert(QMailMessageSortKey::ReceptionTimeStamp, QMailMessageKey::ReceptionTimeStamp);
+     map.insert(QMailMessageSortKey::Status, QMailMessageKey::Status);
+@@ -8572,7 +8573,19 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptQueryMessages(const Q
+                                                                          QMailMessageIdList *ids, 
+                                                                          ReadLock &)
+ {
+-    QSqlQuery query(simpleQuery(QLatin1String("SELECT id FROM mailmessages"),
++    bool sortByOriginalSubject = false;
++    bool descendingOrder = false;
++    for (const QMailMessageSortKey::ArgumentType &arg : sortKey.arguments()) {
++        if (arg.property == QMailMessageSortKey::OriginalSubject) {
++            sortByOriginalSubject = true;
++            descendingOrder = arg.order == Qt::DescendingOrder;
++            break;
++        }
++    }
++
++    QSqlQuery query(simpleQuery(sortByOriginalSubject
++                                ? QLatin1String("SELECT id, subject FROM mailmessages")
++                                : QLatin1String("SELECT id FROM mailmessages"),
+                                 QVariantList(),
+                                 QList<Key>() << Key(key) << Key(sortKey),
+                                 qMakePair(limit, offset),
+@@ -8580,8 +8593,23 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptQueryMessages(const Q
+     if (query.lastError().type() != QSqlError::NoError)
+         return DatabaseFailure;
+ 
+-    while (query.next())
+-        ids->append(QMailMessageId(extractValue<quint64>(query.value(0))));
++    if (sortByOriginalSubject) {
++        QMap<QString, quint64> map;
++        while (query.next())
++            map.insertMulti(extractValue<QString>(query.value(1)).replace(QRegExp(QStringLiteral("^(re:|fw:|fwd:|\\s*|\\\")*"), Qt::CaseInsensitive), QString()),
++                            extractValue<quint64>(query.value(0)));
++        if (descendingOrder) {
++            QMap<QString, quint64>::ConstIterator it = map.cend();
++            while (it != map.cbegin())
++                ids->append(QMailMessageId((--it).value()));
++        } else {
++            for (quint64 id : map.values())
++                ids->append(QMailMessageId(id));
++        }
++    } else {
++        while (query.next())
++            ids->append(QMailMessageId(extractValue<quint64>(query.value(0))));
++    }
+ 
+     //store the results of this call for cache preloading
+     lastQueryMessageResult = *ids;
+-- 
+2.25.1
+
