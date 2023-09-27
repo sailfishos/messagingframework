@@ -8,10 +8,10 @@ Subject: [PATCH] Adjust qmflist for missing bits in 5.6
  1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/src/libraries/qmfclient/qmflist.h b/src/libraries/qmfclient/qmflist.h
-index 1f134e1f..7fd3304f 100644
+index fbe48e02..af32016b 100644
 --- a/src/libraries/qmfclient/qmflist.h
 +++ b/src/libraries/qmfclient/qmflist.h
-@@ -49,6 +49,8 @@
+@@ -50,6 +50,8 @@
   * std::list (which provides reference-stability).
   */
  
@@ -20,7 +20,7 @@ index 1f134e1f..7fd3304f 100644
  template<class T>
  class QmfList : public std::list<T>
  {
-@@ -82,7 +84,13 @@ public:
+@@ -83,7 +85,13 @@ public:
  
      QmfList<T>& operator<<(const T &t) { this->append(t); return *this; }
  
@@ -36,5 +36,5 @@ index 1f134e1f..7fd3304f 100644
  };
  
 -- 
-2.30.2
+2.25.1
 

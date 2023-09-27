@@ -21,7 +21,7 @@ Subject: [PATCH] Introduce acceptUntrustedCertificates() configuration.
  14 files changed, 117 insertions(+), 28 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailserviceaction.h b/src/libraries/qmfclient/qmailserviceaction.h
-index 0f62cc79..fe9d7d35 100644
+index fcaf44b0..d5031196 100644
 --- a/src/libraries/qmfclient/qmailserviceaction.h
 +++ b/src/libraries/qmfclient/qmailserviceaction.h
 @@ -99,6 +99,8 @@ public:
@@ -198,10 +198,10 @@ index f0c0569a..69dc8ad1 100644
  
      void setDeleteMail(bool b);
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index eeec79a0..4e6bca9b 100644
+index 67e44023..807b7ec5 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
-@@ -3064,10 +3064,18 @@ bool ImapProtocol::open( const ImapConfiguration& config, qint64 bufferSize)
+@@ -3065,10 +3065,18 @@ bool ImapProtocol::open( const ImapConfiguration& config, qint64 bufferSize)
                  this, SLOT(connected(QMailTransport::EncryptType)));
          connect(_transport, SIGNAL(readyRead()),
                  this, SLOT(incomingData()));
@@ -441,5 +441,5 @@ index e8b28a6b..ed115d53 100644
      void setSmtpPassword(const QString& password);
      void setSmtpAuthentication(int t);
 -- 
-2.30.2
+2.25.1
 

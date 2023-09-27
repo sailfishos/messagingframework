@@ -21,7 +21,7 @@ Change-Id: I5bbb785343ad60459fa6e52f5728fd796c7e5961
  1 file changed, 36 insertions(+), 18 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index eb505bc1..72555037 100644
+index da2c1513..85e90b84 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
 @@ -333,9 +333,10 @@ static QMailCodec* codecForEncoding(QMailMessageBody::TransferEncoding te, const
@@ -127,5 +127,5 @@ index eb505bc1..72555037 100644
      return out;
  }
 -- 
-2.30.2
+2.25.1
 

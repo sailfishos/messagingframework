@@ -50,19 +50,18 @@ Patch18: 0018-Apply-folder-policy-to-always-on-connection.patch
 Patch19: 0019-Allow-a-service-provided-folder-to-be-set-as-the-sta.patch
 Patch20: 0020-Add-QMailMessage-CalendarCancellation-flag.patch
 Patch21: 0021-Use-a-queued-connection-to-handle-accountsUpdated-si.patch
-Patch22: 0022-Store-socket-in-RuntimeLocation.patch
-Patch23: 0023-Handle-encoded-word-s-containing-partial-characters.patch
-Patch24: 0024-Revert-Fix-bundled-zlib-detection.patch
-Patch25: 0025-Revert-Use-QRandomGenerator-instead-of-qrand.patch
-Patch26: 0026-Revert-Use-range-constructors-for-lists-and-sets.patch
-Patch27: 0027-Revert-Adjust-to-Qt6-QMetaType-API-changes.patch
-Patch28: 0028-Revert-Replace-deprecated-QString-SplitBehavior.patch
-Patch29: 0029-Revert-Fix-disappearance-of-QDateTime-QDate.patch
-Patch30: 0030-Revert-core5compat-addition.patch
-Patch31: 0031-Adjust-qmflist-for-missing-bits-in-5.6.patch
-Patch32: 0032-Revert-loadRelax.patch
-Patch33: 0033-Revert-Set-PLUGIN_CLASS_NAME-in-plugin-.pro-files.patch
-Patch34: 0034-Revert-Bump-version-to-6.0.0-since-we-build-against-.patch
+Patch23: 0022-Handle-encoded-word-s-containing-partial-characters.patch
+Patch24: 0023-Revert-Fix-bundled-zlib-detection.patch
+Patch25: 0024-Revert-Use-QRandomGenerator-instead-of-qrand.patch
+Patch26: 0025-Revert-Use-range-constructors-for-lists-and-sets.patch
+Patch27: 0026-Revert-Adjust-to-Qt6-QMetaType-API-changes.patch
+Patch28: 0027-Revert-Replace-deprecated-QString-SplitBehavior.patch
+Patch29: 0028-Revert-Fix-disappearance-of-QDateTime-QDate.patch
+Patch30: 0029-Revert-core5compat-addition.patch
+Patch31: 0030-Adjust-qmflist-for-missing-bits-in-5.6.patch
+Patch32: 0031-Revert-loadRelax.patch
+Patch33: 0032-Revert-Set-PLUGIN_CLASS_NAME-in-plugin-.pro-files.patch
+Patch34: 0033-Revert-Bump-version-to-6.0.0-since-we-build-against-.patch
 
 
 %description

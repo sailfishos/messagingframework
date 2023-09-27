@@ -10,13 +10,13 @@ Subject: [PATCH] Revert core5compat addition
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmfclient.pro b/src/libraries/qmfclient/qmfclient.pro
-index ac71587c..ebb08fcf 100644
+index 6fedb7bd..88f543ce 100644
 --- a/src/libraries/qmfclient/qmfclient.pro
 +++ b/src/libraries/qmfclient/qmfclient.pro
 @@ -1,5 +1,5 @@
  TARGET     = QmfClient
--QT         = core sql network core5compat
-+QT         = core sql network
+-QT         = core dbus sql network core5compat
++QT         = core dbus sql network
  CONFIG    += warn_on
  
  # FIXME this will result in prl file having explicit linkage against qt-xml and accounts+signon.
@@ -47,5 +47,5 @@ index 62f60541..c736842b 100644
  contains(DEFINES,USE_ACCOUNTS_QT) {
      CONFIG += link_pkgconfig
 -- 
-2.30.2
+2.25.1
 

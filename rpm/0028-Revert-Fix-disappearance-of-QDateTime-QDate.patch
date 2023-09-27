@@ -571,5 +571,5 @@ index 6247f02a..1d5ea7cf 100644
      msg4.setStatus(QMailMessage::New, true);
      msg4.setStatus(QMailMessage::Read, false);
 -- 
-2.30.2
+2.25.1
 
