@@ -42,10 +42,10 @@ index 69eb62ce..3a2775b9 100644
      if ( (mail->status() & QMailMessage::Incoming) && 
          !(mail->status() & QMailMessage::PartialContentAvailable) ) {
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index 1ed66e9e..eb505bc1 100644
+index b27e4cc5..da2c1513 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
-@@ -6509,7 +6509,7 @@ static quint64 lowPriorityFlag = 0;
+@@ -6535,7 +6535,7 @@ static quint64 lowPriorityFlag = 0;
  static quint64 calendarInvitationFlag = 0;
  static quint64 todoFlag = 0;
  static quint64 noNotificationFlag = 0;
@@ -54,7 +54,7 @@ index 1ed66e9e..eb505bc1 100644
  
  /*  QMailMessageMetaData */
  
-@@ -7151,6 +7151,15 @@ void QMailMessageMetaDataPrivate::deserialize(Stream &stream)
+@@ -7176,6 +7176,15 @@ void QMailMessageMetaDataPrivate::deserialize(Stream &stream)
      message externalized by saving in a drafts or sent folder.
  */
  
@@ -70,7 +70,7 @@ index 1ed66e9e..eb505bc1 100644
  const quint64 &QMailMessageMetaData::Incoming = incomingFlag;
  const quint64 &QMailMessageMetaData::Outgoing = outgoingFlag;
  const quint64 &QMailMessageMetaData::Sent = sentFlag;
-@@ -7183,6 +7192,7 @@ const quint64 &QMailMessageMetaData::LowPriority = lowPriorityFlag;
+@@ -7209,6 +7218,7 @@ const quint64 &QMailMessageMetaData::LowPriority = lowPriorityFlag;
  const quint64 &QMailMessageMetaData::CalendarInvitation = calendarInvitationFlag;
  const quint64 &QMailMessageMetaData::Todo = todoFlag;
  const quint64 &QMailMessageMetaData::NoNotification = noNotificationFlag;
@@ -78,7 +78,7 @@ index 1ed66e9e..eb505bc1 100644
  
  /*!
      Constructs an empty message meta data object.
-@@ -8549,6 +8559,21 @@ bool QMailMessage::contentModified() const
+@@ -8577,6 +8587,21 @@ bool QMailMessage::contentModified() const
      otherwise returns false.
  */  
  bool QMailMessage::hasCalendarInvitation() const
@@ -100,7 +100,7 @@ index 1ed66e9e..eb505bc1 100644
  {
      QList<const QMailMessagePartContainer*> parts;
      parts.append(this);
-@@ -8562,7 +8587,7 @@ bool QMailMessage::hasCalendarInvitation() const
+@@ -8590,7 +8615,7 @@ bool QMailMessage::hasCalendarInvitation() const
          } else {
              const QMailMessageContentType &ct(part->contentType());
              if (ct.matches("text", "calendar") &&
@@ -110,10 +110,10 @@ index 1ed66e9e..eb505bc1 100644
              }
          }
 diff --git a/src/libraries/qmfclient/qmailmessage.h b/src/libraries/qmfclient/qmailmessage.h
-index 4c74fb7a..de80c523 100644
+index f30baaab..05be9dc9 100644
 --- a/src/libraries/qmfclient/qmailmessage.h
 +++ b/src/libraries/qmfclient/qmailmessage.h
-@@ -584,6 +584,7 @@ public:
+@@ -586,6 +586,7 @@ public:
      static const quint64 &CalendarInvitation;
      static const quint64 &Todo;
      static const quint64 &NoNotification;
@@ -121,7 +121,7 @@ index 4c74fb7a..de80c523 100644
  
      QMailMessageMetaData();
  #ifndef QTOPIAMAIL_PARSING_ONLY
-@@ -795,6 +796,7 @@ public:
+@@ -797,6 +798,7 @@ public:
      virtual bool partialContentAvailable() const override;
  
      virtual bool hasCalendarInvitation() const;
@@ -129,7 +129,7 @@ index 4c74fb7a..de80c523 100644
  
      virtual bool contentModified() const;
  
-@@ -814,6 +816,7 @@ private:
+@@ -816,6 +818,7 @@ private:
      QMailMessagePrivate* partContainerImpl();
      const QMailMessagePrivate* partContainerImpl() const;
      
@@ -138,10 +138,10 @@ index 4c74fb7a..de80c523 100644
  
      QByteArray duplicatedData(const QString&) const;
 diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
-index ca0d3542..cadc4172 100644
+index 88de3417..40546fd2 100644
 --- a/src/libraries/qmfclient/qmailstore_p.cpp
 +++ b/src/libraries/qmfclient/qmailstore_p.cpp
-@@ -3234,7 +3234,9 @@ bool QMailStorePrivate::initStore()
+@@ -3236,7 +3236,9 @@ bool QMailStorePrivate::initStore()
                  || attemptRegisterStatusBit(QLatin1String("UseCryptoSignatureByDefault"), QLatin1String("accountstatus"),
                                              63, true, const_cast<quint64 *>(&QMailAccount::UseCryptoSignatureByDefault), t, false)
                  || attemptRegisterStatusBit(QLatin1String("NoNotification"), QLatin1String("messagestatus"),
@@ -191,5 +191,5 @@ index 2230f6ac..ca8d9c8a 100644
  
      // Special case to handle spurious hotmail messages. Hide in UI, but do not delete from server
 -- 
-2.30.2
+2.25.1
 

@@ -540,7 +540,7 @@ index fa9079d0..f29335c6 100644
  };
  
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index dff46c46..369abdae 100644
+index 2cb21893..9a454726 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -561,7 +561,7 @@ public:
@@ -589,7 +589,7 @@ index dff46c46..369abdae 100644
      if (!response.isEmpty()) {
          c->sendData(response.toBase64(), true);
      } else {
-@@ -3196,6 +3193,11 @@ void ImapProtocol::setReceivedCapabilities(bool received)
+@@ -3197,6 +3194,11 @@ void ImapProtocol::setReceivedCapabilities(bool received)
      _receivedCapabilities = received;
  }
  
@@ -601,7 +601,7 @@ index dff46c46..369abdae 100644
  bool ImapProtocol::loggingOut() const
  {
      return _fsm->state() == &_fsm->logoutState;
-@@ -3228,7 +3230,7 @@ void ImapProtocol::sendStartTLS()
+@@ -3229,7 +3231,7 @@ void ImapProtocol::sendStartTLS()
  }
  
  #ifdef USE_ACCOUNTS_QT
@@ -1396,5 +1396,5 @@ index 8603694e..a2f66cd9 100644
  };
  
 -- 
-2.30.2
+2.25.1
 

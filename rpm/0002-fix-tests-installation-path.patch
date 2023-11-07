@@ -1475,10 +1475,10 @@ index 623b19ca..1d3ba39e 100644
  include(../common.pri)
  
 diff --git a/tests/tests.pro b/tests/tests.pro
-index da454ccc..de368ce1 100644
+index 6d007765..f9d23fcd 100644
 --- a/tests/tests.pro
 +++ b/tests/tests.pro
-@@ -42,5 +42,5 @@ CONFIG += unittest
+@@ -41,5 +41,5 @@ CONFIG += unittest
  
  # Install test file description
  test_description.files = qt5/tests.xml
@@ -2935,5 +2935,5 @@ index 4cde1fe3..204ecd5a 100644
  
  INSTALLS += testdata
 -- 
-2.30.2
+2.25.1
 

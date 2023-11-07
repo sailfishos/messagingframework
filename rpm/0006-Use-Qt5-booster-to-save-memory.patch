@@ -23,7 +23,7 @@ index 9c107629..d9a35c53 100644
  #ifdef USE_HTML_PARSER
      // Need for html parsing by <QTextdocument> in qmailmessage.cpp, but don't need real UI
 diff --git a/src/tools/messageserver/messageserver.pro b/src/tools/messageserver/messageserver.pro
-index f7d92931..a092b8ce 100644
+index 9ab48893..1950e68b 100644
 --- a/src/tools/messageserver/messageserver.pro
 +++ b/src/tools/messageserver/messageserver.pro
 @@ -17,6 +17,12 @@ contains(DEFINES, USE_HTML_PARSER) {
@@ -61,5 +61,5 @@ index 0d583d15..a5aa05a9 100644
  RestartSec=1
  
 -- 
-2.30.2
+2.25.1
 

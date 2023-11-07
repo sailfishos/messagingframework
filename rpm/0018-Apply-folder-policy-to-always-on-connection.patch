@@ -124,5 +124,5 @@ index 75009809..a5663fdf 100644
  
  int ImapConfiguration::checkInterval() const
 -- 
-2.30.2
+2.25.1
 

@@ -99,5 +99,5 @@ index c736842b..7663a28a 100644
  
  QT = core network qmfclient qmfmessageserver
 -- 
-2.30.2
+2.25.1
 

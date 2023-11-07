@@ -288,5 +288,5 @@ index 1d635dfb..73517aab 100644
      QTimer *authTimeout;
  
 -- 
-2.30.2
+2.25.1
 
