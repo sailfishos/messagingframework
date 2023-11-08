@@ -97,6 +97,3 @@ index 88db5298..00ad7e73 100644
      result.insert(QString::fromLatin1("PLAIN"), plainAuth);
  
      // Currently pop account does not have any auth settings, so only plain can be used
--- 
-2.25.1
-

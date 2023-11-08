@@ -134,6 +134,3 @@ index 346dd7d3..7ef0989f 100644
      foreach(const QString &s, rangeList) {
          bool ok = false;
          int index = s.indexOf(":");
--- 
-2.25.1
-

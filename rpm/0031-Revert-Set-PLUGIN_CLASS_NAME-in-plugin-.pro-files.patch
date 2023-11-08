@@ -98,6 +98,3 @@ index c736842b..7663a28a 100644
  load(qt_plugin)
  
  QT = core network qmfclient qmfmessageserver
--- 
-2.25.1
-

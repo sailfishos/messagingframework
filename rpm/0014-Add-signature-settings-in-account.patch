@@ -114,18 +114,18 @@ index 8ba3efa9..9306dd9c 100644
      void setLastSynchronized(const QMailTimeStamp &synced);
  
 diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
-index 5cc18320..5dfb5ef7 100644
+index e8194303..1a3ae438 100644
 --- a/src/libraries/qmfclient/qmailstore_p.cpp
 +++ b/src/libraries/qmfclient/qmailstore_p.cpp
 @@ -2675,6 +2675,10 @@ bool SSOAccountSatisfyTheProperty(Accounts::Account* ssoAccount, const QMailAcco
              status &= (~QMailAccount::AppendSignature);
              status |= appendSignature?(QMailAccount::AppendSignature):0;
  
-+            bool useCryptoSignature = ssoAccount->valueAsBool("crypto/signByDefault");
++            bool useCryptoSignature = ssoAccount->valueAsBool(QLatin1String("crypto/signByDefault"));
 +            status &= (~QMailAccount::UseCryptoSignatureByDefault);
 +            status |= useCryptoSignature?(QMailAccount::UseCryptoSignatureByDefault):0;
 +
-             bool hasPersistentConnection = ssoAccount->valueAsBool("hasPersistentConnection", false);
+             bool hasPersistentConnection = ssoAccount->valueAsBool(QLatin1String("hasPersistentConnection"), false);
              status &= (~QMailAccount::HasPersistentConnection);
              status |= hasPersistentConnection?(QMailAccount::HasPersistentConnection):0;
 @@ -3229,6 +3233,8 @@ bool QMailStorePrivate::initStore()
@@ -138,10 +138,10 @@ index 5cc18320..5dfb5ef7 100644
                                              63, true, const_cast<quint64 *>(&QMailMessage::NoNotification), t, false);
  
 @@ -3724,17 +3730,21 @@ QMailAccount QMailStorePrivate::extractAccount(const QSharedPointer<Accounts::Ac
-     const bool& canTransmit = ssoAccount->valueAsBool("canTransmit", true);
-     const bool& appendSignature = ssoAccount->valueAsBool("signatureEnabled", true);
-     const bool& hasPersistentConnection = ssoAccount->valueAsBool("hasPersistentConnection", false);
-+    const bool& useCryptoSignature = ssoAccount->valueAsBool("crypto/signByDefault");
+     const bool& canTransmit = ssoAccount->valueAsBool(QLatin1String("canTransmit"), true);
+     const bool& appendSignature = ssoAccount->valueAsBool(QLatin1String("signatureEnabled"), true);
+     const bool& hasPersistentConnection = ssoAccount->valueAsBool(QLatin1String("hasPersistentConnection"), false);
++    const bool& useCryptoSignature = ssoAccount->valueAsBool(QLatin1String("crypto/signByDefault"));
  
      result.setStatus(QMailAccount::Enabled, enabled);
      result.setStatus(QMailAccount::PreferredSender, isDefault);
@@ -150,39 +150,36 @@ index 5cc18320..5dfb5ef7 100644
      result.setStatus(QMailAccount::HasPersistentConnection, hasPersistentConnection);
 +    result.setStatus(QMailAccount::UseCryptoSignatureByDefault, useCryptoSignature);
  
-     result.setSignature(ssoAccount->valueAsString("signature"));
-     result.setFromAddress(ssoAccount->contains("fullName")?
-                           QMailAddress(ssoAccount->valueAsString("fullName"),ssoAccount->valueAsString("emailaddress")):
-                           QMailAddress(ssoAccount->valueAsString("emailaddress")));
-+    result.setCryptoSignatureType(ssoAccount->valueAsString("crypto/pluginName"));
-+    result.setCryptoSignatureIds(ssoAccount->value("crypto/keyNames").toStringList());
+     result.setSignature(ssoAccount->valueAsString(QLatin1String("signature")));
+     result.setFromAddress(ssoAccount->contains(QLatin1String("fullName"))
+                           ? QMailAddress(ssoAccount->valueAsString(QLatin1String("fullName")), ssoAccount->valueAsString(QLatin1String("emailaddress")))
+                           : QMailAddress(ssoAccount->valueAsString(QLatin1String("emailaddress"))));
++    result.setCryptoSignatureType(ssoAccount->valueAsString(QLatin1String("crypto/pluginName")));
++    result.setCryptoSignatureIds(ssoAccount->value(QLatin1String("crypto/keyNames")).toStringList());
  
-     if ((static_cast<uint>(ssoAccount->valueAsUInt64("lastSynchronized"))) == 0) {
-             result.setLastSynchronized(QMailTimeStamp());
-@@ -6236,7 +6246,11 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddAccount(QMailAccou
-     ssoAccount->setValue("signatureEnabled", appendSignature);
+     if ((static_cast<uint>(ssoAccount->valueAsUInt64(QLatin1String("lastSynchronized")))) == 0) {
+         result.setLastSynchronized(QMailTimeStamp());
+@@ -6235,7 +6245,11 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddAccount(QMailAccou
+     ssoAccount->setValue(QLatin1String("signatureEnabled"), appendSignature);
      const bool hasPersistentConnection = (account->status() & QMailAccount::HasPersistentConnection);
-     ssoAccount->setValue("hasPersistentConnection", hasPersistentConnection);
+     ssoAccount->setValue(QLatin1String("hasPersistentConnection"), hasPersistentConnection);
 +    const bool useCryptoSignature = (account->status() & QMailAccount::UseCryptoSignatureByDefault);
-+    ssoAccount->setValue("crypto/signByDefault", useCryptoSignature);
-     ssoAccount->setValue("signature", account->signature());
-+    ssoAccount->setValue("crypto/pluginName", account->cryptoSignatureType());
-+    ssoAccount->setValue("crypto/keyNames", account->cryptoSignatureIds());
-     ssoAccount->setValue("emailaddress", account->fromAddress().address());
-     ssoAccount->setValue("fullName", account->fromAddress().name());
++    ssoAccount->setValue(QLatin1String("crypto/signByDefault"), useCryptoSignature);
+     ssoAccount->setValue(QLatin1String("signature"), account->signature());
++    ssoAccount->setValue(QLatin1String("crypto/pluginName"), account->cryptoSignatureType());
++    ssoAccount->setValue(QLatin1String("crypto/keyNames"), account->cryptoSignatureIds());
+     ssoAccount->setValue(QLatin1String("emailaddress"), account->fromAddress().address());
+     ssoAccount->setValue(QLatin1String("fullName"), account->fromAddress().name());
      //Account was never synced
-@@ -7040,7 +7054,11 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
-         ssoAccount->setValue("signatureEnabled", signatureEnabled);
+@@ -7038,7 +7052,11 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
+         ssoAccount->setValue(QLatin1String("signatureEnabled"), signatureEnabled);
          bool hasPersistentConnection = account->status() & QMailAccount::HasPersistentConnection;
-         ssoAccount->setValue("hasPersistentConnection", hasPersistentConnection);
+         ssoAccount->setValue(QLatin1String("hasPersistentConnection"), hasPersistentConnection);
 +        bool useCryptoSignature = account->status() & QMailAccount::UseCryptoSignatureByDefault;
-+        ssoAccount->setValue("crypto/signByDefault", useCryptoSignature);
-         ssoAccount->setValue("signature", account->signature());
-+        ssoAccount->setValue("crypto/pluginName", account->cryptoSignatureType());
-+        ssoAccount->setValue("crypto/keyNames", account->cryptoSignatureIds());
-         ssoAccount->setValue("emailaddress", account->fromAddress().address());
-         ssoAccount->setValue("fullName", account->fromAddress().name());
++        ssoAccount->setValue(QLatin1String("crypto/signByDefault"), useCryptoSignature);
+         ssoAccount->setValue(QLatin1String("signature"), account->signature());
++        ssoAccount->setValue(QLatin1String("crypto/pluginName"), account->cryptoSignatureType());
++        ssoAccount->setValue(QLatin1String("crypto/keyNames"), account->cryptoSignatureIds());
+         ssoAccount->setValue(QLatin1String("emailaddress"), account->fromAddress().address());
+         ssoAccount->setValue(QLatin1String("fullName"), account->fromAddress().name());
          if (account->lastSynchronized().isValid()) {
--- 
-2.25.1
-

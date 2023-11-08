@@ -16,7 +16,7 @@ enabled.
  7 files changed, 77 insertions(+), 57 deletions(-)
 
 diff --git a/src/libraries/qmfclient/ssosessionmanager.cpp b/src/libraries/qmfclient/ssosessionmanager.cpp
-index edb467d1..dd469aec 100644
+index 2f9092a8..d5232a9e 100644
 --- a/src/libraries/qmfclient/ssosessionmanager.cpp
 +++ b/src/libraries/qmfclient/ssosessionmanager.cpp
 @@ -113,7 +113,7 @@ void SSOSessionManager::cancel()
@@ -29,7 +29,7 @@ index edb467d1..dd469aec 100644
      Returns true if the account has one email service enabled and a valid identity stored
      in ths accounts-sso database, otherwise returns false.
 diff --git a/src/libraries/qmfmessageserver/qmailauthenticator.cpp b/src/libraries/qmfmessageserver/qmailauthenticator.cpp
-index 373bcf21..0827ab58 100644
+index fc11df5b..05d466d8 100644
 --- a/src/libraries/qmfmessageserver/qmailauthenticator.cpp
 +++ b/src/libraries/qmfmessageserver/qmailauthenticator.cpp
 @@ -131,7 +131,7 @@ QByteArray QMailAuthenticator::getAuthentication(const QMailAccountConfiguration
@@ -40,7 +40,7 @@ index 373bcf21..0827ab58 100644
 +                                           const QMail::SaslMechanism authType, const QString &password)
  {
      QMailServiceConfiguration configuration(svcCfg);
-     if (!configuration.value("smtpusername").isEmpty() && authType == QMail::CramMd5Mechanism) {
+     if (!configuration.value(QLatin1String("smtpusername")).isEmpty() && authType == QMail::CramMd5Mechanism) {
 diff --git a/src/libraries/qmfmessageserver/qmailauthenticator.h b/src/libraries/qmfmessageserver/qmailauthenticator.h
 index 3891139d..04ded033 100644
 --- a/src/libraries/qmfmessageserver/qmailauthenticator.h
@@ -287,6 +287,3 @@ index 1d635dfb..73517aab 100644
  
      QTimer *authTimeout;
  
--- 
-2.25.1
-

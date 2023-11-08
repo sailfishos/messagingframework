@@ -104,6 +104,3 @@ index cb0f3976..21eac44a 100644
  };
  
  class ImapServicePlugin : public QMailMessageServicePlugin
--- 
-2.25.1
-

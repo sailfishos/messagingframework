@@ -440,6 +440,3 @@ index e8b28a6b..ed115d53 100644
      void setSmtpUsername(const QString& username);
      void setSmtpPassword(const QString& password);
      void setSmtpAuthentication(int t);
--- 
-2.25.1
-

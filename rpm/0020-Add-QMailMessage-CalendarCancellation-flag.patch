@@ -42,10 +42,10 @@ index 69eb62ce..3a2775b9 100644
      if ( (mail->status() & QMailMessage::Incoming) && 
          !(mail->status() & QMailMessage::PartialContentAvailable) ) {
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index b27e4cc5..da2c1513 100644
+index 57c3fc43..b1439984 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
-@@ -6535,7 +6535,7 @@ static quint64 lowPriorityFlag = 0;
+@@ -6555,7 +6555,7 @@ static quint64 lowPriorityFlag = 0;
  static quint64 calendarInvitationFlag = 0;
  static quint64 todoFlag = 0;
  static quint64 noNotificationFlag = 0;
@@ -54,7 +54,7 @@ index b27e4cc5..da2c1513 100644
  
  /*  QMailMessageMetaData */
  
-@@ -7176,6 +7176,15 @@ void QMailMessageMetaDataPrivate::deserialize(Stream &stream)
+@@ -7196,6 +7196,15 @@ void QMailMessageMetaDataPrivate::deserialize(Stream &stream)
      message externalized by saving in a drafts or sent folder.
  */
  
@@ -70,7 +70,7 @@ index b27e4cc5..da2c1513 100644
  const quint64 &QMailMessageMetaData::Incoming = incomingFlag;
  const quint64 &QMailMessageMetaData::Outgoing = outgoingFlag;
  const quint64 &QMailMessageMetaData::Sent = sentFlag;
-@@ -7209,6 +7218,7 @@ const quint64 &QMailMessageMetaData::LowPriority = lowPriorityFlag;
+@@ -7229,6 +7238,7 @@ const quint64 &QMailMessageMetaData::LowPriority = lowPriorityFlag;
  const quint64 &QMailMessageMetaData::CalendarInvitation = calendarInvitationFlag;
  const quint64 &QMailMessageMetaData::Todo = todoFlag;
  const quint64 &QMailMessageMetaData::NoNotification = noNotificationFlag;
@@ -78,7 +78,7 @@ index b27e4cc5..da2c1513 100644
  
  /*!
      Constructs an empty message meta data object.
-@@ -8577,6 +8587,21 @@ bool QMailMessage::contentModified() const
+@@ -8597,6 +8607,21 @@ bool QMailMessage::contentModified() const
      otherwise returns false.
  */  
  bool QMailMessage::hasCalendarInvitation() const
@@ -100,7 +100,7 @@ index b27e4cc5..da2c1513 100644
  {
      QList<const QMailMessagePartContainer*> parts;
      parts.append(this);
-@@ -8590,7 +8615,7 @@ bool QMailMessage::hasCalendarInvitation() const
+@@ -8610,7 +8635,7 @@ bool QMailMessage::hasCalendarInvitation() const
          } else {
              const QMailMessageContentType &ct(part->contentType());
              if (ct.matches("text", "calendar") &&
@@ -138,7 +138,7 @@ index f30baaab..05be9dc9 100644
  
      QByteArray duplicatedData(const QString&) const;
 diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
-index 88de3417..40546fd2 100644
+index 699c97da..9d74a874 100644
 --- a/src/libraries/qmfclient/qmailstore_p.cpp
 +++ b/src/libraries/qmfclient/qmailstore_p.cpp
 @@ -3236,7 +3236,9 @@ bool QMailStorePrivate::initStore()
@@ -190,6 +190,3 @@ index 2230f6ac..ca8d9c8a 100644
      }
  
      // Special case to handle spurious hotmail messages. Hide in UI, but do not delete from server
--- 
-2.25.1
-

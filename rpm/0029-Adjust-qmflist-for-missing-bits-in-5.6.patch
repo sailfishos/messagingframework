@@ -35,6 +35,3 @@ index fbe48e02..af32016b 100644
      static QmfList<T> fromQList(const QList<T> &list) { return QmfList<T>(list.constBegin(), list.constEnd()); }
  };
  
--- 
-2.25.1
-
