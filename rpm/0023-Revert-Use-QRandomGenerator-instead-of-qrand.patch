@@ -11,7 +11,7 @@ This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
  3 files changed, 31 insertions(+), 11 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index 85e90b84..d95167d7 100644
+index b1439984..663ebcd5 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
 @@ -53,7 +53,6 @@
@@ -22,7 +22,7 @@ index 85e90b84..d95167d7 100644
  #include <qtextstream.h>
  #include <QTextCodec>
  #include <QtDebug>
-@@ -6336,11 +6335,6 @@ void QMailMessagePart::setReferenceResolution(const QString &uri)
+@@ -6338,11 +6337,6 @@ void QMailMessagePart::setReferenceResolution(const QString &uri)
      impl(this)->setReferenceResolution(uri);
  }
  
@@ -34,7 +34,7 @@ index 85e90b84..d95167d7 100644
  static QString randomString(int length)
  {
      if (length <= 0) 
-@@ -6351,7 +6345,7 @@ static QString randomString(int length)
+@@ -6353,7 +6347,7 @@ static QString randomString(int length)
  
      int i = 0;
      while (length--){
@@ -43,7 +43,7 @@ index 85e90b84..d95167d7 100644
          r+=48;
          if (r>57) r+=7;
          if (r>90) r+=6;
-@@ -7990,6 +7984,25 @@ uint QMailMessagePrivate::indicativeSize() const
+@@ -7992,6 +7986,25 @@ uint QMailMessagePrivate::indicativeSize() const
      return (size + 1);
  }
  
@@ -122,6 +122,3 @@ index ff985fc7..fa182c54 100644
      quint32 timeComponent(QDateTime::currentDateTimeUtc().toMSecsSinceEpoch() / 1000);
  
      return ('<' +
--- 
-2.25.1
-

@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
-Date: Wed, 15 Aug 2018 11:26:49 +0300
+Date: Wed, 8 Nov 2023 13:42:29 +0200
 Subject: [PATCH] Introduce discovery of authentication from the anounced
  capabilities(IMAP/SMTP)
 
@@ -49,7 +49,7 @@ index faf3713c..bbc59a76 100644
      virtual SignOn::SessionData sessionData(const QString &accountProvider, QVariantMap authParameters) const = 0;
      virtual SSOAuthService *createService() = 0;
 diff --git a/src/libraries/qmfclient/ssosessionmanager.cpp b/src/libraries/qmfclient/ssosessionmanager.cpp
-index e988ed61..edb467d1 100644
+index d922154e..2f9092a8 100644
 --- a/src/libraries/qmfclient/ssosessionmanager.cpp
 +++ b/src/libraries/qmfclient/ssosessionmanager.cpp
 @@ -67,7 +67,7 @@
@@ -87,7 +87,7 @@ index e988ed61..edb467d1 100644
      if (_waitForSso) {
          _waitForSso = false;
 -        _ssoLogin = QByteArray();
-         emit ssoSessionError(QString("SSO error %1: %2").arg(code.type()).arg(code.message()));
+         emit ssoSessionError(QString::fromLatin1("SSO error %1: %2").arg(code.type()).arg(code.message()));
      }
  }
 @@ -376,8 +372,8 @@ void SSOSessionManager::reAuthenticate()
@@ -139,7 +139,7 @@ index eaecf916..61806ba4 100644
      QString _authMechanism;
      QString _authUsername;
 diff --git a/src/libraries/qmfmessageserver/qmailauthenticator.cpp b/src/libraries/qmfmessageserver/qmailauthenticator.cpp
-index 92a12e70..373bcf21 100644
+index 3fbb9e5e..fc11df5b 100644
 --- a/src/libraries/qmfmessageserver/qmailauthenticator.cpp
 +++ b/src/libraries/qmfmessageserver/qmailauthenticator.cpp
 @@ -32,7 +32,6 @@
@@ -159,15 +159,15 @@ index 92a12e70..373bcf21 100644
 +                                           const QMail::SaslMechanism authType, const QString password)
  {
      QMailServiceConfiguration configuration(svcCfg);
--    if (!configuration.value("smtpusername").isEmpty()
--        && (configuration.value("authentication") == QString::number(QMail::CramMd5Mechanism))) {
-+    if (!configuration.value("smtpusername").isEmpty() && authType == QMail::CramMd5Mechanism) {
+-    if (!configuration.value(QLatin1String("smtpusername")).isEmpty()
+-        && (configuration.value(QLatin1String("authentication")) == QString::number(QMail::CramMd5Mechanism))) {
++    if (!configuration.value(QLatin1String("smtpusername")).isEmpty() && authType == QMail::CramMd5Mechanism) {
          // SMTP server CRAM-MD5 authentication
-         return cramMd5Response(challenge, configuration.value("smtpusername").toUtf8(), password.toUtf8());
--    } else if (configuration.value("authentication") == QString::number(QMail::CramMd5Mechanism)) {
+         return cramMd5Response(challenge, configuration.value(QLatin1String("smtpusername")).toUtf8(), password.toUtf8());
+-    } else if (configuration.value(QLatin1String("authentication")) == QString::number(QMail::CramMd5Mechanism)) {
 +    } else if (authType == QMail::CramMd5Mechanism) {
          // IMAP/POP server CRAM-MD5 authentication
-         return cramMd5Response(challenge, configuration.value("username").toUtf8(), password.toUtf8());
+         return cramMd5Response(challenge, configuration.value(QLatin1String("username")).toUtf8(), password.toUtf8());
      }
 diff --git a/src/libraries/qmfmessageserver/qmailauthenticator.h b/src/libraries/qmfmessageserver/qmailauthenticator.h
 index a9f2d214..3891139d 100644
@@ -1395,6 +1395,3 @@ index 8603694e..a2f66cd9 100644
      Accounts::Manager *m_accountManager;
  };
  
--- 
-2.25.1
-

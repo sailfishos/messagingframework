@@ -171,6 +171,3 @@ index d05c3377..689ad320 100644
 +contains(DEFINES,USE_ACCOUNTS_QT) {
 +    SUBDIRS += accountscheck
 +}
--- 
-2.25.1
-

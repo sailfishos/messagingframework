@@ -36,6 +36,3 @@ index 6a4e9adf..a67092c7 100644
 +    warning("IMAP COMPRESS capability requires zlib")
  }
  
--- 
-2.25.1
-

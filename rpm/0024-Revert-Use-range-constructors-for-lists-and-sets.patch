@@ -224,10 +224,10 @@ index 4d7e8b6e..0721d019 100644
          d->notifyMessageRemovalRecordsChange(type, idList);
  
 diff --git a/src/libraries/qmfclient/qmailstoreimplementation_p.cpp b/src/libraries/qmfclient/qmailstoreimplementation_p.cpp
-index 6af49cdd..5505c930 100644
+index eae4118e..897c39c6 100644
 --- a/src/libraries/qmfclient/qmailstoreimplementation_p.cpp
 +++ b/src/libraries/qmfclient/qmailstoreimplementation_p.cpp
-@@ -117,11 +117,11 @@ void emitIpcUpdates(MailstoreAdaptor &adaptor, const QMailMessageIdList& ids,  q
+@@ -116,11 +116,11 @@ void emitIpcUpdates(MailstoreAdaptor &adaptor, const QMailMessageIdList& ids,  q
      emit adaptor.updated(sig, payload);
  }
  
@@ -242,7 +242,7 @@ index 6af49cdd..5505c930 100644
          ids.clear();
      }
  } 
-@@ -141,7 +141,7 @@ void dispatchNotifications(MailstoreAdaptor &adaptor, MessagesPropertiesBuffer&
+@@ -140,7 +140,7 @@ void dispatchNotifications(MailstoreAdaptor &adaptor, MessagesPropertiesBuffer&
  {
      if (!data.isEmpty()) {
          foreach (const MessagesProperties& props, data) {
@@ -251,7 +251,7 @@ index 6af49cdd..5505c930 100644
          }
          data.clear();
      }
-@@ -154,8 +154,7 @@ void dispatchNotifications(MailstoreAdaptor &adaptor, MessagesStatusBuffer& data
+@@ -153,8 +153,7 @@ void dispatchNotifications(MailstoreAdaptor &adaptor, MessagesStatusBuffer& data
  {
      if (!data.isEmpty()) {
          foreach (const MessagesStatus& status, data.keys()) {
@@ -261,7 +261,7 @@ index 6af49cdd..5505c930 100644
          }
          data.clear();
      }
-@@ -342,7 +341,7 @@ void QMailStoreImplementationBase::notifyAccountsChange(QMailStore::ChangeType c
+@@ -341,7 +340,7 @@ void QMailStoreImplementationBase::notifyAccountsChange(QMailStore::ChangeType c
              flushTimer.start(flushTimeout);
          }
  
@@ -270,7 +270,7 @@ index 6af49cdd..5505c930 100644
          switch (changeType)
          {
          case QMailStore::Added:
-@@ -379,7 +378,7 @@ void QMailStoreImplementationBase::notifyMessagesChange(QMailStore::ChangeType c
+@@ -378,7 +377,7 @@ void QMailStoreImplementationBase::notifyMessagesChange(QMailStore::ChangeType c
              flushTimer.start(flushTimeout);
          }
  
@@ -279,7 +279,7 @@ index 6af49cdd..5505c930 100644
          switch (changeType)
          {
          case QMailStore::Added:
-@@ -445,7 +444,7 @@ void QMailStoreImplementationBase::notifyMessagesDataChange(const QMailMessageId
+@@ -444,7 +443,7 @@ void QMailStoreImplementationBase::notifyMessagesDataChange(const QMailMessageId
              flushTimer.start(flushTimeout);
          }
  
@@ -288,7 +288,7 @@ index 6af49cdd..5505c930 100644
          messagesPropertiesBuffer.append(props);;
  
      } else {
-@@ -465,7 +464,7 @@ void QMailStoreImplementationBase::notifyMessagesDataChange(const QMailMessageId
+@@ -464,7 +463,7 @@ void QMailStoreImplementationBase::notifyMessagesDataChange(const QMailMessageId
          }
  
          MessagesStatus messageStatus(status, set);
@@ -297,7 +297,7 @@ index 6af49cdd..5505c930 100644
  
      } else {
          emitIpcUpdates(*ipcAdaptor, ids, status, set, messageStatusUpdatedSig());
-@@ -485,7 +484,7 @@ void QMailStoreImplementationBase::notifyThreadsChange(QMailStore::ChangeType ch
+@@ -484,7 +483,7 @@ void QMailStoreImplementationBase::notifyThreadsChange(QMailStore::ChangeType ch
              flushTimer.start(flushTimeout);
          }
  
@@ -306,7 +306,7 @@ index 6af49cdd..5505c930 100644
          switch (changeType)
          {
          case QMailStore::Added:
-@@ -523,7 +522,7 @@ void QMailStoreImplementationBase::notifyFoldersChange(QMailStore::ChangeType ch
+@@ -522,7 +521,7 @@ void QMailStoreImplementationBase::notifyFoldersChange(QMailStore::ChangeType ch
              flushTimer.start(flushTimeout);
          }
  
@@ -315,7 +315,7 @@ index 6af49cdd..5505c930 100644
          switch (changeType)
          {
          case QMailStore::Added:
-@@ -560,7 +559,7 @@ void QMailStoreImplementationBase::notifyMessageRemovalRecordsChange(QMailStore:
+@@ -559,7 +558,7 @@ void QMailStoreImplementationBase::notifyMessageRemovalRecordsChange(QMailStore:
              flushTimer.start(flushTimeout);
          }
  
@@ -324,7 +324,7 @@ index 6af49cdd..5505c930 100644
          switch (changeType)
          {
          case QMailStore::Added:
-@@ -598,7 +597,7 @@ void QMailStoreImplementationBase::notifyTransmissionInProgress(const QMailAccou
+@@ -597,7 +596,7 @@ void QMailStoreImplementationBase::notifyTransmissionInProgress(const QMailAccou
  
  bool QMailStoreImplementationBase::setRetrievalInProgress(const QMailAccountIdList& ids)
  {
@@ -333,7 +333,7 @@ index 6af49cdd..5505c930 100644
      if ((idSet != retrievalInProgressIds) || !retrievalSetInitialized) {
          retrievalInProgressIds = idSet;
          retrievalSetInitialized = true;
-@@ -610,7 +609,7 @@ bool QMailStoreImplementationBase::setRetrievalInProgress(const QMailAccountIdLi
+@@ -609,7 +608,7 @@ bool QMailStoreImplementationBase::setRetrievalInProgress(const QMailAccountIdLi
  
  bool QMailStoreImplementationBase::setTransmissionInProgress(const QMailAccountIdList& ids)
  {
@@ -706,6 +706,3 @@ index c17ad816..2c0650a0 100644
      QCOMPARE(messageSet(QMailMessageKey::id(QMailMessageIdList() << smsMessage, Excludes)), allEmailMessages);
      QCOMPARE(messageSet(~QMailMessageKey::id(QMailMessageIdList() << smsMessage, Excludes)), messageSet() << smsMessage);
      QCOMPARE(messageSet(QMailMessageKey::id(QMailMessageIdList() << inboxMessage1, Excludes)), messageSet() << smsMessage << archivedMessage1 << inboxMessage2 << savedMessage2);
--- 
-2.25.1
-

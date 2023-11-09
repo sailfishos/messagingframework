@@ -72,7 +72,7 @@ index 9306dd9c..933cfa0c 100644
      void setStatus(quint64 newStatus);
      void setStatus(quint64 mask, bool set);
 diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
-index 5dfb5ef7..88de3417 100644
+index 1a3ae438..699c97da 100644
 --- a/src/libraries/qmfclient/qmailstore_p.cpp
 +++ b/src/libraries/qmfclient/qmailstore_p.cpp
 @@ -3708,6 +3708,42 @@ bool QMailStorePrivate::messageExists(const QString &serveruid, const QMailAccou
@@ -122,37 +122,37 @@ index 5dfb5ef7..88de3417 100644
  
      ssoAccount->selectService();
      const bool& enabled = ssoAccount->enabled();
-+    result.setFolderSyncPolicy(folderSyncPolicyToEnum(ssoAccount->valueAsString("folderSyncPolicy")));
++    result.setFolderSyncPolicy(folderSyncPolicyToEnum(ssoAccount->valueAsString(QLatin1String("folderSyncPolicy"))));
 +
      ssoAccount->selectService(service);
-     const bool& isDefault = ssoAccount->valueAsBool("email/default");
-     const bool& canTransmit = ssoAccount->valueAsBool("canTransmit", true);
-@@ -6229,6 +6267,9 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddAccount(QMailAccou
+     const bool& isDefault = ssoAccount->valueAsBool(QLatin1String("email/default"));
+     const bool& canTransmit = ssoAccount->valueAsBool(QLatin1String("canTransmit"), true);
+@@ -6228,6 +6266,9 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddAccount(QMailAccou
      ssoAccount->setDisplayName(account->name());
      ssoAccount->setEnabled(account->status() & QMailAccount::Enabled);
  
 +    ssoAccount->selectService();
-+    ssoAccount->setValue("folderSyncPolicy", folderSyncPolicyToString(account->folderSyncPolicy()));
++    ssoAccount->setValue(QLatin1String("folderSyncPolicy"), folderSyncPolicyToString(account->folderSyncPolicy()));
 +
-     Accounts::ServiceList services = ssoAccount->services("e-mail");
+     Accounts::ServiceList services = ssoAccount->services(QLatin1String("e-mail"));
      if (!services.count()) {
          qMailLog(Messaging) << "E-mail Services not found, make sure that *.service and *.provider files are properly installed.";
-@@ -7023,6 +7064,11 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
+@@ -7022,6 +7063,11 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
      if (!ssoAccount)
        return Failure;
  
 +    if (account) {
 +        ssoAccount->selectService();
-+        ssoAccount->setValue("folderSyncPolicy", folderSyncPolicyToString(account->folderSyncPolicy()));
++        ssoAccount->setValue(QLatin1String("folderSyncPolicy"), folderSyncPolicyToString(account->folderSyncPolicy()));
 +    }
 +
      Accounts::ServiceList services = ssoAccount->enabledServices();
      Q_ASSERT (services.count() == 1);
      Accounts::Service service = services.first();
-@@ -7072,6 +7118,7 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
-         ssoAccount->setValue("email/default", isDefault);
-         ssoAccount->setValue("canTransmit", canTransmit);
-         ssoAccount->setValue("iconPath", account->iconPath());
+@@ -7069,6 +7115,7 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
+         ssoAccount->setValue(QLatin1String("email/default"), isDefault);
+         ssoAccount->setValue(QLatin1String("canTransmit"), canTransmit);
+         ssoAccount->setValue(QLatin1String("iconPath"), account->iconPath());
 +
  #else
          QString properties(QLatin1String("type=?, name=?, emailaddress=?, status=?, signature=?, lastsynchronized=?, iconpath=?"));
@@ -383,6 +383,3 @@ index 3b8663a7..7b6492ab 100644
      _service->_client.setOperation(QMailRetrievalAction::MetaData);
      _service->_client.newConnection();
      _unavailable = true;
--- 
-2.25.1
-

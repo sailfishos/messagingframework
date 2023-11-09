@@ -64,6 +64,3 @@ index 73517aab..91d0e517 100644
      QMap<QString, QList<QByteArray> > ssoLogin;
  #endif
  };
--- 
-2.25.1
-
