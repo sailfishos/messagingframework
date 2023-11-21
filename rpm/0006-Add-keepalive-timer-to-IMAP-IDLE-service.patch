@@ -27,7 +27,7 @@ index 6c161169..be6ca85a 100644
      QT += alignedtimer
  }
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 4edae55f..4ce5a6c2 100644
+index 5e0af431..9591fa65 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -1520,6 +1520,12 @@ ImapService::ImapService(const QMailAccountId &accountId)
@@ -43,7 +43,7 @@ index 4edae55f..4ce5a6c2 100644
      QMailAccount account(accountId);
      if (!(account.status() & QMailAccount::CanSearchOnServer)) {
          account.setStatus(QMailAccount::CanSearchOnServer, true);
-@@ -1919,7 +1925,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
+@@ -1932,7 +1938,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
          }
      }
      _idling = status;

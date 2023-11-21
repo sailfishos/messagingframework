@@ -28,7 +28,7 @@ index be6ca85a..6a4e9adf 100644
  
  contains(DEFINES,QT_QMF_USE_ALIGNEDTIMER) {
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 5595a296..8b7e4bed 100644
+index 72a59e07..49597d67 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -447,7 +447,8 @@ ImapClient::ImapClient(QObject* parent)
@@ -68,7 +68,7 @@ index 5595a296..8b7e4bed 100644
                      foreach(const QMailFolderId &id, _monitored.keys()) {
                          IdleProtocol *protocol = _monitored.take(id);
                          protocol->close();
-@@ -1793,8 +1801,7 @@ bool ImapClient::loggingIn() const
+@@ -1794,8 +1802,7 @@ bool ImapClient::loggingIn() const
  
  bool ImapClient::idlesEstablished()
  {
@@ -78,7 +78,7 @@ index 5595a296..8b7e4bed 100644
          return true;
  
      return _idlesEstablished;
-@@ -1817,8 +1824,9 @@ QMailFolderIdList ImapClient::configurationIdleFolderIds()
+@@ -1818,8 +1825,9 @@ QMailFolderIdList ImapClient::configurationIdleFolderIds()
  {
      ImapConfiguration imapCfg(_config);            
      QMailFolderIdList folderIds;
@@ -89,7 +89,7 @@ index 5595a296..8b7e4bed 100644
      foreach(QString folderName, imapCfg.pushFolders()) {
          QMailFolderId idleFolderId(mailboxId(folderName));
          if (idleFolderId.isValid()) {
-@@ -1834,7 +1842,7 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
+@@ -1835,7 +1843,7 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
      
      ImapConfiguration imapCfg(_config);
      if (!_protocol.supportsCapability("IDLE")
@@ -98,7 +98,7 @@ index 5595a296..8b7e4bed 100644
          return;
      }
      
-@@ -1922,6 +1930,26 @@ void ImapClient::removeAllFromBuffer(QMailMessage *message)
+@@ -1923,6 +1931,26 @@ void ImapClient::removeAllFromBuffer(QMailMessage *message)
      }
  }
  
@@ -125,7 +125,7 @@ index 5595a296..8b7e4bed 100644
  #ifdef USE_ACCOUNTS_QT
  void ImapClient::removeSsoIdentity(const QMailAccountId &accountId)
  {
-@@ -1937,7 +1965,7 @@ void ImapClient::removeSsoIdentity(const QMailAccountId &accountId)
+@@ -1938,7 +1966,7 @@ void ImapClient::removeSsoIdentity(const QMailAccountId &accountId)
  
  void ImapClient::ssoProcessLogin()
  {
@@ -134,7 +134,7 @@ index 5595a296..8b7e4bed 100644
          // if account was updated try to recreate
          // identity without asking the user for new
          // credentials
-@@ -1978,6 +2006,8 @@ void ImapClient::onSsoSessionResponse(const QMap<QString,QList<QByteArray> > &ss
+@@ -1979,6 +2007,8 @@ void ImapClient::onSsoSessionResponse(const QMap<QString,QList<QByteArray> > &ss
      }
      if (_sendLogin) {
          _protocol.sendLogin(_config, _ssoLogin);
@@ -143,7 +143,7 @@ index 5595a296..8b7e4bed 100644
      }
  }
  
-@@ -2010,6 +2040,14 @@ void ImapClient::onAccountsUpdated(const QMailAccountIdList &list)
+@@ -2011,6 +2041,14 @@ void ImapClient::onAccountsUpdated(const QMailAccountIdList &list)
          }
  
          qMailLog(IMAP) << Q_FUNC_INFO << imapCfg1.mailUserName() ;
@@ -158,7 +158,7 @@ index 5595a296..8b7e4bed 100644
          // compare config modified by the User
          const bool& notEqual = (imapCfg1.mailUserName() != imapCfg2.mailUserName()) ||
                                 (imapCfg1.mailPassword() != imapCfg2.mailPassword()) ||
-@@ -2017,15 +2055,19 @@ void ImapClient::onAccountsUpdated(const QMailAccountIdList &list)
+@@ -2018,15 +2056,19 @@ void ImapClient::onAccountsUpdated(const QMailAccountIdList &list)
                                 (imapCfg1.mailPort() != imapCfg2.mailPort()) ||
                                 (imapCfg1.mailEncryption() != imapCfg2.mailEncryption()) ||
                                 (imapCfg1.pushEnabled() != imapCfg2.pushEnabled());
@@ -178,7 +178,7 @@ index 5595a296..8b7e4bed 100644
  
  void ImapClient::closeIdleConnections()
  {
-@@ -2035,12 +2077,12 @@ void ImapClient::closeIdleConnections()
+@@ -2036,12 +2078,12 @@ void ImapClient::closeIdleConnections()
      // closing idle connections
      foreach(const QMailFolderId &id, _monitored.keys()) {
          IdleProtocol *protocol = _monitored.take(id);
