@@ -91,7 +91,7 @@ index 60def58c..d5043ea5 100644
          if (r>57) r+=7;
          if (r>90) r+=6;
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index ff985fc7..fa182c54 100644
+index f38feae9..eb6e635b 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -43,7 +43,6 @@
@@ -102,7 +102,7 @@ index ff985fc7..fa182c54 100644
  #include <QRegExp>
  #ifndef QT_NO_SSL
  #include <QSslSocket>
-@@ -58,9 +57,18 @@
+@@ -59,9 +58,18 @@
  // Only this many bytes is queued to be sent at a time.
  #define SENDING_BUFFER_SIZE 5000
  

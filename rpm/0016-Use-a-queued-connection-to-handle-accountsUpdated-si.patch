@@ -18,7 +18,7 @@ code which caused the database change, otherwise crashes can result
  6 files changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 92b69402..cdf3f68f 100644
+index 49597d67..c3506c62 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -505,7 +505,8 @@ ImapClient::ImapClient(QObject* parent)
@@ -72,10 +72,10 @@ index 7b6492ab..45197adf 100644
      _client.setAccount(accountId);
      QMailAccountConfiguration accountCfg(accountId);
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 85936dbf..ff985fc7 100644
+index b056599e..f38feae9 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
-@@ -121,7 +121,7 @@ SmtpClient::SmtpClient(QObject* parent)
+@@ -122,7 +122,7 @@ SmtpClient::SmtpClient(QObject* parent)
  #endif
  {
      connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 

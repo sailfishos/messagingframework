@@ -198,10 +198,10 @@ index f0c0569a..69dc8ad1 100644
  
      void setDeleteMail(bool b);
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index 67e44023..807b7ec5 100644
+index 010c8e34..8515db8b 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
-@@ -3065,10 +3065,18 @@ bool ImapProtocol::open( const ImapConfiguration& config, qint64 bufferSize)
+@@ -3089,10 +3089,18 @@ bool ImapProtocol::open( const ImapConfiguration& config, qint64 bufferSize)
                  this, SLOT(connected(QMailTransport::EncryptType)));
          connect(_transport, SIGNAL(readyRead()),
                  this, SLOT(incomingData()));
@@ -264,7 +264,7 @@ index a1c50426..50c12e51 100644
      void test();
  
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index 6cf2cb1f..a092ca9c 100644
+index 77801a21..7473198a 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
 @@ -113,6 +113,10 @@ void PopClient::createTransport()
@@ -368,10 +368,10 @@ index 1644faad..fe0119c3 100644
  
      void setDeleteMail(bool b);
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index ea45ca8e..71785ea0 100644
+index 7eab2081..62018491 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
-@@ -199,10 +199,20 @@ void SmtpClient::newConnection()
+@@ -207,10 +207,20 @@ void SmtpClient::newConnection()
                  this, SIGNAL(updateStatus(QString)));
          connect(transport, SIGNAL(errorOccurred(int,QString)),
                  this, SLOT(transportError(int,QString)));
@@ -393,7 +393,7 @@ index ea45ca8e..71785ea0 100644
  
  QMailServiceAction::Status::ErrorCode SmtpClient::addMail(const QMailMessage& mail)
 diff --git a/src/plugins/messageservices/smtp/smtpconfiguration.cpp b/src/plugins/messageservices/smtp/smtpconfiguration.cpp
-index e8807cc7..23d43949 100644
+index 0c3c3dae..cc30785e 100644
 --- a/src/plugins/messageservices/smtp/smtpconfiguration.cpp
 +++ b/src/plugins/messageservices/smtp/smtpconfiguration.cpp
 @@ -66,6 +66,11 @@ int SmtpConfiguration::smtpPort() const
@@ -408,7 +408,7 @@ index e8807cc7..23d43949 100644
  QString SmtpConfiguration::smtpUsername() const
  {
      return value("smtpusername");
-@@ -116,6 +121,11 @@ void SmtpConfigurationEditor::setSmtpPort(int i)
+@@ -121,6 +126,11 @@ void SmtpConfigurationEditor::setSmtpPort(int i)
  
  #ifndef QT_NO_SSL
  
@@ -421,7 +421,7 @@ index e8807cc7..23d43949 100644
  {
      setValue("smtpusername", str);
 diff --git a/src/plugins/messageservices/smtp/smtpconfiguration.h b/src/plugins/messageservices/smtp/smtpconfiguration.h
-index e8b28a6b..ed115d53 100644
+index 89eb82c4..7d7e85c6 100644
 --- a/src/plugins/messageservices/smtp/smtpconfiguration.h
 +++ b/src/plugins/messageservices/smtp/smtpconfiguration.h
 @@ -69,6 +69,7 @@ public:
@@ -432,7 +432,7 @@ index e8b28a6b..ed115d53 100644
      QString smtpUsername() const;
      QString smtpPassword() const;
  #endif
-@@ -86,6 +87,7 @@ public:
+@@ -87,6 +88,7 @@ public:
      void setSmtpServer(const QString &str);
      void setSmtpPort(int i);
  #ifndef QT_NO_SSL

@@ -1,0 +1,51 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Damien Caliste <dcaliste@free.fr>
+Date: Tue, 21 Nov 2023 09:51:51 +0100
+Subject: [PATCH] Adjust for Qt 5.6
+
+Change-Id: Ia5853d84f5ef4dad30b3b7a6bbf64a9f0f81bb31
+---
+ tests/tst_smtp/tst_smtp.cpp | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/tests/tst_smtp/tst_smtp.cpp b/tests/tst_smtp/tst_smtp.cpp
+index 74360d1a..ebeaa0cf 100644
+--- a/tests/tst_smtp/tst_smtp.cpp
++++ b/tests/tst_smtp/tst_smtp.cpp
+@@ -99,9 +99,9 @@ void tst_SmtpClient::test_connection()
+     QVERIFY(completed.wait());
+ 
+     QCOMPARE(updateStatus.count(), 3);
+-    QCOMPARE(updateStatus.takeFirst().first(), QString::fromLatin1("DNS lookup"));
+-    QCOMPARE(updateStatus.takeFirst().first(), QString::fromLatin1("Connected"));
+-    QCOMPARE(updateStatus.takeFirst().first(), QString::fromLatin1("Connected"));
++    QCOMPARE(updateStatus.takeFirst().first().toString(), QString::fromLatin1("DNS lookup"));
++    QCOMPARE(updateStatus.takeFirst().first().toString(), QString::fromLatin1("Connected"));
++    QCOMPARE(updateStatus.takeFirst().first().toString(), QString::fromLatin1("Connected"));
+ }
+ 
+ void tst_SmtpClient::test_auth()
+@@ -120,9 +120,9 @@ void tst_SmtpClient::test_auth()
+     QVERIFY(!completed.wait(250)); // Fails with wrong credentials
+ 
+     QCOMPARE(updateStatus.count(), 3);
+-    QCOMPARE(updateStatus.takeFirst().first(), QString::fromLatin1("DNS lookup"));
+-    QCOMPARE(updateStatus.takeFirst().first(), QString::fromLatin1("Connected"));
+-    QCOMPARE(updateStatus.takeFirst().first(), QString::fromLatin1("Connected"));
++    QCOMPARE(updateStatus.takeFirst().first().toString(), QString::fromLatin1("DNS lookup"));
++    QCOMPARE(updateStatus.takeFirst().first().toString(), QString::fromLatin1("Connected"));
++    QCOMPARE(updateStatus.takeFirst().first().toString(), QString::fromLatin1("Connected"));
+ 
+     smtp.setSmtpAuthentication(QMail::PlainMechanism);
+     QVERIFY(QMailStore::instance()->updateAccountConfiguration(&config));
+@@ -131,7 +131,7 @@ void tst_SmtpClient::test_auth()
+     QVERIFY(!completed.wait(250)); // Fails with wrong credentials
+ 
+     QCOMPARE(updateStatus.count(), 3);
+-    QCOMPARE(updateStatus.takeFirst().first(), QString::fromLatin1("DNS lookup"));
+-    QCOMPARE(updateStatus.takeFirst().first(), QString::fromLatin1("Connected"));
+-    QCOMPARE(updateStatus.takeFirst().first(), QString::fromLatin1("Connected"));
++    QCOMPARE(updateStatus.takeFirst().first().toString(), QString::fromLatin1("DNS lookup"));
++    QCOMPARE(updateStatus.takeFirst().first().toString(), QString::fromLatin1("Connected"));
++    QCOMPARE(updateStatus.takeFirst().first().toString(), QString::fromLatin1("Connected"));
+ }

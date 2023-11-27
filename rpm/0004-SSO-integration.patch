@@ -1,0 +1,3775 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerio Valerio <valerio.valerio@jollamobile.com>
+Date: Wed, 29 May 2013 09:44:20 +0300
+Subject: [PATCH] SSO integration.
+
+Squashed commits, either one line description or block comment:
+
+-----
+Don't call signon-ui from background process.
+
+Set credentials need update when SSO autenthication fails.
+-----
+
+- Use service username instead of global if it exists.
+- Use password from SSO for CramMd5 authentication.
+- Make installation of SSO provider optional.
+- Force refresh of SSO tokens when token returned is the same as last
+  one that failed.
+- Amend last commit and bump version
+
+-----
+Add enablers for credentials checking.
+
+Don't try to re-create SSO sessions when accounts are in checking mode.
+Don't try to autoconnect to SMTP server during account setup.
+-----
+
+Fix memory leak in SSOSessionManager::createSsoIdentity
+
+Accounts::AccountService was allocated and never deleted.
+-----
+Fixed memory leak in SSOSessionManager::createSsoIdentity
+
+The object allocated by Accounts::Manager::account() needs to be deleted
+by the caller.
+-----
+
+- Removed unnecessary SSOSessionManager::createSsoIdentity call
+
+-----
+
+Send correct smtp command when auth is not required(SmtpConfiguration::Auth_NONE)
+
+----
+Make SMTP AUTH PLAIN more robust.
+
+SMTP authentication using AUTH PLAIN supports two ways to send the information to the server,
+seems that some servers don't support anymore auth in two steps:
+
+c: AUTH PLAIN
+S: 334
+C: <UserName and password encoded in base64>
+S: 235 2.7.0 Authentication successful
+
+Auth in one step introduced by this commit, better to reduce communication with the server
+
+c: AUTH PLAIN <UserName and password encoded in base64>
+S: 235 2.7.0 Authentication successful
+
+----
+
+Trigger notification if account credentials are incorrect
+
+For accounts that use passwords, if the credentials are incorrect this
+change will cause the "CredentialsNeedUpdate = true" property to be set
+on the account, triggering signond to show a notification to the user.
+
+This mirrors the behavour of qmf-oauth2-plugin. See
+SSOOauth2Plugin::credentialsNeedUpdate() in
+base-qmf-oauth2-plugin/oauth2plugin.cpp
+
+Change-Id: If6e92e95a3a5c53ac46fe300906508804f0fd9ce
+---
+ src/libraries/qmfclient/qmfclient.pro         |  11 +
+ src/libraries/qmfclient/ssoaccountmanager.cpp |  66 +++
+ src/libraries/qmfclient/ssoaccountmanager.h   |  75 ++++
+ src/libraries/qmfclient/ssoauthplugin.cpp     | 118 ++++++
+ src/libraries/qmfclient/ssoauthplugin.h       |  74 ++++
+ src/libraries/qmfclient/ssosessionmanager.cpp | 388 ++++++++++++++++++
+ src/libraries/qmfclient/ssosessionmanager.h   | 112 +++++
+ .../qmfmessageserver/qmailauthenticator.cpp   |  20 +-
+ .../qmfmessageserver/qmailauthenticator.h     |   4 +
+ .../qmfmessageserver/qmfmessageserver.pro     |   9 +
+ src/libraries/qmfwidgets/qmfwidgets.pro       |   6 +
+ src/plugins/messageservices/imap/imap.pro     |   7 +
+ .../imap/imapauthenticator.cpp                |  89 ++++
+ .../messageservices/imap/imapauthenticator.h  |   5 +
+ .../messageservices/imap/imapclient.cpp       | 299 +++++++++++++-
+ src/plugins/messageservices/imap/imapclient.h |  29 +-
+ .../messageservices/imap/imapprotocol.cpp     |  39 +-
+ .../messageservices/imap/imapprotocol.h       |   5 +
+ .../messageservices/imap/imapservice.cpp      | 101 ++++-
+ src/plugins/messageservices/pop/pop.pro       |   7 +
+ .../messageservices/pop/popauthenticator.cpp  |  33 +-
+ .../messageservices/pop/popauthenticator.h    |   4 +
+ src/plugins/messageservices/pop/popclient.cpp | 122 ++++++
+ src/plugins/messageservices/pop/popclient.h   |  25 ++
+ .../messageservices/pop/popservice.cpp        |  25 ++
+ src/plugins/messageservices/smtp/smtp.pro     |   7 +
+ .../smtp/smtpauthenticator.cpp                | 121 +++++-
+ .../messageservices/smtp/smtpauthenticator.h  |   5 +
+ .../messageservices/smtp/smtpclient.cpp       | 167 +++++++-
+ src/plugins/messageservices/smtp/smtpclient.h |  28 ++
+ .../messageservices/smtp/smtpservice.cpp      |   8 +
+ src/plugins/plugins.pro                       |   3 +
+ src/plugins/ssoauth/password/password.pro     |  21 +
+ .../ssoauth/password/passwordplugin.cpp       | 231 +++++++++++
+ src/plugins/ssoauth/password/passwordplugin.h |  78 ++++
+ src/tools/messageserver/servicehandler.cpp    |  13 +
+ tests/tst_qmailstore/tst_qmailstore.cpp       |  93 ++++-
+ tests/tst_smtp/tst_smtp.pro                   |   4 +
+ 38 files changed, 2412 insertions(+), 40 deletions(-)
+ create mode 100644 src/libraries/qmfclient/ssoaccountmanager.cpp
+ create mode 100644 src/libraries/qmfclient/ssoaccountmanager.h
+ create mode 100644 src/libraries/qmfclient/ssoauthplugin.cpp
+ create mode 100644 src/libraries/qmfclient/ssoauthplugin.h
+ create mode 100644 src/libraries/qmfclient/ssosessionmanager.cpp
+ create mode 100644 src/libraries/qmfclient/ssosessionmanager.h
+ create mode 100644 src/plugins/ssoauth/password/password.pro
+ create mode 100644 src/plugins/ssoauth/password/passwordplugin.cpp
+ create mode 100644 src/plugins/ssoauth/password/passwordplugin.h
+
+diff --git a/src/libraries/qmfclient/qmfclient.pro b/src/libraries/qmfclient/qmfclient.pro
+index ea2f00fb..6fedb7bd 100644
+--- a/src/libraries/qmfclient/qmfclient.pro
++++ b/src/libraries/qmfclient/qmfclient.pro
+@@ -8,6 +8,17 @@ CONFIG    += warn_on
+ contains(DEFINES,USE_ACCOUNTS_QT) {
+     CONFIG += link_pkgconfig
+     PKGCONFIG += accounts-qt5
++    PKGCONFIG += libsignon-qt5
++
++    HEADERS += ssoaccountmanager.h \
++               ssosessionmanager.h \
++               ssoauthplugin.h
++
++    SOURCES += ssoaccountmanager.cpp \
++               ssosessionmanager.cpp \
++               ssoauthplugin.cpp
++
++    MODULE_PLUGIN_TYPES += ssoauth
+ 
+     # Install email SSO provider description
+     sso_providers.files = share/email.provider
+diff --git a/src/libraries/qmfclient/ssoaccountmanager.cpp b/src/libraries/qmfclient/ssoaccountmanager.cpp
+new file mode 100644
+index 00000000..e113f40b
+--- /dev/null
++++ b/src/libraries/qmfclient/ssoaccountmanager.cpp
+@@ -0,0 +1,66 @@
++/****************************************************************************
++**
++** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/legal
++**
++** This file is part of the Qt Messaging Framework.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and Digia.  For licensing terms and
++** conditions see http://qt.digia.com/licensing.  For further information
++** use the contact form at http://qt.digia.com/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 as published by the Free Software
++** Foundation and appearing in the file LICENSE.LGPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU Lesser General Public License version 2.1 requirements
++** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Digia gives you certain additional
++** rights.  These rights are described in the Digia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 3.0 as published by the Free Software
++** Foundation and appearing in the file LICENSE.GPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU General Public License version 3.0 requirements will be
++** met: http://www.gnu.org/copyleft/gpl.html.
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "ssoaccountmanager.h"
++
++using namespace Accounts;
++
++Manager* SSOAccountManager::_manager = 0;
++int SSOAccountManager::_refCount = 0;
++
++SSOAccountManager::SSOAccountManager()
++{
++    if (!_manager) {
++        Q_ASSERT(!_refCount);
++        _manager = new Manager(QLatin1String("e-mail"));
++        _manager->setAbortOnTimeout(true);
++    }
++
++    ++_refCount;
++}
++
++SSOAccountManager::~SSOAccountManager()
++{
++    if (--_refCount == 0) {
++        delete _manager;
++        _manager = 0;
++    }
++}
+diff --git a/src/libraries/qmfclient/ssoaccountmanager.h b/src/libraries/qmfclient/ssoaccountmanager.h
+new file mode 100644
+index 00000000..aa756828
+--- /dev/null
++++ b/src/libraries/qmfclient/ssoaccountmanager.h
+@@ -0,0 +1,75 @@
++/****************************************************************************
++**
++** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/legal
++**
++** This file is part of the Qt Messaging Framework.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and Digia.  For licensing terms and
++** conditions see http://qt.digia.com/licensing.  For further information
++** use the contact form at http://qt.digia.com/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 as published by the Free Software
++** Foundation and appearing in the file LICENSE.LGPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU Lesser General Public License version 2.1 requirements
++** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Digia gives you certain additional
++** rights.  These rights are described in the Digia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 3.0 as published by the Free Software
++** Foundation and appearing in the file LICENSE.GPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU General Public License version 3.0 requirements will be
++** met: http://www.gnu.org/copyleft/gpl.html.
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#ifndef SSOACCOUNTMANAGER_H
++#define SSOACCOUNTMANAGER_H
++
++#include <qglobal.h>
++#include "qmailglobal.h"
++
++// Accounts
++#include <Accounts/Manager>
++
++/// Accounts::Manager wrapper.
++class QMF_EXPORT SSOAccountManager
++{
++public:
++    SSOAccountManager();
++    ~SSOAccountManager();
++
++    Accounts::Manager* operator ->() const
++    {
++        Q_ASSERT (_manager);
++        return _manager;
++    }
++
++    operator Accounts::Manager*() const
++    {
++        Q_ASSERT (_manager);
++        return _manager;
++    }
++
++private:
++    Q_DISABLE_COPY (SSOAccountManager);
++    static Accounts::Manager* _manager;
++    static int _refCount;
++};
++#endif // SSOACCOUNTMANAGER_H
+diff --git a/src/libraries/qmfclient/ssoauthplugin.cpp b/src/libraries/qmfclient/ssoauthplugin.cpp
+new file mode 100644
+index 00000000..cb595242
+--- /dev/null
++++ b/src/libraries/qmfclient/ssoauthplugin.cpp
+@@ -0,0 +1,118 @@
++/****************************************************************************
++**
++** Copyright (C) 2013 Jolla Ltd.
++** Contact: Valério Valério <valerio.valerio@jollamobile.com>
++**
++** This file is part of the Qt Messaging Framework.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and Digia.  For licensing terms and
++** conditions see http://qt.digia.com/licensing.  For further information
++** use the contact form at http://qt.digia.com/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 as published by the Free Software
++** Foundation and appearing in the file LICENSE.LGPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU Lesser General Public License version 2.1 requirements
++** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Digia gives you certain additional
++** rights.  These rights are described in the Digia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 3.0 as published by the Free Software
++** Foundation and appearing in the file LICENSE.GPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU General Public License version 3.0 requirements will be
++** met: http://www.gnu.org/copyleft/gpl.html.
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "ssoauthplugin.h"
++
++#include <QMap>
++#include <QDebug>
++#include <qmailpluginmanager.h>
++
++static QString PLUGIN_KEY = QStringLiteral("ssoauth");
++
++typedef QMap<QString, SSOAuthService*> PluginMap;
++
++// Load all the auth plugins into a map for quicker reference
++static PluginMap initMap(QMailPluginManager& manager)
++{
++    PluginMap map;
++
++    foreach (const QString &item, manager.list()) {
++        QObject *instance = manager.instance(item);
++        if (SSOAuthService* iface = qobject_cast<SSOAuthService*>(instance))
++                map.insert(iface->key(), iface);
++    }
++    return map;
++}
++
++// Return a reference to a map containing all loaded plugin objects
++static PluginMap& pluginMap()
++{
++    static QMailPluginManager pluginManager(PLUGIN_KEY);
++    static PluginMap map(initMap(pluginManager));
++
++    return map;
++}
++
++// Return the auth plugin object matching the specified ID
++static SSOAuthService* mapping(const QString& key)
++{
++    PluginMap::ConstIterator it;
++    if ((it = pluginMap().find(key)) != pluginMap().end())
++        return it.value();
++
++    qWarning() << "Failed attempt to map plugin: " << key;
++    return 0;
++}
++
++SSOAuthService::SSOAuthService(QObject *parent)
++    : QObject(parent)
++{
++}
++
++SSOAuthService::~SSOAuthService()
++{
++}
++
++/*!
++    Returns a list of the keys of the installed plugins.
++ */
++QStringList SSOAuthFactory::keys()
++{
++    QStringList in;
++
++    foreach (PluginMap::mapped_type plugin, pluginMap())
++        in << plugin->key();
++
++    return in;
++}
++
++/*!
++    Creates a plugin object of the class identified by \a key.
++*/
++SSOAuthService* SSOAuthFactory::createService(const QString& key)
++{
++    if (SSOAuthService* plugin = mapping(key))
++        return plugin->createService();
++
++    return 0;
++}
++
++
+diff --git a/src/libraries/qmfclient/ssoauthplugin.h b/src/libraries/qmfclient/ssoauthplugin.h
+new file mode 100644
+index 00000000..bbc59a76
+--- /dev/null
++++ b/src/libraries/qmfclient/ssoauthplugin.h
+@@ -0,0 +1,74 @@
++/****************************************************************************
++**
++** Copyright (C) 2013 Jolla Ltd.
++** Contact: Valério Valério <valerio.valerio@jollamobile.com>
++**
++** This file is part of the Qt Messaging Framework.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and Digia.  For licensing terms and
++** conditions see http://qt.digia.com/licensing.  For further information
++** use the contact form at http://qt.digia.com/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 as published by the Free Software
++** Foundation and appearing in the file LICENSE.LGPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU Lesser General Public License version 2.1 requirements
++** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Digia gives you certain additional
++** rights.  These rights are described in the Digia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 3.0 as published by the Free Software
++** Foundation and appearing in the file LICENSE.GPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU General Public License version 3.0 requirements will be
++** met: http://www.gnu.org/copyleft/gpl.html.
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#ifndef SSOAUTHPLUGIN_H
++#define SSOAUTHPLUGIN_H
++
++#include "qmailglobal.h"
++#include <QObject>
++#include <QString>
++#include <QVariantMap>
++#include <SignOn/SessionData>
++
++class QMF_EXPORT SSOAuthService : public QObject
++{
++    Q_OBJECT
++
++public:
++    SSOAuthService(QObject* parent = 0);
++    ~SSOAuthService();
++
++    virtual QString key() const = 0;
++    virtual QMap<QString, QList<QByteArray> > authentication(const SignOn::SessionData &sessionData,
++                                         const QString &serviceType, const QString &userName) const = 0;
++    virtual void credentialsNeedUpdate(int accountId) = 0;
++    virtual SignOn::SessionData sessionData(const QString &accountProvider, QVariantMap authParameters) const = 0;
++    virtual SSOAuthService *createService() = 0;
++};
++
++class QMF_EXPORT SSOAuthFactory
++{
++public:
++    static QStringList keys();
++    static SSOAuthService *createService(const QString& key);
++};
++
++#endif // SSOAUTHPLUGIN_H
+diff --git a/src/libraries/qmfclient/ssosessionmanager.cpp b/src/libraries/qmfclient/ssosessionmanager.cpp
+new file mode 100644
+index 00000000..d5232a9e
+--- /dev/null
++++ b/src/libraries/qmfclient/ssosessionmanager.cpp
+@@ -0,0 +1,388 @@
++/****************************************************************************
++**
++** Copyright (C) 2013 Jolla Ltd.
++** Contact: Valério Valério <valerio.valerio@jollamobile.com>
++**
++** This file is part of the Qt Messaging Framework.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and Digia.  For licensing terms and
++** conditions see http://qt.digia.com/licensing.  For further information
++** use the contact form at http://qt.digia.com/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 as published by the Free Software
++** Foundation and appearing in the file LICENSE.LGPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU Lesser General Public License version 2.1 requirements
++** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Digia gives you certain additional
++** rights.  These rights are described in the Digia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 3.0 as published by the Free Software
++** Foundation and appearing in the file LICENSE.GPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU General Public License version 3.0 requirements will be
++** met: http://www.gnu.org/copyleft/gpl.html.
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "ssosessionmanager.h"
++#include "ssoaccountmanager.h"
++#include <qmaillog.h>
++#include <QTimer>
++
++#include <Accounts/AccountService>
++#include <Accounts/AuthData>
++
++/*!
++    \class SSOSessionManager
++
++    \preliminary
++    \brief The SSOSessionManager class provides a manager to query authentication details
++    from accounts-sso framework.
++    \ingroup messaginglibrary
++*/
++
++/*!
++    \fn ssoSessionError(const QString &error)
++
++    This signal is emitted when we receive a reply to an authentication
++    request from accounts-sso framework and a error occurred, the error
++    details are described by \a error.
++
++    \sa ssoSessionResponse()
++*/
++
++/*!
++    \fn ssoSessionResponse(const QMap<QString,QList<QByteArray> > &ssoLogin)
++
++    This signal is emitted when we receive a reply to a authentication
++    request from accounts-sso framework, the authentication details are
++    described by \a ssologin.
++
++    \sa ssoSessionError()
++*/
++
++SSOSessionManager::SSOSessionManager(QObject *parent)
++    : QObject(parent),
++      _waitForSso(false),
++      _recreatingSession(false),
++      _reAuthenticate(false),
++      _credentialsCheck(false),
++      _identity(0),
++      _session(0)
++{
++    _availableAuthMethods = SSOAuthFactory::keys();
++}
++
++SSOSessionManager::~SSOSessionManager()
++{
++}
++
++bool SSOSessionManager::authPluginAvailable(const QString &method) const
++{
++    return _availableAuthMethods.contains(method);
++}
++
++/*!
++    Cancels the current session.
++*/
++
++void SSOSessionManager::cancel()
++{
++    if (_waitForSso) {
++        _session->cancel();
++        // Canceled by other process,
++        // no need to emit any error from here.
++        _waitForSso = false;
++    }
++}
++
++/*!
++    Creates a new SSO identity for the account identified by \a id for
++    the service to \a serviceType.
++
++    Returns true if the account has one email service enabled and a valid identity stored
++    in ths accounts-sso database, otherwise returns false.
++
++    The authentication details will be queried from accounts-sso framework and reported by
++    ssoSessionResponse() signal, if a error occurs it will be reported by ssoSessionError()
++    signal.
++
++    \sa ssoSessionResponse(), ssoSessionError()
++*/
++
++bool SSOSessionManager::createSsoIdentity(const QMailAccountId &id, const QString &serviceType)
++{
++    deleteSsoIdentity();
++    _serviceType = serviceType;
++    _accountId = id.toULongLong();
++
++    SSOAccountManager manager;
++    QScopedPointer<Accounts::Account> account(Accounts::Account::fromId(manager, static_cast<Accounts::AccountId>(_accountId), this));
++    if (!account)
++        return false;
++
++    Accounts::ServiceList emailServices = account->enabledServices();
++    if (1 != emailServices.count()) {
++        qMailLog(Messaging) << Q_FUNC_INFO << "Account must have one active e-mail service, but it has "
++                       << emailServices.count();
++        return false;
++    }
++
++    account->selectService(emailServices.first());
++    Accounts::AccountService* emailService = new Accounts::AccountService(account.data(), account->selectedService());
++    Accounts::AuthData auth = emailService->authData();
++    delete emailService;
++    _accountProvider = account->providerName();
++    _authMethod = auth.method();
++    _authMechanism = auth.mechanism();
++    _authParameters = auth.parameters();
++
++    if (!authPluginAvailable(_authMethod)) {
++        qMailLog(Messaging) << Q_FUNC_INFO
++                            << "SSO error: No authentication plugin found for the following method: " + _authMethod;
++        return false;
++    }
++
++    quint32 credentialsId = account->valueAsInt(serviceCredentialsId(_serviceType), 0);
++    _authUsername = account->valueAsString(serviceUsername(_serviceType));
++
++    if (_authUsername.isEmpty()) {
++        _authUsername = account->valueAsString(QLatin1String("emailaddress"));
++    }
++
++    if (_authUsername.isEmpty()) {
++        qMailLog(Messaging) << Q_FUNC_INFO
++                            << "SSO error: User name is emtpy.";
++        return false;
++    }
++
++    _credentialsCheck = account->valueAsBool(QLatin1String("credentialsCheck"));
++
++    // Some plugins stores an identity per service.
++    // If there is no specific credentials for the specific service than we should check regular credentialsId.
++    // This allows to store different credentials for incoming and outgoing servers for example.
++    if (credentialsId == 0) {
++        credentialsId = account->credentialsId();
++    }
++
++    _identity = SignOn::Identity::existingIdentity(credentialsId, this);
++
++    if (_identity) {
++
++        qMailLog(Messaging) << Q_FUNC_INFO << "Creating SSO identity for the service " << _serviceType
++                            << " from account " << id.toULongLong()
++                            << " using authentication method " << _authMethod;
++       _session = _identity->createSession(_authMethod);
++        Q_ASSERT (_session);
++        ENFORCE(connect(_session, SIGNAL(response(SignOn::SessionData)),
++                        this, SLOT(ssoResponse(SignOn::SessionData))));
++        ENFORCE(connect(_session, SIGNAL(error(SignOn::Error)),
++                        this, SLOT(ssoSessionError(SignOn::Error))));
++        _waitForSso = true;
++        _authService = SSOAuthFactory::createService(_authMethod);
++        _sessionData = _authService->sessionData(_accountProvider, _authParameters);
++        _session->process(_sessionData, _authMechanism);
++        return true;
++    } else {
++        _session = 0;
++        return false;
++    }
++}
++
++/*!
++  Returns true if credentials checking is being performed for this account, otherwise returns false.
++*/
++bool SSOSessionManager::checkingCredentials() const
++{
++    return _credentialsCheck;
++}
++
++/*!
++  Set credentials need update if the plugin supports it.
++*/
++
++void SSOSessionManager::credentialsNeedUpdate()
++{
++    qMailLog(Messaging) << Q_FUNC_INFO << "Setting credentials need update for the service " << _serviceType
++                        << " from account " << _accountId
++                        << " using authentication method " << _authMethod;
++    _authService->credentialsNeedUpdate(_accountId);
++}
++
++/*!
++    Deletes the SSO identity.
++*/
++void SSOSessionManager::deleteSsoIdentity()
++{
++    _authMethod.clear();
++    _serviceType.clear();
++    if (_identity) {
++        Q_ASSERT (_session);
++        _identity->destroySession(_session);
++        delete _identity;
++        _identity = 0;
++    }
++}
++
++/*!
++    Recreates the SSO identity.
++
++    This function should be used when stored authentication details
++    are no longer valid.
++*/
++void SSOSessionManager::recreateSsoIdentity()
++{
++    qMailLog(Messaging) << Q_FUNC_INFO << "Recreating SSO identity using auth method "
++                           << _authMethod;
++    if (_identity && _session && !_waitForSso) {
++        if (!_authService)
++            _authService = SSOAuthFactory::createService(_authMethod);
++
++        _waitForSso = true;
++        _recreatingSession = true;
++        _session->process(_sessionData, _authMechanism);
++    } else {
++        _waitForSso = true;
++        emit ssoSessionError(QLatin1String("SSO error: Identity is not valid, can't recreate session."));
++    }
++}
++
++void SSOSessionManager::removeSsoIdentity()
++{
++    qWarning() << Q_FUNC_INFO << "unimplemented!";
++}
++
++QString SSOSessionManager::serviceUsername(const QString &serviceType) const
++{
++    if (serviceType == QLatin1String("imap4")) {
++        return QLatin1String("imap4/username");
++    } else if (serviceType == QLatin1String("pop3")) {
++        return QLatin1String("pop3/username");
++    } else if (serviceType == QLatin1String("smtp")) {
++        return QLatin1String("smtp/smtpusername");
++    } else {
++        return QString();
++    }
++
++}
++
++QString SSOSessionManager::serviceCredentialsId(const QString &serviceType) const
++{
++    if (serviceType == QLatin1String("imap4")) {
++        return QLatin1String("imap4/CredentialsId");
++    } else if (serviceType == QLatin1String("pop3")) {
++        return QLatin1String("pop3/CredentialsId");
++    } else if (serviceType == QLatin1String("smtp")) {
++        return QLatin1String("smtp/CredentialsId");
++    } else {
++        return QString();
++    }
++}
++
++void SSOSessionManager::ssoResponse(const SignOn::SessionData &sessionData)
++{
++    if (_waitForSso) {
++        _waitForSso = false;
++        if (!_authService)
++            _authService = SSOAuthFactory::createService(_authMethod);
++
++        if (_authService->key() == QLatin1String("oauth2")) {
++            QVariantMap newToken;
++            foreach (const QString &key, sessionData.propertyNames()) {
++                newToken.insert(key, sessionData.getProperty(key));
++            }
++
++            if (_recreatingSession) {
++                if (_oldToken[QLatin1String("AccessToken")].toString() != newToken[QLatin1String("AccessToken")].toString()
++                        && !newToken[QLatin1String("AccessToken")].toString().isEmpty()) {
++                    _recreatingSession = false;
++                    qMailLog(Messaging) << Q_FUNC_INFO << "Recreating SSO identity, authentication token refreshed sucessfully";
++                    _oldToken = newToken;
++                    sessionResponse(sessionData);
++                } else {
++                    _oldToken = newToken;
++                    _recreatingSession = false;
++                    forceTokenRefresh();
++                }
++                return;
++            } else if (_reAuthenticate) {
++                _reAuthenticate = false;
++                QTimer::singleShot(5000, this, SLOT(reAuthenticate()));
++            } else {
++                _oldToken = newToken;
++                sessionResponse(sessionData);
++            }
++        } else {
++            sessionResponse(sessionData);
++        }
++    }
++}
++
++void SSOSessionManager::ssoSessionError(const SignOn::Error &code)
++{
++    if (code.type() == SignOn::Error::InvalidCredentials || code.type() == SignOn::Error:: UserInteraction) {
++        credentialsNeedUpdate();
++    }
++
++    if (_waitForSso) {
++        _waitForSso = false;
++        emit ssoSessionError(QString::fromLatin1("SSO error %1: %2").arg(code.type()).arg(code.message()));
++    }
++}
++
++void SSOSessionManager::forceTokenRefresh()
++{
++    qMailLog(Messaging) << Q_FUNC_INFO << "Forcing authentication token refresh";
++    QVariantMap providedTokens = _oldToken;
++    providedTokens.insert(QLatin1String("ExpiresIn"), 1);
++
++    QVariantMap sdvmap(_authParameters);
++    sdvmap.insert(QLatin1String("UiPolicy"), SignOn::NoUserInteractionPolicy);
++    sdvmap.insert(QLatin1String("ClientId"), _sessionData.getProperty(QLatin1String("ClientId")));
++    sdvmap.insert(QLatin1String("ClientSecret"), _sessionData.getProperty(QLatin1String("ClientSecret")));
++    sdvmap.insert(QLatin1String("ProvidedTokens"), providedTokens);
++    _refreshSessionData = sdvmap;
++
++    _reAuthenticate = true;
++    _waitForSso = true;
++    _session->process(SignOn::SessionData(sdvmap), _authMechanism);
++}
++
++void SSOSessionManager::reAuthenticate()
++{
++    qMailLog(Messaging) << Q_FUNC_INFO << "Re-authenticating with SSO after token refresh";
++    _waitForSso = true;
++    _session->process(_sessionData, _authMechanism);
++}
++
++void SSOSessionManager::sessionResponse(const SignOn::SessionData &sessionData)
++{
++    QMap<QString,QList<QByteArray> > ssoLogin = _authService->authentication(sessionData, _serviceType,
++                                                          _authUsername);
++    emit ssoSessionResponse(ssoLogin);
++}
++
++/*!
++    Returns true if we are waiting for a reply
++    from accounts-sso framework, otherwise false.
++*/
++bool SSOSessionManager::waitForSso()
++{
++    return _waitForSso;
++}
++
+diff --git a/src/libraries/qmfclient/ssosessionmanager.h b/src/libraries/qmfclient/ssosessionmanager.h
+new file mode 100644
+index 00000000..61806ba4
+--- /dev/null
++++ b/src/libraries/qmfclient/ssosessionmanager.h
+@@ -0,0 +1,112 @@
++/****************************************************************************
++**
++** Copyright (C) 2013 Jolla Ltd.
++** Contact: Valério Valério <valerio.valerio@jollamobile.com>
++**
++** This file is part of the Qt Messaging Framework.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and Digia.  For licensing terms and
++** conditions see http://qt.digia.com/licensing.  For further information
++** use the contact form at http://qt.digia.com/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 as published by the Free Software
++** Foundation and appearing in the file LICENSE.LGPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU Lesser General Public License version 2.1 requirements
++** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Digia gives you certain additional
++** rights.  These rights are described in the Digia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 3.0 as published by the Free Software
++** Foundation and appearing in the file LICENSE.GPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU General Public License version 3.0 requirements will be
++** met: http://www.gnu.org/copyleft/gpl.html.
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#ifndef SSOSESSIONMANAGER_H
++#define SSOSESSIONMANAGER_H
++
++#include "ssoauthplugin.h"
++#include "qmailglobal.h"
++#include "qmailaccount.h"
++#include <QString>
++#include <qglobal.h>
++
++// Accounts
++#include <Accounts/Account>
++#include <SignOn/Identity>
++#include <SignOn/SessionData>
++
++using namespace SignOn;
++
++class QMF_EXPORT SSOSessionManager : public QObject
++{
++    Q_OBJECT
++public:
++    SSOSessionManager(QObject* parent);
++    ~SSOSessionManager();
++
++    void cancel();
++    bool createSsoIdentity(const QMailAccountId &id, const QString &serviceType);
++    bool checkingCredentials() const;
++    void credentialsNeedUpdate();
++    void deleteSsoIdentity();
++    void recreateSsoIdentity();
++    void removeSsoIdentity();
++    bool waitForSso();
++
++signals:
++    void ssoSessionResponse(const QMap<QString,QList<QByteArray> > &ssoLogin);
++    void ssoSessionError(const QString &error);
++
++protected slots:
++    void ssoResponse(const SignOn::SessionData &sessionData);
++    void ssoSessionError(const SignOn::Error &code);
++
++private slots:
++    void reAuthenticate();
++
++private:
++    bool authPluginAvailable(const QString &method) const;
++    QString serviceUsername(const QString &serviceType) const;
++    QString serviceCredentialsId(const QString &serviceType) const;
++    void forceTokenRefresh();
++    void sessionResponse(const SignOn::SessionData &sessionData);
++
++    int _accountId;
++    bool _waitForSso;
++    bool _recreatingSession;
++    bool _reAuthenticate;
++    bool _credentialsCheck;
++    QString _authMethod;
++    QString _authMechanism;
++    QString _authUsername;
++    QVariantMap _authParameters;
++    QString _serviceType;
++    QString _accountProvider;
++    QStringList _availableAuthMethods;
++    SSOAuthService *_authService;
++    SignOn::Identity *_identity;
++    SignOn::AuthSession *_session;
++    SignOn::SessionData _sessionData;
++    QVariantMap _oldToken;
++    QVariantMap _refreshSessionData;
++};
++
++#endif // SSOSESSIONMANAGER_H
+diff --git a/src/libraries/qmfmessageserver/qmailauthenticator.cpp b/src/libraries/qmfmessageserver/qmailauthenticator.cpp
+index 81983691..212dc33f 100644
+--- a/src/libraries/qmfmessageserver/qmailauthenticator.cpp
++++ b/src/libraries/qmfmessageserver/qmailauthenticator.cpp
+@@ -32,7 +32,6 @@
+ ****************************************************************************/
+ 
+ #include "qmailauthenticator.h"
+-#include "qmailnamespace.h"
+ #include <qmailserviceconfiguration.h>
+ #include <qcryptographichash.h>
+ #include <qbytearray.h>
+@@ -148,6 +147,23 @@ QByteArray QMailAuthenticator::getAuthentication(const QMailAccountConfiguration
+     should be decoded before invocation, and the result should be encoded for
+     transmission.
+ */
++#ifdef USE_ACCOUNTS_QT
++QByteArray QMailAuthenticator::getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge,
++                                           const QMail::SaslMechanism authType, const QString &password)
++{
++    QMailServiceConfiguration configuration(svcCfg);
++    if (!configuration.value(QLatin1String("smtpusername")).isEmpty() && authType == QMail::CramMd5Mechanism) {
++        // SMTP server CRAM-MD5 authentication
++        return cramMd5Response(challenge, configuration.value(QLatin1String("smtpusername")).toUtf8(), password.toUtf8());
++    } else if (authType == QMail::CramMd5Mechanism) {
++        // IMAP/POP server CRAM-MD5 authentication
++        return cramMd5Response(challenge, configuration.value(QLatin1String("username")).toUtf8(), password.toUtf8());
++    }
++
++    // Unknown service type and/or authentication type
++    return QByteArray();
++}
++#else
+ QByteArray QMailAuthenticator::getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge)
+ {
+     QMailServiceConfiguration configuration(svcCfg);
+@@ -165,4 +181,4 @@ QByteArray QMailAuthenticator::getResponse(const QMailAccountConfiguration::Serv
+     // Unknown service type and/or authentication type
+     return QByteArray();
+ }
+-
++#endif
+diff --git a/src/libraries/qmfmessageserver/qmailauthenticator.h b/src/libraries/qmfmessageserver/qmailauthenticator.h
+index 4e235fb1..6d7e5752 100644
+--- a/src/libraries/qmfmessageserver/qmailauthenticator.h
++++ b/src/libraries/qmfmessageserver/qmailauthenticator.h
+@@ -46,7 +46,11 @@ public:
+     static bool useEncryption(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities);
+     static QMail::SaslMechanism authFromCapabilities(const QStringList &capabilities);
+     static QByteArray getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities);
++#ifdef USE_ACCOUNTS_QT
++    static QByteArray getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge, const QMail::SaslMechanism authType, const QString &password);
++#else
+     static QByteArray getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge);
++#endif
+ };
+ 
+ #endif
+diff --git a/src/libraries/qmfmessageserver/qmfmessageserver.pro b/src/libraries/qmfmessageserver/qmfmessageserver.pro
+index b042ba2b..62d1e28d 100644
+--- a/src/libraries/qmfmessageserver/qmfmessageserver.pro
++++ b/src/libraries/qmfmessageserver/qmfmessageserver.pro
+@@ -39,3 +39,12 @@ SOURCES += qmailauthenticator.cpp \
+            qmailtransport.cpp \
+            qmailheartbeattimer_qtimer.cpp # NB: There are multiple implementations
+ 
++
++# FIXME this will result in prl file having explicit linkage against qt-xml and accounts+signon.
++# Should probably have LIBS_PRIVATE type of usage, but now as there are even some header differences
++# on accounts enabled version, let's just allow the dependency. See also qmfclient.pro
++contains(DEFINES,USE_ACCOUNTS_QT) {
++    CONFIG += link_pkgconfig
++    PKGCONFIG += accounts-qt5
++    PKGCONFIG += libsignon-qt5
++}
+diff --git a/src/libraries/qmfwidgets/qmfwidgets.pro b/src/libraries/qmfwidgets/qmfwidgets.pro
+index ddff356e..dafd090a 100644
+--- a/src/libraries/qmfwidgets/qmfwidgets.pro
++++ b/src/libraries/qmfwidgets/qmfwidgets.pro
+@@ -41,3 +41,9 @@ TRANSLATIONS += libqmfutil-ar.ts \
+ 
+ RESOURCES += qmfutil.qrc
+ 
++contains(DEFINES,USE_ACCOUNTS_QT) {
++    CONFIG += link_pkgconfig
++    QT += xml
++    PKGCONFIG += accounts-qt5
++    PKGCONFIG += libsignon-qt5
++}
+diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
+index 42c0151b..6c161169 100644
+--- a/src/plugins/messageservices/imap/imap.pro
++++ b/src/plugins/messageservices/imap/imap.pro
+@@ -10,6 +10,13 @@ contains(DEFINES,QT_QMF_USE_ALIGNEDTIMER) {
+     QT += alignedtimer
+ }
+ 
++contains(DEFINES,USE_ACCOUNTS_QT) {
++    CONFIG += link_pkgconfig
++    QT += xml
++    PKGCONFIG += accounts-qt5
++    PKGCONFIG += libsignon-qt5
++}
++
+ HEADERS += imapclient.h \
+            imapconfiguration.h \
+            imapmailboxproperties.h \
+diff --git a/src/plugins/messageservices/imap/imapauthenticator.cpp b/src/plugins/messageservices/imap/imapauthenticator.cpp
+index 6319aebb..dde528f3 100644
+--- a/src/plugins/messageservices/imap/imapauthenticator.cpp
++++ b/src/plugins/messageservices/imap/imapauthenticator.cpp
+@@ -39,6 +39,16 @@
+ #include <qmailauthenticator.h>
+ #include <qmailtransport.h>
+ #include <qmailnamespace.h>
++#include <qmaillog.h>
++#include <qmailstore.h>
++
++#ifdef USE_ACCOUNTS_QT
++namespace {
++QString authPassword;
++QMail::SaslMechanism responseAuthType;
++QByteArray gResponse;
++}
++#endif
+ 
+ bool ImapAuthenticator::useEncryption(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities)
+ {
+@@ -63,7 +73,79 @@ bool ImapAuthenticator::useEncryption(const QMailAccountConfiguration::ServiceCo
+     return QMailAuthenticator::useEncryption(svcCfg, capabilities);
+ #endif
+ }
++#ifdef USE_ACCOUNTS_QT
++static QByteArray authenticationResponses(QList<QByteArray> &authList, const QMail::SaslMechanism &authType, const QMailAccountId &id)
++{
++    QByteArray result;
++    if(!authList.empty()) {
++        result = authList.takeFirst();
++        if (!authList.empty()) {
++            if (authType == QMail::CramMd5Mechanism) {
++                authPassword = QString::fromLatin1(authList.takeFirst());
++                responseAuthType = QMail::CramMd5Mechanism;
++            } else {
++                gResponse = authList.first();
++                responseAuthType = authType;
++            }
++        }
++    } else {
++        qMailLog(IMAP) << "Failed to get authentication for method" << authType << "in account id:" << id;
++    }
++    return result;
++}
++
++
++QByteArray ImapAuthenticator::getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin)
++{
++    QByteArray result;
++    ImapConfiguration imapCfg(svcCfg);
++    QMailAccountId id(imapCfg.id());
++    QMail::SaslMechanism authType = static_cast<QMail::SaslMechanism>(imapCfg.mailAuthentication());
++
++    // if we don't have auth yet, try to get it from the capabilities
++    if (ssoLogin.size() > 1 && authType == QMail::NoMechanism) {
++        qMailLog(IMAP) << "Discovering authentication from capabilities for account id:" << id;
++        authType = QMailAuthenticator::authFromCapabilities(capabilities);
++        if (authType != QMail::NoMechanism) {
++            QMailAccount account(id);
++            QMailAccountConfiguration accountConfig(id);
++            QMailAccountConfiguration::ServiceConfiguration serviceConf(accountConfig.serviceConfiguration("imap4"));
++            serviceConf.setValue("authentication",QString::number(authType));
++            if (!QMailStore::instance()->updateAccount(&account, &accountConfig)) {
++                qWarning() << "Unable to update account" << account.id() << "to auth type!!!!";
++            }
++        }
++    }
+ 
++    if (authType != QMail::NoMechanism) {
++        if (!ssoLogin.isEmpty()) {
++            QList<QByteArray> auth;
++            if (ssoLogin.size() == 1) {
++                QList<QString> keys = ssoLogin.keys();
++                auth = ssoLogin.value(keys.at(0));
++                result = authenticationResponses(auth, authType, id);
++                qMailLog(IMAP) << "Using authentication method " << keys.at(0)
++                               << " for account id:" << id;
++            } else {
++                if (authType == QMail::CramMd5Mechanism) {
++                    auth = ssoLogin.value("CRAM-MD5");
++                    result = authenticationResponses(auth, authType, id);
++                } else if (authType == QMail::PlainMechanism) {
++                    auth = ssoLogin.value("PLAIN");
++                    result = authenticationResponses(auth, authType, id);
++                } else if (authType == QMail::LoginMechanism) {
++                    auth = ssoLogin.value("LOGIN");
++                    result = authenticationResponses(auth, authType, id);
++                }
++            }
++        } else {
++            qMailLog(IMAP) << Q_FUNC_INFO << "SSO identity is not found for account id: "<< id
++                           << ", returning empty authentication";
++        }
++    }
++    return result;
++}
++#else
+ QByteArray ImapAuthenticator::getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities)
+ {
+     QByteArray result(QMailAuthenticator::getAuthentication(svcCfg, capabilities));
+@@ -79,10 +161,17 @@ QByteArray ImapAuthenticator::getAuthentication(const QMailAccountConfiguration:
+     return QByteArray("LOGIN") + ' ' + ImapProtocol::quoteString(imapCfg.mailUserName().toLatin1())
+                                + ' ' + ImapProtocol::quoteString(imapCfg.mailPassword().toLatin1());
+ }
++#endif
+ 
+ QByteArray ImapAuthenticator::getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge)
+ {
++#ifdef USE_ACCOUNTS_QT
++    QByteArray response(QMailAuthenticator::getResponse(svcCfg, challenge, responseAuthType, authPassword));
++    if (response.isEmpty())
++        response = gResponse;
++#else
+     const QByteArray response(QMailAuthenticator::getResponse(svcCfg, challenge));
++#endif
+     if (!response.isEmpty())
+         return response;
+ 
+diff --git a/src/plugins/messageservices/imap/imapauthenticator.h b/src/plugins/messageservices/imap/imapauthenticator.h
+index 3a9bdf8d..02b3d67c 100644
+--- a/src/plugins/messageservices/imap/imapauthenticator.h
++++ b/src/plugins/messageservices/imap/imapauthenticator.h
+@@ -43,8 +43,13 @@ class ImapAuthenticator
+ {
+ public:
+     static bool useEncryption(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities);
++#ifdef USE_ACCOUNTS_QT
++    static QByteArray getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin);
++#else
+     static QByteArray getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities);
++#endif
+     static QByteArray getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge);
++
+ };
+ 
+ #endif
+diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
+index cfe7787d..72a59e07 100644
+--- a/src/plugins/messageservices/imap/imapclient.cpp
++++ b/src/plugins/messageservices/imap/imapclient.cpp
+@@ -182,16 +182,23 @@ class IdleProtocol : public ImapProtocol {
+     Q_OBJECT
+ 
+ public:
++#ifdef USE_ACCOUNTS_QT
++    IdleProtocol(ImapClient *client, const QMailFolder &folder, const bool ssoAccount, QMap<QString, QList<QByteArray> > &ssoLogin);
++#else
+     IdleProtocol(ImapClient *client, const QMailFolder &folder);
++#endif
+     virtual ~IdleProtocol() {}
+ 
+     virtual void handleIdling() { _client->idling(_folder.id()); }
+     virtual bool open(const ImapConfiguration& config, qint64 bufferSize = 10*1024);
++#ifdef USE_ACCOUNTS_QT
++    int idleRetryDelay() { return _idleRetryDelay; }
++#endif
+ 
+ signals:
+     void idleNewMailNotification(QMailFolderId);
+     void idleFlagsChangedNotification(QMailFolderId);
+-    void openRequest();
++    void openRequest(IdleProtocol*);
+ 
+ protected slots:
+     virtual void idleContinuation(ImapCommand, const QString &);
+@@ -211,9 +218,22 @@ private:
+     QTimer _idleTimer; // Send a DONE command every 29 minutes
+ #endif
+     QTimer _idleRecoveryTimer; // Check command hasn't hung
++#ifdef USE_ACCOUNTS_QT
++    int _idleRetryDelay; // Try to restablish IDLE state
++    enum IdleRetryDelay { InitialIdleRetryDelay = 30 }; //seconds
++    bool _ssoAccount;
++    QMap<QString, QList<QByteArray> > _ssoLogin;
++#endif
+ };
+ 
++#ifdef USE_ACCOUNTS_QT
++IdleProtocol::IdleProtocol(ImapClient *client, const QMailFolder &folder, const bool ssoAccount, QMap<QString, QList<QByteArray> > &ssoLogin)
++    : _idleRetryDelay(InitialIdleRetryDelay),
++      _ssoAccount(ssoAccount),
++      _ssoLogin(ssoLogin)
++#else
+ IdleProtocol::IdleProtocol(ImapClient *client, const QMailFolder &folder)
++#endif
+ {
+     _client = client;
+     _folder = folder;
+@@ -310,14 +330,28 @@ void IdleProtocol::idleCommandTransition(const ImapCommand command, const Operat
+                     break;
+                 }
+             }
+-
++#ifdef USE_ACCOUNTS_QT
++            // We are now connected
++            if (_ssoAccount)
++                sendLogin(config, _ssoLogin);
++            else
++                sendLogin(config, QMap<QString, QList<QByteArray> >());
++#else
+             // We are now connected
+             sendLogin(config);
++#endif
+             return;
+         }
+         case IMAP_StartTLS:
+         {
++#ifdef USE_ACCOUNTS_QT
++        if (_ssoAccount)
++            sendLogin(config, _ssoLogin);
++        else
++            sendLogin(config, QMap<QString, QList<QByteArray> >());
++#else
+             sendLogin(config);
++#endif
+             break;
+         }
+         case IMAP_Login: // Fall through
+@@ -385,9 +419,23 @@ void IdleProtocol::idleErrorRecovery()
+     const int oneHour = 60*60;
+     _idleRecoveryTimer.stop();
+ 
+-    _client->setIdleRetryDelay(qMin( oneHour, _client->idleRetryDelay()*2 ));
++#ifdef USE_ACCOUNTS_QT
++    if (connected() && _idleTimer.isActive()) {
++        qMailLog(IMAP) << objectName() << "IDLE: IMAP IDLE error recovery was successful. About to check for new mail.";
++        _idleRetryDelay = InitialIdleRetryDelay;
++        emit idleNewMailNotification(_folder.id()); // Check for new messages arriving while idle connection was down
++        emit idleFlagsChangedNotification(_folder.id());
++        return;
++    }
++    updateStatus(tr("Idle Error occurred"));
++
++    QTimer::singleShot(_idleRetryDelay*1000, this, SLOT(idleErrorRecovery()));
++    _idleRetryDelay = qMin( oneHour, _idleRetryDelay*2 );
+ 
+-    emit openRequest();
++#else
++    _client->setIdleRetryDelay(qMin( oneHour, _client->idleRetryDelay()*2 ));
++#endif
++    emit openRequest(this);
+ }
+ 
+ ImapClient::ImapClient(QObject* parent)
+@@ -400,6 +448,12 @@ ImapClient::ImapClient(QObject* parent)
+       _rapidClosing(false),
+       _idleRetryDelay(InitialIdleRetryDelay),
+       _pushConnectionsReserved(0)
++#ifdef USE_ACCOUNTS_QT
++    , _ssoSessionManager(0),
++      _loginFailed(false),
++      _sendLogin(false),
++      _recreateIdentity(true)
++#endif
+ {
+     static int count(0);
+     ++count;
+@@ -449,6 +503,9 @@ ImapClient::ImapClient(QObject* parent)
+             this, SLOT(connectionInactive()));
+ 
+     connect(QMailMessageBuffer::instance(), SIGNAL(flushed()), this, SLOT(messageBufferFlushed()));
++#ifdef USE_ACCOUNTS_QT
++    connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)), this, SLOT(onAccountsUpdated(QMailAccountIdList)));
++#endif
+ }
+ 
+ ImapClient::~ImapClient()
+@@ -466,6 +523,10 @@ ImapClient::~ImapClient()
+         QMailMessageBuffer::instance()->removeCallback(callback);
+     }
+     delete _strategyContext;
++#ifdef USE_ACCOUNTS_QT
++    if (_ssoSessionManager)
++        _ssoSessionManager->deleteSsoIdentity();
++#endif
+ }
+ 
+ // Called to begin executing a strategy
+@@ -539,8 +600,28 @@ void ImapClient::checkCommandResponse(ImapCommand command, OperationStatus statu
+ 
+             case IMAP_Login:
+             {
++#ifdef USE_ACCOUNTS_QT
++                // We try only once to recreate the sso identity and relogin,
++                // in order to allow user interaction if defined by the sso
++                // plugin.
++                if (_ssoSessionManager && _ssoSessionManager->checkingCredentials()) {
++                    operationFailed(QMailServiceAction::Status::ErrLoginFailed, _protocol.lastError());
++                    return;
++                } else if (!_loginFailed && _recreateIdentity) {
++                    _loginFailed = true;
++                    _sendLogin = true;
++                    ssoProcessLogin();
++                    return;
++                } else {
++                    _recreateIdentity = true;
++                    ssoCredentialsNeedUpdate();
++                    operationFailed(QMailServiceAction::Status::ErrLoginFailed, _protocol.lastError());
++                    return;
++                }
++#else
+                 operationFailed(QMailServiceAction::Status::ErrLoginFailed, _protocol.lastError());
+                 return;
++#endif
+             }
+ 
+             case IMAP_Full:
+@@ -571,6 +652,12 @@ void ImapClient::checkCommandResponse(ImapCommand command, OperationStatus statu
+         case IMAP_Unconnected:
+             operationFailed(QMailServiceAction::Status::ErrNoConnection, _protocol.lastError());
+             return;
++#ifdef USE_ACCOUNTS_QT
++        case IMAP_Login:
++            _loginFailed = false;
++            _recreateIdentity = true;
++            break;
++#endif
+         default:
+             break;
+     }
+@@ -631,7 +718,15 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
+                     }
+                 }
+                 emit updateStatus( tr("Logging in" ) );
++#ifdef USE_ACCOUNTS_QT
++                if (_ssoSessionManager) {
++                    _sendLogin = true;
++                    ssoProcessLogin();
++                } else
++                    _protocol.sendLogin(_config, QMap<QString, QList<QByteArray> >());
++#else
+                 _protocol.sendLogin(_config);
++#endif
+             }
+             break;
+         }
+@@ -639,7 +734,15 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
+         case IMAP_Idle_Continuation:
+         {
+             emit updateStatus( tr("Logging in" ) );
++#ifdef USE_ACCOUNTS_QT
++            if (_ssoSessionManager) {
++                _sendLogin = true;
++                ssoProcessLogin();
++            } else
++                _protocol.sendLogin(_config, QMap<QString, QList<QByteArray> >());
++#else
+             _protocol.sendLogin(_config);
++#endif
+             break;
+         }
+         
+@@ -678,9 +781,16 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
+                 account.setStatus(QMailAccount::CanReferenceExternalData, supportsReferences);
+                 imapCfg.setPushCapable(_protocol.supportsCapability("IDLE"));
+                 imapCfg.setCapabilities(_protocol.capabilities());
++#ifdef USE_ACCOUNTS_QT
++                if ((!QMailStore::instance()->updateAccount(&account)) ||
++                    (!QMailStore::instance()->updateAccount(&account, &_config))) {
++                    qWarning() << "Unable to update account" << account.id() << "to set imap4 configuration";
++                }
++#else
+                 if (!QMailStore::instance()->updateAccount(&account, &_config)) {
+                     qWarning() << "Unable to update account" << account.id() << "to set imap4 configuration";
+                 }
++#endif
+             }
+             // After logging in server capabilities reported may change so we need to
+             // check if IDLE is already established, when enabled
+@@ -1489,6 +1599,24 @@ void ImapClient::setAccount(const QMailAccountId &id)
+             qMailLog(Messaging) << "Disable HasPersistentConnection for account" << account.id();
+         }
+     }
++
++#ifdef USE_ACCOUNTS_QT
++    if (!_ssoSessionManager) {
++        _ssoSessionManager = new SSOSessionManager(this);
++         if (_ssoSessionManager->createSsoIdentity(id, "imap4")) {
++             ENFORCE(connect(_ssoSessionManager, SIGNAL(ssoSessionResponse(QMap<QString,QList<QByteArray> >))
++                             ,this, SLOT(onSsoSessionResponse(QMap<QString,QList<QByteArray> >))));
++             ENFORCE(connect(_ssoSessionManager, SIGNAL(ssoSessionError(QString))
++                             ,this, SLOT(onSsoSessionError(QString))));
++             qMailLog(IMAP) << Q_FUNC_INFO << "SSO identity is found for account id: "<< id;
++         } else {
++             delete _ssoSessionManager;
++             _ssoSessionManager = 0;
++             qMailLog(IMAP) << Q_FUNC_INFO << "SSO identity is not found for account id: "<< id
++                            << ", accounts configuration will be used";
++         }
++    }
++#endif
+ }
+ 
+ QMailAccountId ImapClient::account() const
+@@ -1522,6 +1650,11 @@ void ImapClient::transportStatus(const QString& status)
+ void ImapClient::cancelTransfer(QMailServiceAction::Status::ErrorCode code, const QString &text)
+ {
+     operationFailed(code, text);
++#ifdef USE_ACCOUNTS_QT
++    if (_ssoSessionManager) {
++        _ssoSessionManager->cancel();
++    }
++#endif
+ }
+ 
+ void ImapClient::retrieveOperationCompleted()
+@@ -1650,6 +1783,15 @@ void ImapClient::updateFolderCountStatus(QMailFolder *folder)
+     folder->setStatus(QMailFolder::PartialContent, (count < folder->serverCount()));
+ }
+ 
++bool ImapClient::loggingIn() const
++{
++    if (_protocol.inUse()) {
++        return _protocol.loggingIn();
++    } else {
++       return false;
++    }
++}
++
+ bool ImapClient::idlesEstablished()
+ {
+     ImapConfiguration imapCfg(_config);
+@@ -1708,27 +1850,39 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
+     foreach(QMailFolderId id, mailboxIds) {
+         if (!_monitored.contains(id)) {
+             ++count;
++#ifdef USE_ACCOUNTS_QT
++            bool ssoAccount = _ssoSessionManager != 0;
++            IdleProtocol *protocol = new IdleProtocol(this, QMailFolder(id), ssoAccount, _ssoLogin);
++#else
+             IdleProtocol *protocol = new IdleProtocol(this, QMailFolder(id));
++#endif
+             protocol->setObjectName(QString("I:%1").arg(count));
+             _monitored.insert(id, protocol);
+             connect(protocol, SIGNAL(idleNewMailNotification(QMailFolderId)),
+                     this, SIGNAL(idleNewMailNotification(QMailFolderId)));
+             connect(protocol, SIGNAL(idleFlagsChangedNotification(QMailFolderId)),
+                     this, SIGNAL(idleFlagsChangedNotification(QMailFolderId)));
+-            connect(protocol, SIGNAL(openRequest()),
+-                    this, SLOT(idleOpenRequested()));
++            connect(protocol, SIGNAL(openRequest(IdleProtocol *)),
++                    this, SLOT(idleOpenRequested(IdleProtocol *)));
+             protocol->open(imapCfg);
+         }
+     }
+ }
+ 
+-void ImapClient::idleOpenRequested()
++void ImapClient::idleOpenRequested(IdleProtocol *idleProtocol)
+ {
+     if (_protocol.inUse()) { // Setting up new idle connection may be in progress
+-        qMailLog(IMAP) << _protocol.objectName() 
+-                       << "IDLE: IMAP IDLE error recovery detected that the primary connection is "
+-                          "busy. Retrying to establish IDLE state in" 
+-                       << idleRetryDelay()/2 << "seconds.";
++#ifdef USE_ACCOUNTS_QT
++        qMailLog(IMAP) << _protocol.objectName()
++               << "IDLE: IMAP IDLE error recovery detected that the primary connection is "
++                  "busy. Retrying to establish IDLE state in"
++               << idleProtocol->idleRetryDelay()/2 << "seconds.";
++#else
++        qMailLog(IMAP) << _protocol.objectName()
++               << "IDLE: IMAP IDLE error recovery detected that the primary connection is "
++                  "busy. Retrying to establish IDLE state in"
++               << idleRetryDelay()/2 << "seconds.";
++#endif
+         return;
+     }
+     _protocol.close();
+@@ -1739,7 +1893,7 @@ void ImapClient::idleOpenRequested()
+         delete protocol;
+     }
+     _idlesEstablished = false;
+-    qMailLog(IMAP) << _protocol.objectName() 
++    qMailLog(IMAP) << _protocol.objectName()
+                    << "IDLE: IMAP IDLE error recovery trying to establish IDLE state now.";
+     emit restartPushEmail();
+ }
+@@ -1769,4 +1923,125 @@ void ImapClient::removeAllFromBuffer(QMailMessage *message)
+     }
+ }
+ 
++#ifdef USE_ACCOUNTS_QT
++void ImapClient::removeSsoIdentity(const QMailAccountId &accountId)
++{
++    //removing sso Identity
++    if (_config.id() == accountId) {
++        if (_ssoSessionManager) {
++            _ssoSessionManager->removeSsoIdentity();
++            delete _ssoSessionManager;
++            _ssoSessionManager = 0;
++        }
++    }
++}
++
++void ImapClient::ssoProcessLogin()
++{
++    if (_loginFailed && _recreateIdentity) {
++        // if account was updated try to recreate
++        // identity without asking the user for new
++        // credentials
++        if (_ssoSessionManager)
++            _ssoSessionManager->recreateSsoIdentity();
++        else
++            operationFailed(QMailServiceAction::Status::ErrLoginFailed, "SSO Error: can't recreate identity.");
++    } else {
++        if (_sendLogin && !_ssoSessionManager->waitForSso()) {
++            _sendLogin = false;
++            _protocol.sendLogin(_config, _ssoLogin);
++        } else {
++            qMailLog(IMAP) << Q_FUNC_INFO << "Waiting for SSO...";
++        }
++    }
++}
++
++void ImapClient::ssoCredentialsNeedUpdate()
++{
++    if (_ssoSessionManager) {
++        _ssoSessionManager->credentialsNeedUpdate();
++    } else {
++        qMailLog(IMAP) << Q_FUNC_INFO << "SSO Error: can't set credentials need update.";
++    }
++}
++
++void ImapClient::onSsoSessionResponse(const QMap<QString,QList<QByteArray> > &ssoLogin)
++{
++    qMailLog(IMAP)  << "Got SSO response";
++    if (!ssoLogin.isEmpty()) {
++        _ssoLogin = ssoLogin;
++    }
++
++    if (_loginFailed) {
++        _recreateIdentity = false;
++        commandTransition(IMAP_Init, OpPending);
++        return;
++    }
++    if (_sendLogin) {
++        _protocol.sendLogin(_config, _ssoLogin);
++    }
++}
++
++void ImapClient::onSsoSessionError(const QString &error)
++{
++    // Reset vars
++    _loginFailed = false;
++    _sendLogin = false;
++    _recreateIdentity = true;
++    qMailLog(IMAP) <<  "Got SSO error:" << error;
++    operationFailed(QMailServiceAction::Status::ErrLoginFailed, error);
++}
++
++void ImapClient::onAccountsUpdated(const QMailAccountIdList &list)
++{
++    if (list.contains(_config.id()) && !loggingIn()) {
++        ImapConfiguration imapCfg1(_config);
++        // copying here as the data is shared
++        QMailAccountConfiguration config = QMailAccountConfiguration(_config.id());
++        ImapConfiguration imapCfg2(config);
++
++        if (!imapCfg1.isValid()) {
++            qMailLog(IMAP) << Q_FUNC_INFO << "current config is invalid";
++            return;
++        }
++
++        if (!imapCfg2.isValid()) {
++            qMailLog(IMAP) << Q_FUNC_INFO << "invalid config from db";
++            return;
++        }
++
++        qMailLog(IMAP) << Q_FUNC_INFO << imapCfg1.mailUserName() ;
++        // compare config modified by the User
++        const bool& notEqual = (imapCfg1.mailUserName() != imapCfg2.mailUserName()) ||
++                               (imapCfg1.mailPassword() != imapCfg2.mailPassword()) ||
++                               (imapCfg1.mailServer() != imapCfg2.mailServer()) ||
++                               (imapCfg1.mailPort() != imapCfg2.mailPort()) ||
++                               (imapCfg1.mailEncryption() != imapCfg2.mailEncryption()) ||
++                               (imapCfg1.pushEnabled() != imapCfg2.pushEnabled());
++        if (notEqual)
++            closeIdleConnections();
++
++        if (imapCfg1.pushEnabled() != imapCfg2.pushEnabled()) {
++            if (imapCfg2.pushEnabled())
++                emit restartPushEmail();
++        }
++    }
++}
++
++void ImapClient::closeIdleConnections()
++{
++    qMailLog(IMAP) << Q_FUNC_INFO << "Account was modified. Closing connections";
++
++    closeConnection();
++    // closing idle connections
++    foreach(const QMailFolderId &id, _monitored.keys()) {
++        IdleProtocol *protocol = _monitored.take(id);
++        protocol->close();
++        delete protocol;
++    }
++    _idlesEstablished = false;
++}
++
++#endif
++
+ #include "imapclient.moc"
+diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
+index c0ec295c..f29335c6 100644
+--- a/src/plugins/messageservices/imap/imapclient.h
++++ b/src/plugins/messageservices/imap/imapclient.h
+@@ -47,6 +47,10 @@
+ #include <qmailmessageclassifier.h>
+ #include <qmailmessageserver.h>
+ 
++#ifdef USE_ACCOUNTS_QT
++#include <ssosessionmanager.h>
++#endif
++
+ 
+ class ImapStrategy;
+ class ImapStrategyContext;
+@@ -62,6 +66,10 @@ public:
+     ~ImapClient();
+ 
+     void setAccount(const QMailAccountId& accountId);
++#ifdef USE_ACCOUNTS_QT
++    void removeSsoIdentity(const QMailAccountId& accountId);
++    void closeIdleConnections();
++#endif
+     QMailAccountId account() const;
+     void requestRapidClose() { _requestRapidClose = true; } // Close connection ASAP, unless interactive checking occurred recently
+ 
+@@ -84,6 +92,7 @@ public:
+     QMailMessageKey trashKey(const QMailFolderId &folderId) const;
+     QStringList deletedMessages(const QMailFolderId &folderId) const;
+ 
++    bool loggingIn() const;
+     bool idlesEstablished();
+     void idling(const QMailFolderId &id);
+     QMailFolderIdList configurationIdleFolderIds();
+@@ -141,12 +150,22 @@ protected slots:
+     void checkCommandResponse(const ImapCommand, const OperationStatus);
+     void commandTransition(const ImapCommand, const OperationStatus);
+     void transportStatus(const QString& status);
+-    void idleOpenRequested();
++    void idleOpenRequested(IdleProtocol*);
+     void messageBufferFlushed();
+ 
++#ifdef USE_ACCOUNTS_QT
++    void onAccountsUpdated(const QMailAccountIdList& list);
++    void onSsoSessionError(const QString &error);
++    void onSsoSessionResponse(const QMap<QString, QList<QByteArray> > &ssoLogin);
++#endif
++
+ private:
+     friend class ImapStrategyContextBase;
+ 
++#ifdef USE_ACCOUNTS_QT
++    void ssoProcessLogin();
++    void ssoCredentialsNeedUpdate();
++#endif
+     void deactivateConnection();
+     void retrieveOperationCompleted();
+ 
+@@ -180,6 +199,14 @@ private:
+     int _pushConnectionsReserved;
+ 
+     QMultiMap<QMailMessageId,QString> detachedTempFiles;
++
++#ifdef USE_ACCOUNTS_QT
++    SSOSessionManager* _ssoSessionManager;
++    bool _loginFailed;
++    bool _sendLogin;
++    bool _recreateIdentity;
++    QMap<QString, QList<QByteArray> > _ssoLogin;
++#endif
+ };
+ 
+ #endif
+diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
+index 8515db8b..ee293e31 100644
+--- a/src/plugins/messageservices/imap/imapprotocol.cpp
++++ b/src/plugins/messageservices/imap/imapprotocol.cpp
+@@ -561,8 +561,11 @@ class LoginState : public ImapState
+ public:
+     LoginState() : ImapState(IMAP_Login, "Login") { LoginState::init(); }
+ 
++#ifdef USE_ACCOUNTS_QT
++    void setConfiguration(const QMailAccountConfiguration &config, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin);
++#else
+     void setConfiguration(const QMailAccountConfiguration &config, const QStringList &capabilities);
+-
++#endif
+     virtual void init();
+     virtual QString transmit(ImapContext *c);
+     virtual bool continuationResponse(ImapContext *c, const QString &line);
+@@ -571,8 +574,19 @@ public:
+ private:
+     QMailAccountConfiguration _config;
+     QStringList _capabilities;
++#ifdef USE_ACCOUNTS_QT
++    QMap<QString, QList<QByteArray> > _ssoLogin;
++#endif
+ };
+ 
++#ifdef USE_ACCOUNTS_QT
++void LoginState::setConfiguration(const QMailAccountConfiguration &config, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin)
++{
++    _config = config;
++    _capabilities = capabilities;
++    _ssoLogin = ssoLogin;
++}
++#else
+ void LoginState::setConfiguration(const QMailAccountConfiguration &config, const QStringList &capabilities)
+ {
+     _config = config;
+@@ -597,17 +611,25 @@ void LoginState::setConfiguration(const QMailAccountConfiguration &config, const
+         }
+     }
+ }
++#endif
+ 
+ void LoginState::init()
+ {
+     ImapState::init();
+     _config = QMailAccountConfiguration();
+     _capabilities = QStringList();
++#ifdef USE_ACCOUNTS_QT
++    _ssoLogin = QMap<QString, QList<QByteArray> >();
++#endif
+ }
+ 
+ QString LoginState::transmit(ImapContext *c)
+ {
++#ifdef USE_ACCOUNTS_QT
++    return c->sendCommand(ImapAuthenticator::getAuthentication(_config.serviceConfiguration("imap4"), _capabilities, _ssoLogin));
++#else
+     return c->sendCommand(ImapAuthenticator::getAuthentication(_config.serviceConfiguration("imap4"), _capabilities));
++#endif
+ }
+ 
+ bool LoginState::continuationResponse(ImapContext *c, const QString &received)
+@@ -3192,6 +3214,11 @@ void ImapProtocol::setReceivedCapabilities(bool received)
+     _receivedCapabilities = received;
+ }
+ 
++bool ImapProtocol::loggingIn() const
++{
++    return _fsm->state() == &_fsm->loginState;
++}
++
+ bool ImapProtocol::loggingOut() const
+ {
+     return _fsm->state() == &_fsm->logoutState;
+@@ -3223,11 +3250,19 @@ void ImapProtocol::sendStartTLS()
+     _fsm->setState(&_fsm->startTlsState);
+ }
+ 
++#ifdef USE_ACCOUNTS_QT
++void ImapProtocol::sendLogin(const QMailAccountConfiguration &config , const QMap<QString, QList<QByteArray> > &ssoLogin)
++{
++    _fsm->loginState.setConfiguration(config, _capabilities, ssoLogin);
++    _fsm->setState(&_fsm->loginState);
++}
++#else
+ void ImapProtocol::sendLogin( const QMailAccountConfiguration &config )
+ {
+     _fsm->loginState.setConfiguration(config, _capabilities);
+     _fsm->setState(&_fsm->loginState);
+ }
++#endif
+ 
+ void ImapProtocol::sendLogout()
+ {
+@@ -3850,7 +3885,7 @@ QString ImapProtocol::quoteString(const QString& input)
+ 
+ QByteArray ImapProtocol::quoteString(const QByteArray& input)
+ {
+-    return quoteString(QString(input)).toLatin1();
++    return quoteString(QString::fromLatin1(input)).toLatin1();
+ }
+ 
+ void ImapProtocol::createMail(const QString &uid, const QDateTime &timeStamp, int size, uint flags, const QString &detachedFile, const QStringList& structure)
+diff --git a/src/plugins/messageservices/imap/imapprotocol.h b/src/plugins/messageservices/imap/imapprotocol.h
+index c7dc4dee..166919b8 100644
+--- a/src/plugins/messageservices/imap/imapprotocol.h
++++ b/src/plugins/messageservices/imap/imapprotocol.h
+@@ -144,6 +144,7 @@ public:
+     bool connected() const;
+     bool encrypted() const;
+     bool inUse() const;
++    bool loggingIn() const;
+     bool loggingOut() const;
+ 
+     bool delimiterUnknown() const;
+@@ -175,7 +176,11 @@ public:
+     /*  Valid in non-authenticated state only    */
+     void sendCapability();
+     void sendStartTLS();
++#ifdef USE_ACCOUNTS_QT
++    void sendLogin(const QMailAccountConfiguration &config, const QMap<QString, QList<QByteArray> > &ssoLogin);
++#else
+     void sendLogin(const QMailAccountConfiguration &config);
++#endif
+ 
+     /* Valid in authenticated state only    */
+     void sendList(const QMailFolder &reference, const QString &mailbox);
+diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
+index c12a5d9e..5e0af431 100644
+--- a/src/plugins/messageservices/imap/imapservice.cpp
++++ b/src/plugins/messageservices/imap/imapservice.cpp
+@@ -198,6 +198,12 @@ private:
+ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, const QMailFolderId &folderId, bool descending)
+ {
+     Q_ASSERT(!_unavailable);
++    // Make sure service is still available, for e.g
++    // long sync operation is ongoing and account
++    // is disabled in the meantime.
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -271,6 +277,9 @@ bool ImapService::Source::retrieveNewMessages(const QMailAccountId &accountId, c
+ bool ImapService::Source::retrieveMessageLists(const QMailAccountId &accountId, const QMailFolderIdList &_folderIds, uint minimum, const QMailMessageSortKey &sort, bool accountCheck)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -314,6 +323,9 @@ bool ImapService::Source::retrieveMessageLists(const QMailAccountId &accountId,
+ bool ImapService::Source::retrieveMessages(const QMailMessageIdList &messageIds, QMailRetrievalAction::RetrievalSpecification spec)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -362,6 +374,9 @@ bool ImapService::Source::retrieveMessages(const QMailMessageIdList &messageIds,
+ bool ImapService::Source::retrieveMessagePart(const QMailMessagePart::Location &partLocation)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -399,6 +414,9 @@ bool ImapService::Source::retrieveMessagePart(const QMailMessagePart::Location &
+ bool ImapService::Source::retrieveMessageRange(const QMailMessageId &messageId, uint minimum)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -440,6 +458,9 @@ bool ImapService::Source::retrieveMessageRange(const QMailMessageId &messageId,
+ bool ImapService::Source::retrieveMessagePartRange(const QMailMessagePart::Location &partLocation, uint minimum)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -482,6 +503,9 @@ bool ImapService::Source::retrieveMessagePartRange(const QMailMessagePart::Locat
+ bool ImapService::Source::retrieveAll(const QMailAccountId &accountId)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -534,6 +558,9 @@ void ImapService::Source::queueDisconnectedOperations(const QMailAccountId &acco
+ bool ImapService::Source::exportUpdates(const QMailAccountId &accountId)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -583,6 +610,8 @@ bool ImapService::Source::synchronize(const QMailAccountId &accountId)
+ bool ImapService::Source::deleteMessages(const QMailMessageIdList &allIds)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
+     // If a server crash has occurred duplicate messages may exist in the store.
+     // A duplicate message is one that refers to the same serverUid as another message in the same account & folder.
+     // Ensure that when a duplicate message is deleted no message is deleted from the server.
+@@ -642,6 +671,9 @@ bool ImapService::Source::deleteMessages(const QMailMessageIdList &allIds)
+ bool ImapService::Source::doDelete(const QMailMessageIdList &ids)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -667,6 +699,9 @@ bool ImapService::Source::doDelete(const QMailMessageIdList &ids)
+ bool ImapService::Source::copyMessages(const QMailMessageIdList &messageIds, const QMailFolderId &destinationId)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -698,6 +733,9 @@ bool ImapService::Source::copyMessages(const QMailMessageIdList &messageIds, con
+ bool ImapService::Source::moveMessages(const QMailMessageIdList &messageIds, const QMailFolderId &destinationId)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -764,6 +802,9 @@ bool ImapService::Source::moveMessages(const QMailMessageIdList &messageIds, con
+ bool ImapService::Source::flagMessages(const QMailMessageIdList &messageIds, quint64 setMask, quint64 unsetMask)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -959,6 +1000,9 @@ bool ImapService::Source::flagMessages(const QMailMessageIdList &messageIds, qui
+ bool ImapService::Source::createFolder(const QString &name, const QMailAccountId &accountId, const QMailFolderId &parentId)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -1046,6 +1090,9 @@ bool ImapService::Source::createStandardFolders(const QMailAccountId &accountId)
+ bool ImapService::Source::deleteFolder(const QMailFolderId &folderId)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -1071,6 +1118,9 @@ bool ImapService::Source::deleteFolder(const QMailFolderId &folderId)
+ bool ImapService::Source::renameFolder(const QMailFolderId &folderId, const QString &name)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -1143,6 +1193,8 @@ bool ImapService::Source::countMessages(const QMailMessageKey &searchCriteria, c
+ bool ImapService::Source::searchMessages(const QMailMessageKey &searchCriteria, const QString &bodyText, quint64 limit, const QMailMessageSortKey &sort, bool count)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -1163,6 +1215,9 @@ bool ImapService::Source::searchMessages(const QMailMessageKey &searchCriteria,
+ 
+ bool ImapService::Source::cancelSearch()
+ {
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -1178,6 +1233,9 @@ bool ImapService::Source::cancelSearch()
+ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Location, QMailMessagePart::Location> > &messageIds)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -1272,6 +1330,9 @@ bool ImapService::Source::initiateStrategy()
+ // Copy or Move Completed
+ void ImapService::Source::messageCopyCompleted(QMailMessage &message, const QMailMessage &original)
+ {
++    if (!_service)
++        return;
++
+     if (_service->_client->strategy()->error()) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrInvalidData, tr("Destination message failed to match source message"));
+         return;
+@@ -1551,6 +1612,10 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
+     bool isPushEnabled(imapCfg.pushEnabled());
+     QStringList pushFolders(imapCfg.pushFolders());
+     QString newConnectionSettings(connectionSettings(imapCfg));
++    bool loggingIn = false;
++    if (_client) {
++        loggingIn = _client->loggingIn();
++    }
+     if (!isEnabled) {
+         if (_accountWasEnabled) {
+             // Account changed from enabled to disabled
+@@ -1561,18 +1626,27 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
+         return;
+     }
+ 
+-    if ((_accountWasPushEnabled != isPushEnabled)
+-        || (_previousPushFolders != pushFolders) 
+-        || (_previousConnectionSettings != newConnectionSettings)) {
+-        // push email or connection settings have changed, restart client
+-        _initiatePushDelay.remove(_accountId);
+-        if (_accountWasEnabled) {
+-            disable();
++    // if we are in logging state let it fail first before removing the connections
++    // update settings anyway
++    if (!loggingIn) {
++        if ((_accountWasPushEnabled != isPushEnabled)
++            || (_previousPushFolders != pushFolders)
++            || (_previousConnectionSettings != newConnectionSettings)) {
++            // push email or connection settings have changed, restart client
++            _initiatePushDelay.remove(_accountId);
++            if (_accountWasEnabled) {
++                disable();
++            }
++            enable();
++        } else if (!_accountWasEnabled) {
++            // account changed from disabled to enabled
++            enable();
+         }
+-        enable();
+-    } else if (!_accountWasEnabled) {
+-        // account changed from disabled to enabled
+-        enable();
++    } else {
++        // Update the settings
++        _accountWasPushEnabled = imapCfg.pushEnabled();
++        _previousPushFolders = imapCfg.pushFolders();
++        _previousConnectionSettings = connectionSettings(imapCfg);
+     }
+     
+     // account was enabled and still is, update checkinterval 
+@@ -1582,6 +1656,11 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
+ 
+ ImapService::~ImapService()
+ {
++#ifdef USE_ACCOUNTS_QT
++    //If account was deleted, we should remove appropriate signon identity from the signon.db
++    if (!_accountId.isValid())
++        _client->removeSsoIdentity(_accountId);
++#endif
+     disable();
+     destroyIdleSession();
+     delete _source;
+diff --git a/src/plugins/messageservices/pop/pop.pro b/src/plugins/messageservices/pop/pop.pro
+index edcc1220..bdef288d 100644
+--- a/src/plugins/messageservices/pop/pop.pro
++++ b/src/plugins/messageservices/pop/pop.pro
+@@ -6,6 +6,13 @@ load(qt_plugin)
+ 
+ QT = core core5compat network qmfclient qmfclient-private qmfmessageserver
+ 
++contains(DEFINES,USE_ACCOUNTS_QT) {
++    CONFIG += link_pkgconfig
++    QT += xml
++    PKGCONFIG += accounts-qt5
++    PKGCONFIG += libsignon-qt5
++}
++
+ HEADERS += popclient.h \
+            popconfiguration.h \
+            popservice.h \
+diff --git a/src/plugins/messageservices/pop/popauthenticator.cpp b/src/plugins/messageservices/pop/popauthenticator.cpp
+index 34b9c422..843b1675 100644
+--- a/src/plugins/messageservices/pop/popauthenticator.cpp
++++ b/src/plugins/messageservices/pop/popauthenticator.cpp
+@@ -38,6 +38,16 @@
+ #include <qmailauthenticator.h>
+ #include <qmailtransport.h>
+ 
++#include <qmaillog.h>
++
++#ifdef USE_ACCOUNTS_QT
++namespace {
++
++QString authPassword;
++QMail::SaslMechanism responseAuthType;
++
++}
++#endif
+ 
+ bool PopAuthenticator::useEncryption(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities)
+ {
+@@ -68,6 +78,23 @@ bool PopAuthenticator::useEncryption(const QMailAccountConfiguration::ServiceCon
+ #endif
+ }
+ 
++#ifdef USE_ACCOUNTS_QT
++QList<QByteArray> PopAuthenticator::getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin)
++{
++    Q_UNUSED(capabilities);
++    QList<QByteArray> result;
++
++    // Currently pop account does not have any auth settings, so only plain can be used
++    if(ssoLogin.isEmpty()){
++        PopConfiguration popCfg(svcCfg);
++        qMailLog(POP) << Q_FUNC_INFO << "SSO identity is not found for account id: "<< popCfg.id()
++                      << ", returning empty authentication";
++    } else {
++        result = ssoLogin.value("PLAIN");
++    }
++    return result;
++}
++#else
+ QList<QByteArray> PopAuthenticator::getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities)
+ {
+     QList<QByteArray> result;
+@@ -85,9 +112,13 @@ QList<QByteArray> PopAuthenticator::getAuthentication(const QMailAccountConfigur
+ 
+     return result;
+ }
+-
++#endif
+ QByteArray PopAuthenticator::getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge)
+ {
++#ifdef USE_ACCOUNTS_QT
++    return QMailAuthenticator::getResponse(svcCfg, challenge, responseAuthType, authPassword);
++#else
+     return QMailAuthenticator::getResponse(svcCfg, challenge);
++#endif
+ }
+ 
+diff --git a/src/plugins/messageservices/pop/popauthenticator.h b/src/plugins/messageservices/pop/popauthenticator.h
+index a704ab57..419b9508 100644
+--- a/src/plugins/messageservices/pop/popauthenticator.h
++++ b/src/plugins/messageservices/pop/popauthenticator.h
+@@ -43,7 +43,11 @@ class PopAuthenticator
+ {
+ public:
+     static bool useEncryption(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities);
++#ifdef USE_ACCOUNTS_QT
++    static QList<QByteArray> getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin);
++#else
+     static QList<QByteArray> getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities);
++#endif
+     static QByteArray getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge);
+ };
+ 
+diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
+index 7473198a..ca8d9c8a 100644
+--- a/src/plugins/messageservices/pop/popclient.cpp
++++ b/src/plugins/messageservices/pop/popclient.cpp
+@@ -77,10 +77,18 @@ PopClient::PopClient(QObject* parent)
+       transport(0),
+       testing(false),
+       pendingDeletes(false)
++#ifdef USE_ACCOUNTS_QT
++    , ssoSessionManager(0),
++      loginFailed(false),
++      sendLogin(false)
++#endif
+ {
+     inactiveTimer.setSingleShot(true);
+     connect(&inactiveTimer, SIGNAL(timeout()), this, SLOT(connectionInactive()));
+     connect(QMailMessageBuffer::instance(), SIGNAL(flushed()), this, SLOT(messageBufferFlushed()));
++#ifdef USE_ACCOUNTS_QT
++    connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)), this, SLOT(onAccountsUpdated(QMailAccountIdList)));
++#endif
+ }
+ 
+ PopClient::~PopClient()
+@@ -91,6 +99,10 @@ PopClient::~PopClient()
+ 
+     delete dataStream;
+     delete transport;
++#ifdef USE_ACCOUNTS_QT
++    if (ssoSessionManager)
++        ssoSessionManager->deleteSsoIdentity();
++#endif
+ }
+ 
+ void PopClient::messageBufferFlushed()
+@@ -169,6 +181,7 @@ void PopClient::newConnection()
+     testing = false;
+     pendingDeletes = false;
+     lastStatusTimer.start();
++
+     if (transport && transport->connected()) {
+         if (selected) {
+             // Re-use the existing connection
+@@ -258,6 +271,23 @@ void PopClient::setAccount(const QMailAccountId &id)
+             qMailLog(POP) <<  "Flags for POP folder" << folder.id() << folder.path() << "updated";
+         }
+     }
++
++#ifdef USE_ACCOUNTS_QT
++    if (!ssoSessionManager) {
++        ssoSessionManager = new SSOSessionManager(this);
++        if (ssoSessionManager->createSsoIdentity(id, "pop3")) {
++            ENFORCE(connect(ssoSessionManager, SIGNAL(ssoSessionResponse(QMap<QString,QList<QByteArray> >))
++                            ,this, SLOT(onSsoSessionResponse(QMap<QString,QList<QByteArray> >))));
++            ENFORCE(connect(ssoSessionManager, SIGNAL(ssoSessionError(QString)),this, SLOT(onSsoSessionError(QString))));
++            qMailLog(POP) << Q_FUNC_INFO << "SSO identity is found for account id: "<< id;
++        } else {
++            delete ssoSessionManager;
++            ssoSessionManager = 0;
++            qMailLog(POP) << Q_FUNC_INFO << "SSO identity is not found for account id: "<< id
++                          << ", accounts configuration will be used";
++        }
++    }
++#endif
+ }
+ 
+ QMailAccountId PopClient::accountId() const
+@@ -530,7 +560,21 @@ void PopClient::processResponse(const QString &response)
+     {
+         if (response[0] != '+') {
+             // Authentication failed
++#ifdef USE_ACCOUNTS_QT
++            if (ssoSessionManager && ssoSessionManager->checkingCredentials()) {
++                operationFailed(QMailServiceAction::Status::ErrLoginFailed, "");
++            } else {
++                if (ssoSessionManager && !loginFailed) {
++                    loginFailed = true;
++                    ssoProcessLogin();
++                } else {
++                    ssoCredentialsNeedUpdate();
++                    operationFailed(QMailServiceAction::Status::ErrLoginFailed, "");
++                }
++            }
++#else
+             operationFailed(QMailServiceAction::Status::ErrLoginFailed, "");
++#endif
+         } else {
+             if ((response.length() > 2) && (response[1] == ' ')) {
+                 // This is a continuation containing a challenge string (in Base64)
+@@ -744,7 +788,11 @@ void PopClient::nextAction()
+         emit updateStatus(tr("Logging in"));
+ 
+         // Get the login command sequence to use
++#ifdef USE_ACCOUNTS_QT
++        authCommands = PopAuthenticator::getAuthentication(config.serviceConfiguration("pop3"), capabilities, ssoLogin);
++#else
+         authCommands = PopAuthenticator::getAuthentication(config.serviceConfiguration("pop3"), capabilities);
++#endif
+ 
+         nextStatus = Auth;
+         nextCommand = authCommands.takeFirst();
+@@ -1242,6 +1290,11 @@ void PopClient::checkForNewMessages()
+ void PopClient::cancelTransfer(QMailServiceAction::Status::ErrorCode code, const QString &text)
+ {
+     operationFailed(code, text);
++#ifdef USE_ACCOUNTS_QT
++    if (ssoSessionManager) {
++        ssoSessionManager->cancel();
++    }
++#endif
+ }
+ 
+ void PopClient::retrieveOperationCompleted()
+@@ -1339,3 +1392,72 @@ void PopClient::removeAllFromBuffer(QMailMessage *message)
+         _bufferedMessages.remove(i);
+     }
+ }
++
++#ifdef USE_ACCOUNTS_QT
++void PopClient::removeSsoIdentity(const QMailAccountId &accountId)
++{
++    if (config.id() == accountId) {
++        if (ssoSessionManager) {
++            ssoSessionManager->removeSsoIdentity();
++            delete ssoSessionManager;
++            ssoSessionManager = 0;
++        }
++    }
++}
++
++void PopClient::onSsoSessionResponse(const QMap<QString, QList<QByteArray> > &ssoCredentials)
++{
++    qMailLog(POP)  << "Got SSO response";
++    if(!ssoCredentials.isEmpty()) {
++        ssoLogin = ssoCredentials;
++        if (sendLogin) {
++            sendLogin = false;
++            newConnection();
++        }
++    }
++}
++
++void PopClient::onSsoSessionError(const QString &error)
++{
++    loginFailed = false;
++    sendLogin = false;
++    qMailLog(POP) <<  "Got SSO error:" << error;
++    operationFailed(QMailSearchAction::Status::ErrLoginFailed, error);
++}
++
++void PopClient::ssoCredentialsNeedUpdate()
++{
++    if (ssoSessionManager) {
++        ssoSessionManager->credentialsNeedUpdate();
++    } else {
++        qMailLog(POP) << Q_FUNC_INFO << "SSO Error: can't set credentials need update.";
++    }
++}
++
++void PopClient::ssoProcessLogin()
++{
++    if (loginFailed) {
++        if (ssoSessionManager) {
++            sendLogin = true;
++            ssoSessionManager->recreateSsoIdentity();
++        } else
++            operationFailed(QMailServiceAction::Status::ErrLoginFailed, "SSO Error: can't recreate identity.");
++    } else {
++        status = Connected;
++        nextAction();
++    }
++}
++
++void PopClient::onAccountsUpdated(const QMailAccountIdList &list)
++{
++    if (!list.contains(accountId()))
++        return;
++
++    QMailAccount acc(accountId());
++    bool isEnabled(acc.status() & QMailAccount::Enabled);
++    if (!isEnabled)
++        return;
++    setAccount(accountId());
++}
++
++#endif
+diff --git a/src/plugins/messageservices/pop/popclient.h b/src/plugins/messageservices/pop/popclient.h
+index 41f7026a..6ef713ac 100644
+--- a/src/plugins/messageservices/pop/popclient.h
++++ b/src/plugins/messageservices/pop/popclient.h
+@@ -47,6 +47,10 @@
+ #include <qmailtransport.h>
+ #include <qmailmessagebuffer.h>
+ 
++#ifdef USE_ACCOUNTS_QT
++#include <ssosessionmanager.h>
++#endif
++
+ class LongStream;
+ class QMailTransport;
+ class QMailAccount;
+@@ -83,6 +87,10 @@ public:
+     void messageFlushed(QMailMessage &message, bool isComplete);
+     void removeAllFromBuffer(QMailMessage *message);
+ 
++#ifdef USE_ACCOUNTS_QT
++    void removeSsoIdentity(const QMailAccountId &accountId);
++#endif
++
+ signals:
+     void connectionError(QMailServiceAction::Status::ErrorCode status, const QString &msg);
+     void errorOccurred(int, const QString &);
+@@ -101,10 +109,20 @@ protected slots:
+     void connected(QMailTransport::EncryptType encryptType);
+     void transportError(int, QString msg);
+ 
++#ifdef USE_ACCOUNTS_QT
++    void onAccountsUpdated(const QMailAccountIdList& list);
++    void onSsoSessionError(const QString &error);
++    void onSsoSessionResponse(const QMap<QString, QList<QByteArray> > &ssoCredentials);
++#endif
++
+     void connectionInactive();
+     void incomingData();
+ 
+ private:
++#ifdef USE_ACCOUNTS_QT
++    void ssoCredentialsNeedUpdate();
++    void ssoProcessLogin();
++#endif
+     void deactivateConnection();
+     int nextMsgServerPos();
+     int msgPosFromUidl(QString uidl);
+@@ -183,6 +201,13 @@ private:
+     QVector<QMailMessageBufferFlushCallback*> callbacks;
+     bool testing;
+     bool pendingDeletes;
++
++#ifdef USE_ACCOUNTS_QT
++    SSOSessionManager* ssoSessionManager;
++    bool loginFailed;
++    bool sendLogin;
++    QMap<QString, QList<QByteArray> > ssoLogin;
++#endif
+ };
+ 
+ #endif
+diff --git a/src/plugins/messageservices/pop/popservice.cpp b/src/plugins/messageservices/pop/popservice.cpp
+index 7d9aa16e..3b8663a7 100644
+--- a/src/plugins/messageservices/pop/popservice.cpp
++++ b/src/plugins/messageservices/pop/popservice.cpp
+@@ -101,6 +101,9 @@ private:
+ 
+ bool PopService::Source::retrieveFolderList(const QMailAccountId &accountId, const QMailFolderId &folderId, bool descending)
+ {
++    if (!_service)
++        return false;
++
+     if (!accountId.isValid()) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrInvalidData, tr("No account specified"));
+         return false;
+@@ -123,6 +126,8 @@ bool PopService::Source::retrieveFolderList(const QMailAccountId &accountId, con
+ 
+ bool PopService::Source::retrieveMessageLists(const QMailAccountId &accountId, const QMailFolderIdList &folderIds, uint minimum, const QMailMessageSortKey &sort)
+ {
++    if (!_service)
++        return false;
+     if (folderIds.isEmpty()) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrInvalidData, tr("No folders specified"));
+         return false;
+@@ -133,6 +138,9 @@ bool PopService::Source::retrieveMessageLists(const QMailAccountId &accountId, c
+ 
+ bool PopService::Source::retrieveMessageList(const QMailAccountId &accountId, const QMailFolderId &folderId, uint minimum, const QMailMessageSortKey &sort)
+ {
++    if (!_service)
++        return false;
++
+     if (!accountId.isValid()) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrInvalidData, tr("No account specified"));
+         return false;
+@@ -163,6 +171,9 @@ bool PopService::Source::retrieveMessageList(const QMailAccountId &accountId, co
+ 
+ bool PopService::Source::retrieveMessages(const QMailMessageIdList &messageIds, QMailRetrievalAction::RetrievalSpecification spec)
+ {
++    if (!_service)
++        return false;
++
+     if (messageIds.isEmpty()) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrInvalidData, tr("No messages to retrieve"));
+         return false;
+@@ -189,6 +200,9 @@ bool PopService::Source::retrieveMessages(const QMailMessageIdList &messageIds,
+ 
+ bool PopService::Source::retrieveAll(const QMailAccountId &accountId)
+ {
++    if (!_service)
++        return false;
++
+     if (!accountId.isValid()) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrInvalidData, tr("No account specified"));
+         return false;
+@@ -202,6 +216,9 @@ bool PopService::Source::retrieveAll(const QMailAccountId &accountId)
+ 
+ bool PopService::Source::exportUpdates(const QMailAccountId &accountId)
+ {
++    if (!_service)
++        return false;
++
+     if (!accountId.isValid()) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrInvalidData, tr("No account specified"));
+         return false;
+@@ -219,6 +236,9 @@ bool PopService::Source::synchronize(const QMailAccountId &accountId)
+ 
+ bool PopService::Source::deleteMessages(const QMailMessageIdList &messageIds)
+ {
++    if (!_service)
++        return false;
++
+     if (messageIds.isEmpty()) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrInvalidData, tr("No messages to delete"));
+         return false;
+@@ -324,6 +344,11 @@ PopService::PopService(const QMailAccountId &accountId)
+ 
+ PopService::~PopService()
+ {
++#ifdef USE_ACCOUNTS_QT
++    //If account was deleted, we should remove appropriate signon identity from the signon.db
++    if (!accountId().isValid())
++        _client.removeSsoIdentity(accountId());
++#endif
+     delete _source;
+ }
+ 
+diff --git a/src/plugins/messageservices/smtp/smtp.pro b/src/plugins/messageservices/smtp/smtp.pro
+index a987d84a..62f60541 100644
+--- a/src/plugins/messageservices/smtp/smtp.pro
++++ b/src/plugins/messageservices/smtp/smtp.pro
+@@ -6,6 +6,13 @@ load(qt_plugin)
+ 
+ QT = core core5compat network qmfclient qmfmessageserver
+ 
++contains(DEFINES,USE_ACCOUNTS_QT) {
++    CONFIG += link_pkgconfig
++    QT += xml
++    PKGCONFIG += accounts-qt5
++    PKGCONFIG += libsignon-qt5
++}
++
+ HEADERS += smtpauthenticator.h \
+            smtpclient.h \
+            smtpconfiguration.h \
+diff --git a/src/plugins/messageservices/smtp/smtpauthenticator.cpp b/src/plugins/messageservices/smtp/smtpauthenticator.cpp
+index 76fb904e..100bdc27 100644
+--- a/src/plugins/messageservices/smtp/smtpauthenticator.cpp
++++ b/src/plugins/messageservices/smtp/smtpauthenticator.cpp
+@@ -33,17 +33,124 @@
+ 
+ #include "smtpauthenticator.h"
+ 
+-#include "smtpconfiguration.h"
+-
+ #include <qmailauthenticator.h>
+-
++#include <qmailstore.h>
++#include <qmaillog.h>
+ 
+ namespace {
+ 
+ QMap<QMailAccountId, QList<QByteArray> > gResponses;
+ 
++#ifdef USE_ACCOUNTS_QT
++QString authPassword;
++QMail::SaslMechanism responseAuthType;
++#endif
++}
++
++#ifdef USE_ACCOUNTS_QT
++// Returns authentication type from more secure to less secure supported
++static SmtpConfiguration::AuthType authFromCapabilities(const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin)
++{
++    QStringList authCaps;
++    foreach (QString const& capability, capabilities) {
++        if (capability.startsWith("AUTH", Qt::CaseInsensitive)) {
++            authCaps.append(capability.split(" ",QString::SkipEmptyParts));
++        }
++    }
++    qMailLog(SMTP) << "Auths found: " << authCaps;
++
++    if (authCaps.contains("CRAM-MD5", Qt::CaseInsensitive) && ssoLogin.contains("CRAM-MD5")) {
++        qMailLog(SMTP) << "Returning auth CRAM-MD5";
++        return SmtpConfiguration::Auth_CRAMMD5;
++    } else if (authCaps.contains("LOGIN", Qt::CaseInsensitive) && !authCaps.contains("PLAIN", Qt::CaseInsensitive)
++               && ssoLogin.contains("LOGIN")) {
++        // LOGIN mechanism is obsolete, use it as last resort, see: http://www.iana.org/assignments/sasl-mechanisms/sasl-mechanisms.xhtml
++        qMailLog(SMTP) <<  "Returning auth LOGIN";
++        return SmtpConfiguration::Auth_LOGIN;
++    } else if (ssoLogin.contains("PLAIN")) {
++        qMailLog(SMTP) << "Returning auth PLAIN";
++        return SmtpConfiguration::Auth_PLAIN;
++    } else {
++        qMailLog(SMTP) << "Returning auth NONE";
++        return SmtpConfiguration::Auth_NONE;
++    }
++}
++
++static QByteArray authenticationResponses(QList<QByteArray> &authList, const SmtpConfiguration::AuthType &authType, const QMailAccountId &id)
++{
++    QByteArray result;
++    if(!authList.empty()) {
++        result = authList.takeFirst();
++        if (!authList.empty()) {
++            if (authType == SmtpConfiguration::Auth_CRAMMD5) {
++                authPassword = QString::fromLatin1(authList.takeFirst());
++                responseAuthType = QMail::CramMd5Mechanism;
++            } else {
++                gResponses[id] = authList;
++            }
++        }
++    } else {
++        qMailLog(SMTP) << "Failed to get authentication for method" << authType << "in account id:" << id;
++    }
++    return result;
++}
++
++QByteArray SmtpAuthenticator::getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin)
++{
++    QByteArray result;
++    SmtpConfiguration smtpCfg(svcCfg);
++    QMailAccountId id(smtpCfg.id());
++    SmtpConfiguration::AuthType authType = static_cast<SmtpConfiguration::AuthType>(smtpCfg.smtpAuthentication());
++
++    // if we don't have auth yet, try to get it from the capabilities
++    if (ssoLogin.size() > 1 && authType == SmtpConfiguration::Auth_NONE
++            && smtpCfg.smtpAuthFromCapabilities()) {
++        qMailLog(SMTP) << "Discovering authentication from capabilities for account id:" << id;
++        authType = authFromCapabilities(capabilities, ssoLogin);;
++        if (authType != SmtpConfiguration::Auth_NONE) {
++            QMailAccount account(id);
++            QMailAccountConfiguration accountConfig(id);
++            QMailAccountConfiguration::ServiceConfiguration serviceConf(accountConfig.serviceConfiguration("smtp"));
++            serviceConf.setValue("authentication",QString::number(authType));
++            if (!QMailStore::instance()->updateAccount(&account, &accountConfig)) {
++                qWarning() << "Unable to update account" << account.id() << "to auth type!!!!";
++            }
++        }
++    }
++
++#ifndef QT_NO_OPENSSL
++    if (authType != SmtpConfiguration::Auth_NONE) {
++        if (!ssoLogin.isEmpty()) {
++            QList<QByteArray> auth;
++
++            if (ssoLogin.size() == 1) {
++                QList<QString> keys = ssoLogin.keys();
++                auth = ssoLogin.value(keys.at(0));
++                result = authenticationResponses(auth, authType, id);
++                qMailLog(SMTP) << "Using authentication method " << keys.at(0)
++                               << " for account id:" << id;
++            } else {
++                if (authType == SmtpConfiguration::Auth_CRAMMD5) {
++                    auth = ssoLogin.value("CRAM-MD5");
++                    result = authenticationResponses(auth, authType, id);
++                } else if (authType == SmtpConfiguration::Auth_PLAIN) {
++                    auth = ssoLogin.value("PLAIN");
++                    result = authenticationResponses(auth, authType, id);
++                } else if (authType == SmtpConfiguration::Auth_LOGIN) {
++                    auth = ssoLogin.value("LOGIN");
++                    result = authenticationResponses(auth, authType, id);
++                }
++            }
++        } else {
++            qMailLog(SMTP) << Q_FUNC_INFO << "SSO identity is not found for account id: "<< id
++                           << ", returning empty authentication";
++        }
++    }
++#endif
++    return result;
+ }
+ 
++#else
+ QByteArray SmtpAuthenticator::getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities)
+ {
+     QByteArray result(QMailAuthenticator::getAuthentication(svcCfg, capabilities));
+@@ -72,6 +179,7 @@ QByteArray SmtpAuthenticator::getAuthentication(const QMailAccountConfiguration:
+     }
+     return result;
+ }
++#endif
+ 
+ QByteArray SmtpAuthenticator::getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge)
+ {
+@@ -85,9 +193,14 @@ QByteArray SmtpAuthenticator::getResponse(const QMailAccountConfiguration::Servi
+         if (responses.isEmpty())
+             gResponses.erase(it);
+     } else {
++#ifdef USE_ACCOUNTS_QT
++        if (!authPassword.isEmpty()) {
++            result = QMailAuthenticator::getResponse(svcCfg, challenge, responseAuthType, authPassword);
++        }
++#else
+         result = QMailAuthenticator::getResponse(svcCfg, challenge);
++#endif
+     }
+ 
+     return result;
+ }
+-
+diff --git a/src/plugins/messageservices/smtp/smtpauthenticator.h b/src/plugins/messageservices/smtp/smtpauthenticator.h
+index 97300b99..23f31cb2 100644
+--- a/src/plugins/messageservices/smtp/smtpauthenticator.h
++++ b/src/plugins/messageservices/smtp/smtpauthenticator.h
+@@ -34,6 +34,7 @@
+ #ifndef SMTPAUTHENTICATOR_H
+ #define SMTPAUTHENTICATOR_H
+ 
++#include "smtpconfiguration.h"
+ #include <qmailaccountconfiguration.h>
+ 
+ #include <QByteArray>
+@@ -42,7 +43,11 @@
+ class SmtpAuthenticator
+ {
+ public:
++#ifdef USE_ACCOUNTS_QT
++    static QByteArray getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin);
++#else
+     static QByteArray getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities);
++#endif
+     static QByteArray getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge);
+ };
+ 
+diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
+index 62018491..8e00bd52 100644
+--- a/src/plugins/messageservices/smtp/smtpclient.cpp
++++ b/src/plugins/messageservices/smtp/smtpclient.cpp
+@@ -113,6 +113,11 @@ SmtpClient::SmtpClient(QObject* parent)
+     , notUsingAuth(false)
+     , authReset(false)
+     , authTimeout(0)
++#ifdef USE_ACCOUNTS_QT
++    , ssoSessionManager(0)
++    , loginFailed(false)
++    , sendLogin(false)
++#endif
+ {
+     connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
+             this, SLOT(accountsUpdated(const QMailAccountIdList&)));
+@@ -123,6 +128,10 @@ SmtpClient::~SmtpClient()
+     delete transport;
+     delete temporaryFile;
+     delete authTimeout;
++#ifdef USE_ACCOUNTS_QT
++    if (ssoSessionManager)
++        ssoSessionManager->deleteSsoIdentity();
++#endif
+ }
+ 
+ void SmtpClient::accountsUpdated(const QMailAccountIdList &ids)
+@@ -146,6 +155,22 @@ void SmtpClient::setAccount(const QMailAccountId &id)
+ {
+     // Load the current configuration for this account
+     config = QMailAccountConfiguration(id);
++#ifdef USE_ACCOUNTS_QT
++    if (!ssoSessionManager) {
++        ssoSessionManager = new SSOSessionManager(this);
++        if (ssoSessionManager->createSsoIdentity(id, "smtp")) {
++            ENFORCE(connect(ssoSessionManager, SIGNAL(ssoSessionResponse(QMap<QString,QList<QByteArray> >))
++                            ,this, SLOT(onSsoSessionResponse(QMap<QString,QList<QByteArray> >))));
++            ENFORCE(connect(ssoSessionManager, SIGNAL(ssoSessionError(QString)),this, SLOT(onSsoSessionError(QString))));
++            qMailLog(SMTP) << Q_FUNC_INFO << "SSO identity is found for account id: "<< id;
++        } else {
++            delete ssoSessionManager;
++            ssoSessionManager = 0;
++            qMailLog(SMTP) << Q_FUNC_INFO << "SSO identity is not found for account id: "<< id
++                           << ", accounts configuration will be used";
++        }
++    }
++#endif
+ }
+ 
+ QMailAccountId SmtpClient::account() const
+@@ -161,6 +186,15 @@ void SmtpClient::newConnection()
+     // in the account settings are being managed properly.
+     config = QMailAccountConfiguration(config.id());
+ 
++#ifdef USE_ACCOUNTS_QT
++    loginFailed = false;
++#endif
++    // Load the current configuration for this account
++    // Reload the account configuration whenever a new SMTP
++    // connection is created, in order to ensure the changes
++    // in the account settings are being managed properly.
++    config = QMailAccountConfiguration(config.id());
++
+     if (sending) {
+         operationFailed(QMailServiceAction::Status::ErrConnectionInUse, tr("Cannot send message; transport in use"));
+         return;
+@@ -577,6 +611,31 @@ void SmtpClient::nextAction(const QString &response)
+         addressComponent = localAddress.toIPv4Address();
+ 
+         // Find the authentication mode to use
++#ifdef USE_ACCOUNTS_QT
++        if (ssoSessionManager) {
++            // start single signon session
++            status = SignOnSession;
++            nextAction(QString());
++        } else {
++            // Use credentials from accounts db
++            // Find the authentication mode to use
++            ssoLogin.clear();
++            QByteArray authCmd(SmtpAuthenticator::getAuthentication(config.serviceConfiguration("smtp"), capabilities, ssoLogin));
++            if (!authCmd.isEmpty()) {
++                sendCommand(authCmd);
++                status = Authenticating;
++            } else {
++                foreach (QString const& capability, capabilities) {
++                    if (capability.startsWith("AUTH", Qt::CaseInsensitive)) {
++                        notUsingAuth = true;
++                        break;
++                    }
++                }
++                status = Authenticated;
++                nextAction(QString());
++            }
++        }
++#else
+         QByteArray authCmd(SmtpAuthenticator::getAuthentication(config.serviceConfiguration("smtp"), capabilities));
+         if (!authCmd.isEmpty()) {
+             sendCommand(authCmd);
+@@ -592,8 +651,40 @@ void SmtpClient::nextAction(const QString &response)
+             status = Authenticated;
+             nextAction(QString());
+         }
++#endif
++        break;
++    }
++#ifdef USE_ACCOUNTS_QT
++    case SignOnSession:
++    {
++        if (loginFailed) {
++            if (ssoSessionManager && ssoSessionManager->checkingCredentials()) {
++                operationFailed(QMailServiceAction::Status::ErrLoginFailed, response);
++            } else {
++                if (ssoSessionManager) {
++                    sendLogin = true;
++                    ssoSessionManager->recreateSsoIdentity();
++                } else {
++                    operationFailed(QMailServiceAction::Status::ErrLoginFailed, response);
++                }
++            }
++        } else {
++            if (!ssoSessionManager->waitForSso()) {
++                QByteArray authCmd(SmtpAuthenticator::getAuthentication(config.serviceConfiguration("smtp"), capabilities, ssoLogin));
++                if (!authCmd.isEmpty()) {
++                    sendCommand(authCmd);
++                    status = Authenticating;
++                } else {
++                    status = Authenticated;
++                    nextAction(QString());
++                }
++            } else {
++                sendLogin = true;
++            }
++        }
+         break;
+     }
++#endif
+     case Authenticating:
+     {
+         if (responseCode == 334) {
+@@ -607,8 +698,9 @@ void SmtpClient::nextAction(const QString &response)
+                 bufferedResponse.clear();
+                 return;
+             } else {
+-                // No username/password defined
+-                operationFailed(QMailServiceAction::Status::ErrLoginFailed, response);
++                // Challenge response is empty
++                // send a empty response.
++                sendCommand("");
+             }
+         } else if (responseCode == 235) {
+             // We are now authenticated
+@@ -638,14 +730,29 @@ void SmtpClient::nextAction(const QString &response)
+         } else if (responseCode == 530) {
+             operationFailed(QMailServiceAction::Status::ErrConfiguration, response);
+         } else {
++#ifdef USE_ACCOUNTS_QT
++            if (ssoSessionManager && ssoSessionManager->checkingCredentials()) {
++               operationFailed(QMailServiceAction::Status::ErrLoginFailed, response);
++            } else if (!loginFailed) {
++                loginFailed = true;
++                status = SignOnSession;
++                nextAction(QString());
++            } else {
++                ssoCredentialsNeedUpdate();
++                operationFailed(QMailServiceAction::Status::ErrLoginFailed, response);
++            }
++#else
+             operationFailed(QMailServiceAction::Status::ErrLoginFailed, response);
++#endif
+         }
+-
+         // Otherwise, we're authenticated
+         break;
+     }
+     case Authenticated:
+     {
++#ifdef USE_ACCOUNTS_QT
++        loginFailed = false;
++#endif
+         if (mailItr == mailList.end()) {
+             // Nothing to send
+             status = Quit;
+@@ -899,6 +1006,10 @@ void SmtpClient::nextAction(const QString &response)
+ void SmtpClient::cancelTransfer(QMailServiceAction::Status::ErrorCode code, const QString &text)
+ {
+     operationFailed(code, text);
++#ifdef USE_ACCOUNTS_QT
++    if (ssoSessionManager)
++        ssoSessionManager->cancel();
++#endif
+ }
+ 
+ void SmtpClient::messageProcessed(const QMailMessageId &id)
+@@ -1053,3 +1164,53 @@ void SmtpClient::stopTransferring()
+         status = Sent;
+     }
+ }
++
++#ifdef USE_ACCOUNTS_QT
++void SmtpClient::ssoCredentialsNeedUpdate()
++{
++    if (ssoSessionManager) {
++        ssoSessionManager->credentialsNeedUpdate();
++    } else {
++        qMailLog(SMTP) << Q_FUNC_INFO << "SSO Error: can't set credentials need update.";
++    }
++}
++
++void SmtpClient::removeSsoIdentity(const QMailAccountId &accountId)
++{
++    if (config.id() == accountId) {
++        if (ssoSessionManager) {
++            ssoSessionManager->removeSsoIdentity();
++            delete ssoSessionManager;
++            ssoSessionManager = 0;
++        }
++    }
++}
++
++void SmtpClient::onSsoSessionResponse(const QMap<QString, QList<QByteArray> > &ssoCredentials)
++{
++    qMailLog(SMTP)  << "Got SSO response";
++    if(!ssoCredentials.isEmpty()) {
++        ssoLogin = ssoCredentials;
++        if (sendLogin) {
++            sendLogin = false;
++            QByteArray authCmd(SmtpAuthenticator::getAuthentication(config.serviceConfiguration("smtp"), capabilities, ssoLogin));
++            if (!authCmd.isEmpty()) {
++                sendCommand(authCmd);
++                status = Authenticating;
++            } else {
++                status = Authenticated;
++                nextAction(QString());
++            }
++        }
++    }
++}
++
++void SmtpClient::onSsoSessionError(const QString &error)
++{
++    // Reset vars
++    loginFailed = false;
++    sendLogin = false;
++    qMailLog(SMTP) <<  "Got SSO error:" << error;
++    operationFailed(QMailServiceAction::Status::ErrLoginFailed, error);
++}
++#endif
+diff --git a/src/plugins/messageservices/smtp/smtpclient.h b/src/plugins/messageservices/smtp/smtpclient.h
+index b799f1fd..73517aab 100644
+--- a/src/plugins/messageservices/smtp/smtpclient.h
++++ b/src/plugins/messageservices/smtp/smtpclient.h
+@@ -44,6 +44,10 @@
+ #include <qmailmessageserver.h>
+ #include <qmailtransport.h>
+ 
++#ifdef USE_ACCOUNTS_QT
++#include <ssosessionmanager.h>
++#endif
++
+ QT_BEGIN_NAMESPACE
+ 
+ class QTemporaryFile;
+@@ -70,6 +74,11 @@ public:
+     void setAccount(const QMailAccountId &accountId);
+     QMailAccountId account() const;
+ 
++#ifdef USE_ACCOUNTS_QT
++    void ssoCredentialsNeedUpdate();
++    void removeSsoIdentity(const QMailAccountId &accountId);
++#endif
++
+     void newConnection();
+     void cancelTransfer(QMailServiceAction::Status::ErrorCode code, const QString &text);
+ 
+@@ -95,6 +104,10 @@ protected slots:
+ private slots:
+     void sendMoreData(qint64);
+     void authExpired();
++#ifdef USE_ACCOUNTS_QT
++    void onSsoSessionResponse(const QMap<QString, QList<QByteArray> > &ssoCredentials);
++    void onSsoSessionError(const QString &error);
++#endif
+ 
+ private:
+     void sendCommand(const char *data, int len = -1, bool maskDebug = false);
+@@ -111,11 +124,19 @@ private:
+     void stopTransferring();
+ 
+ private:
++#ifdef USE_ACCOUNTS_QT
++    enum TransferStatus
++    {
++        Init, Helo, Extension, StartTLS, TLS, Connected, SignOnSession,  Authenticating, Authenticated,
++        MetaData, From, Recv, MRcv, PrepareData, Data, Body, Chunk, ChunkSent, Sent, Quit, Done
++    };
++#else
+     enum TransferStatus
+     {
+         Init, Helo, Extension, StartTLS, TLS, Connected, Authenticating, Authenticated,
+         MetaData, From, Recv, MRcv, PrepareData, Data, Body, Chunk, ChunkSent, Sent, Quit, Done
+     };
++#endif
+ 
+     QMailAccountConfiguration config;
+     TransferStatus status;
+@@ -150,6 +171,13 @@ private:
+     bool authReset;
+ 
+     QTimer *authTimeout;
++
++#ifdef USE_ACCOUNTS_QT
++    SSOSessionManager* ssoSessionManager;
++    bool loginFailed;
++    bool sendLogin;
++    QMap<QString, QList<QByteArray> > ssoLogin;
++#endif
+ };
+ 
+ #endif
+diff --git a/src/plugins/messageservices/smtp/smtpservice.cpp b/src/plugins/messageservices/smtp/smtpservice.cpp
+index e098fbc8..8c7ab73f 100644
+--- a/src/plugins/messageservices/smtp/smtpservice.cpp
++++ b/src/plugins/messageservices/smtp/smtpservice.cpp
+@@ -127,7 +127,10 @@ SmtpService::SmtpService(const QMailAccountId &accountId)
+ 
+     _client.setAccount(accountId);
+ 
++// Don't try to autoconnect on account creation for SSO services
++#ifndef USE_ACCOUNTS_QT
+     fetchCapabilities();
++#endif
+ }
+ 
+ void SmtpService::fetchCapabilities()
+@@ -255,6 +258,11 @@ void SmtpService::onAccountsUpdated(const QMailAccountIdList &accountIds)
+ 
+ SmtpService::~SmtpService()
+ {
++#ifdef USE_ACCOUNTS_QT
++    //If account was deleted, we should remove appropriate signon identity from the signon.db
++    if (!accountId().isValid())
++        _client.removeSsoIdentity(accountId());
++#endif
+     delete _sink;
+ }
+ 
+diff --git a/src/plugins/plugins.pro b/src/plugins/plugins.pro
+index dc1528b7..5226faa1 100644
+--- a/src/plugins/plugins.pro
++++ b/src/plugins/plugins.pro
+@@ -11,3 +11,6 @@ exists(/usr/bin/gpgme-config) {
+     SUBDIRS += crypto/smime
+ }
+ 
++contains(DEFINES,USE_ACCOUNTS_QT) {
++    SUBDIRS += ssoauth/password
++}
+diff --git a/src/plugins/ssoauth/password/password.pro b/src/plugins/ssoauth/password/password.pro
+new file mode 100644
+index 00000000..f41e80ad
+--- /dev/null
++++ b/src/plugins/ssoauth/password/password.pro
+@@ -0,0 +1,21 @@
++TEMPLATE = lib 
++TARGET = passwordplugin
++QT = core qmfclient qmfclient-private
++PLUGIN_TYPE = ssoauth
++load(qt_plugin)
++
++CONFIG -= create_cmake
++
++DEPENDPATH += .
++
++contains(DEFINES,USE_ACCOUNTS_QT) {
++    CONFIG += link_pkgconfig
++    QT += xml
++    PKGCONFIG += accounts-qt5
++    PKGCONFIG += libsignon-qt5
++}
++
++HEADERS += passwordplugin.h
++
++SOURCES += passwordplugin.cpp
++
+diff --git a/src/plugins/ssoauth/password/passwordplugin.cpp b/src/plugins/ssoauth/password/passwordplugin.cpp
+new file mode 100644
+index 00000000..00ad7e73
+--- /dev/null
++++ b/src/plugins/ssoauth/password/passwordplugin.cpp
+@@ -0,0 +1,231 @@
++/****************************************************************************
++**
++** Copyright (c) 2013-2020 Jolla Ltd.
++** Copyright (c) 2020 Open Mobile Platform LLC.
++**
++** This file is part of the Qt Messaging Framework.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and Digia.  For licensing terms and
++** conditions see http://qt.digia.com/licensing.  For further information
++** use the contact form at http://qt.digia.com/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 as published by the Free Software
++** Foundation and appearing in the file LICENSE.LGPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU Lesser General Public License version 2.1 requirements
++** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Digia gives you certain additional
++** rights.  These rights are described in the Digia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 3.0 as published by the Free Software
++** Foundation and appearing in the file LICENSE.GPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU General Public License version 3.0 requirements will be
++** met: http://www.gnu.org/copyleft/gpl.html.
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "passwordplugin.h"
++#include "qmailnamespace.h"
++
++// libaccounts-qt
++#include <Accounts/Manager>
++#include <Accounts/Account>
++
++// From Qt Messaging Framework IMAP plugin
++// Ensure a string is quoted, if required for IMAP transmission
++// As per IMAP4 rfc 2060 section 4.2
++QString quoteIMAPString(const QString& input)
++{
++    // We can't easily catch controls other than those caught by \\s...
++    QRegExp atomSpecials("[\\(\\)\\{\\s\\*%\\\\\"\\]]");
++
++    // The empty string must be quoted
++    if (input.isEmpty())
++        return QString("\"\"");
++
++    if (atomSpecials.indexIn(input) == -1)
++        return input;
++
++    // We need to quote this string because it is not an atom
++    QString result(input);
++
++    QString::iterator begin = result.begin(), it = begin;
++    while (it != result.end()) {
++        // We need to escape any characters specially treated in quotes
++        if ((*it) == '\\' || (*it) == '"') {
++            int pos = (it - begin);
++            result.insert(pos, '\\');
++            it = result.begin() + (pos + 1);
++        }
++        ++it;
++    }
++
++    return QMail::quoteString(result);
++}
++
++QByteArray quoteIMAPString(const QByteArray& input)
++{
++    return quoteIMAPString(QString::fromLatin1(input)).toLatin1();
++}
++
++SSOPasswordPlugin::SSOPasswordPlugin(QObject *parent)
++    : SSOAuthService(parent)
++    , m_accountManager(new Accounts::Manager(this))
++{
++}
++
++SSOPasswordPlugin::~SSOPasswordPlugin()
++{
++}
++
++QMap<QString, QList<QByteArray> > SSOPasswordPlugin::getIMAPAuthentication(const QString &password,
++                                                    const QString &username) const
++{
++    QMap<QString, QList<QByteArray> > result;
++
++    // Add PLAIN auth
++    QByteArray user(username.toUtf8());
++    QByteArray pass(password.toUtf8());
++
++    QList<QByteArray> plainAuth;
++    plainAuth.append(QByteArray("AUTHENTICATE PLAIN"));
++    plainAuth.append(QByteArray(user + '\0' + user + '\0' + pass));
++    result.insert(QString::fromLatin1("PLAIN"), plainAuth);
++
++    // Add LOGIN auth
++    result.insert(QString::fromLatin1("LOGIN"), QList<QByteArray>() << QByteArray("LOGIN") + ' ' + quoteIMAPString(username.toUtf8())
++                  + ' ' + quoteIMAPString(password.toUtf8()));
++
++    // Add CRAM_MD5
++    QList<QByteArray> cramAuth;
++    cramAuth.append(QByteArray("AUTHENTICATE CRAM-MD5"));
++    cramAuth.append(QByteArray(password.toUtf8()));
++    result.insert(QString::fromLatin1("CRAM-MD5"), cramAuth);
++
++    return result;
++}
++
++QMap<QString, QList<QByteArray> > SSOPasswordPlugin::getPOPAuthentication(const QString &password,
++                                                   const QString &username) const
++{
++    QMap<QString, QList<QByteArray> > result;
++
++    // Add PLAIN auth
++    QList<QByteArray> plainAuth;
++    plainAuth.append(QByteArray("USER ") + username.toUtf8());
++    plainAuth.append(QByteArray("PASS ") + password.toUtf8());
++    result.insert(QString::fromLatin1("PLAIN"), plainAuth);
++
++    // Currently pop account does not have any auth settings, so only plain can be used
++
++    // Add CRAM-MD5
++    /*QList<QByteArray> cramAuth;
++    cramAuth.append(QByteArray("AUTH CRAM-MD5"));
++    cramAuth.append(QByteArray(password.toLatin1()));
++    result.insert(QString::fromLatin1("CRAM-MD5"), cramAuth);*/
++
++    return result;
++}
++
++QMap<QString, QList<QByteArray> > SSOPasswordPlugin::getSMTPAuthentication(const QString &password,
++                                                    const QString &username) const
++{
++    QMap<QString, QList<QByteArray> > result;
++
++    QByteArray user(username.toUtf8());
++    QByteArray pass(password.toUtf8());
++
++    // Add PLAIN auth
++    QList<QByteArray> plainAuth;
++    plainAuth.append(QByteArray("AUTH PLAIN ") + QByteArray(user + '\0' + user + '\0' + pass).toBase64());
++    plainAuth.append(QByteArray(user + '\0' + user + '\0' + pass));
++    result.insert(QString::fromLatin1("PLAIN"), plainAuth);
++
++    // Add LOGIN auth
++    QList<QByteArray> loginAuth;
++    loginAuth.append(QByteArray("AUTH LOGIN"));
++    loginAuth.append(QByteArray(user));
++    loginAuth.append(QByteArray(pass));
++    result.insert(QString::fromLatin1("LOGIN"), loginAuth);
++
++    // Add CRAM-MD5 auth
++    QList<QByteArray> cramAuth;
++    cramAuth.append(QByteArray("AUTH CRAM-MD5"));
++    cramAuth.append(QByteArray(pass));
++    result.insert(QString::fromLatin1("CRAM-MD5"), cramAuth);
++
++    return result;
++}
++
++SSOAuthService* SSOPasswordPlugin::createService()
++{
++    return this;
++}
++
++QString SSOPasswordPlugin::key() const
++{
++    return "password";
++}
++
++QMap<QString, QList<QByteArray> > SSOPasswordPlugin::authentication(const SignOn::SessionData &sessionData,
++                                                const QString &serviceType, const QString &userName) const
++{
++    QString password = sessionData.Secret();
++    QString username = sessionData.UserName();
++
++    if (username.isEmpty())
++        username = userName;
++
++    if (serviceType == "imap4") {
++        return getIMAPAuthentication(password, username);
++    } else if (serviceType == "pop3") {
++        return getPOPAuthentication(password, username);
++    } else if (serviceType == "smtp") {
++        return getSMTPAuthentication(password, username);
++    } else {
++        return QMap<QString, QList<QByteArray> >();
++    }
++}
++
++void SSOPasswordPlugin::credentialsNeedUpdate(int accountId)
++{
++    // Mirrors the functionality of SSOOauth2Plugin::credentialsNeedUpdate
++    // See base-qmf-oauth2-plugin/oauth2plugin.cpp
++    Accounts::Account *account = Accounts::Account::fromId(m_accountManager, accountId, this);
++    Accounts::Service srv(m_accountManager->service(QStringLiteral("email")));
++    if (srv.isValid()) {
++        qWarning() << "password-plugin: setting CredentialsNeedUpdate on account:" << account->id();
++        account->selectService(srv);
++        account->setValue("CredentialsNeedUpdate", QVariant::fromValue<bool>(true));
++        account->setValue("CredentialsNeedUpdateFrom", QVariant::fromValue<QString>(QString::fromLatin1("messageserver5")));
++        account->selectService(Accounts::Service());
++        account->syncAndBlock();
++    }
++    account->deleteLater();
++}
++
++SignOn::SessionData SSOPasswordPlugin::sessionData(const QString &accountProvider,  QVariantMap authParameters) const
++{
++    Q_UNUSED(accountProvider);
++    Q_UNUSED(authParameters);
++
++    SignOn::SessionData data;
++    data.setUiPolicy(SignOn::NoUserInteractionPolicy);
++    return data;
++}
++
+diff --git a/src/plugins/ssoauth/password/passwordplugin.h b/src/plugins/ssoauth/password/passwordplugin.h
+new file mode 100644
+index 00000000..a2f66cd9
+--- /dev/null
++++ b/src/plugins/ssoauth/password/passwordplugin.h
+@@ -0,0 +1,78 @@
++/****************************************************************************
++**
++** Copyright (c) 2013-2020 Jolla Ltd.
++** Copyright (c) 2020 Open Mobile Platform LLC.
++**
++** This file is part of the Qt Messaging Framework.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and Digia.  For licensing terms and
++** conditions see http://qt.digia.com/licensing.  For further information
++** use the contact form at http://qt.digia.com/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 as published by the Free Software
++** Foundation and appearing in the file LICENSE.LGPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU Lesser General Public License version 2.1 requirements
++** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Digia gives you certain additional
++** rights.  These rights are described in the Digia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 3.0 as published by the Free Software
++** Foundation and appearing in the file LICENSE.GPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU General Public License version 3.0 requirements will be
++** met: http://www.gnu.org/copyleft/gpl.html.
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#ifndef PASSWORDPLUGIN_H
++#define PASSWORDPLUGIN_H
++
++#include "ssoauthplugin.h"
++#include <QtPlugin>
++#include <QVariantMap>
++#include <SignOn/SessionData>
++
++namespace Accounts {
++    class Manager;
++    class Account;
++}
++
++class SSOPasswordPlugin : public SSOAuthService
++{
++    Q_OBJECT
++    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.SSOPasswordPluginHandlerFactoryInterface")
++
++public:
++    SSOPasswordPlugin( QObject *parent = 0 );
++    ~SSOPasswordPlugin();
++
++    virtual QString key() const;
++    virtual QMap<QString, QList<QByteArray> > authentication(const SignOn::SessionData &sessionData,
++                                         const QString &serviceType, const QString &userName) const;
++    virtual void credentialsNeedUpdate(int accountId);
++    virtual SignOn::SessionData sessionData(const QString &accountProvider, QVariantMap authParameters) const;
++    virtual SSOAuthService* createService();
++
++private:
++    QMap<QString, QList<QByteArray> > getIMAPAuthentication(const QString &password, const QString &username) const;
++    QMap<QString, QList<QByteArray> > getPOPAuthentication(const QString &password, const QString &username) const;
++    QMap<QString, QList<QByteArray> > getSMTPAuthentication(const QString &password, const QString &username) const;
++    Accounts::Manager *m_accountManager;
++};
++
++#endif // PASSWORDPLUGIN_H
+diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
+index 93ebace0..ca105660 100644
+--- a/src/tools/messageserver/servicehandler.cpp
++++ b/src/tools/messageserver/servicehandler.cpp
+@@ -801,10 +801,23 @@ void ServiceHandler::accountsAdded(const QMailAccountIdList &ids)
+ 
+ void ServiceHandler::accountsUpdated(const QMailAccountIdList &ids)
+ {
++#ifdef USE_ACCOUNTS_QT
++    QMailAccountIdList idList;
++    foreach (const QMailAccountId &id, ids) {
++        if (!sourceMap.contains(id) && !sinkMap.contains(id)) {
++                idList << id;
++        }
++    }
++    if (!idList.isEmpty()) {
++        registerAccountServices(idList);
++    }
++
++#else
+     // Only respond to updates that were generated by other processes
+     if (QMailStore::instance()->asynchronousEmission()) {
+         reregisterAccountServices(ids, QMailServiceAction::Status::ErrInternalStateReset, tr("Account updated by other process"));
+     }
++#endif
+ }
+ 
+ void ServiceHandler::accountsRemoved(const QMailAccountIdList &ids)
+diff --git a/tests/tst_qmailstore/tst_qmailstore.cpp b/tests/tst_qmailstore/tst_qmailstore.cpp
+index 61635b8c..27d79101 100644
+--- a/tests/tst_qmailstore/tst_qmailstore.cpp
++++ b/tests/tst_qmailstore/tst_qmailstore.cpp
+@@ -48,6 +48,9 @@
+     This class tests that QMailStore correctly handles addition, updates, removal, counting and
+     querying of QMailMessages and QMailFolders.
+ */
++
++Q_DECLARE_METATYPE(QMailMessageKey::Properties)
++
+ class tst_QMailStore : public QObject
+ {
+     Q_OBJECT
+@@ -78,8 +81,19 @@ private slots:
+     void removeMessageWithInResponse();
+     void message();
+     void implementationbase();
++
++#ifdef USE_ACCOUNTS_QT
++private:
++    static const QSet<QString> defaultMailServices;
++#endif
+ };
+ 
++#ifdef USE_ACCOUNTS_QT
++// Keep in sync with src/libraries/qmfclient/share/email.service
++const QSet<QString> tst_QMailStore::defaultMailServices =
++    QSet<QString>() << "auth" << "crypto";
++#endif
++
+ QTEST_MAIN(tst_QMailStore)
+ 
+ #include "tst_qmailstore.moc"
+@@ -97,6 +111,7 @@ tst_QMailStore::~tst_QMailStore()
+ void tst_QMailStore::initTestCase()
+ {
+     QMailStore::instance()->clearContent();
++    qRegisterMetaType<QMailMessageKey::Properties>("QMailMessageKeyProperties");
+ }
+ 
+ void tst_QMailStore::cleanup()
+@@ -110,6 +125,9 @@ void tst_QMailStore::cleanupTestCase()
+ 
+ void tst_QMailStore::addAccount()
+ {
++
++    QSignalSpy spyAccountAdded(QMailStore::instance(), SIGNAL(accountsAdded(QMailAccountIdList)));
++
+     QMailAccount account1;
+     account1.setName("Account 1");
+     account1.setFromAddress(QMailAddress("Account 1", "account1@example.org"));
+@@ -132,9 +150,9 @@ void tst_QMailStore::addAccount()
+         svcCfg->setValue("username", "account1");
+     }
+ 
+-    // Verify that invalid retrieval fails
++    // Verify that invalid retrieval succeeds but returns an invalid account
+     QMailAccount accountX(account1.id());
+-    QCOMPARE(QMailStore::instance()->lastError(), QMailStore::InvalidId);
++    QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
+     QVERIFY(!accountX.id().isValid());
+     
+     // Verify that addition is successful
+@@ -147,6 +165,9 @@ void tst_QMailStore::addAccount()
+     QCOMPARE(QMailStore::instance()->countAccounts(), 1);
+     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
+ 
++    // Verify that the addAccount signal is emitted only once
++    QCOMPARE(spyAccountAdded.count(), 1);
++
+     // Verify that retrieval yields matching result
+     QMailAccount account2(account1.id());
+     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
+@@ -162,12 +183,22 @@ void tst_QMailStore::addAccount()
+ 
+     QMailAccountConfiguration config2(account1.id());
+     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
++
++#ifdef USE_ACCOUNTS_QT
++    QCOMPARE(config2.services().toSet() - defaultMailServices, config1.services().toSet());
++    foreach (const QString &service, config2.services().toSet() - defaultMailServices) {
++        if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
++            QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
++        } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
++    }
++#else
+     QCOMPARE(config2.services(), config1.services());
+     foreach (const QString &service, config2.services()) {
+         if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
+             QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
+         } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
+     }
++#endif
+ 
+     QCOMPARE(QMailStore::instance()->countAccounts(QMailAccountKey::id(account1.id())), 1);
+     QCOMPARE(QMailStore::instance()->countAccounts(QMailAccountKey::id(account1.id(), QMailDataComparator::NotEqual)), 0);
+@@ -707,12 +738,21 @@ void tst_QMailStore::updateAccount()
+ 
+     QMailAccountConfiguration config2(account1.id());
+     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
++#ifdef USE_ACCOUNTS_QT
++    QCOMPARE(config2.services().toSet() - defaultMailServices, config1.services().toSet());
++    foreach (const QString &service, config2.services().toSet() - defaultMailServices) {
++        if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
++            QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
++        } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
++    }
++#else
+     QCOMPARE(config2.services(), config1.services());
+     foreach (const QString &service, config2.services()) {
+         if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
+             QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
+         } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
+     }
++#endif
+ }
+ 
+ void tst_QMailStore::updateFolder()
+@@ -1222,8 +1262,12 @@ void tst_QMailStore::updateMessage()
+ 
+ void tst_QMailStore::updateMessages()
+ {
++    QSignalSpy spyMessagesAdded(QMailStore::instance(), SIGNAL(messagesAdded(QMailMessageIdList)));
+     QSignalSpy spyMessagesUpdated(QMailStore::instance(), SIGNAL(messagesUpdated(QMailMessageIdList)));
+     QSignalSpy spyMessagesDataUpdated(QMailStore::instance(), SIGNAL(messageDataUpdated(QMailMessageMetaDataList)));
++    QSignalSpy spyMessagePropertyUpdated(QMailStore::instance(), SIGNAL(messagePropertyUpdated(QMailMessageIdList, QMailMessageKeyProperties, QMailMessageMetaData)));
++    QSignalSpy spyMessageStatusUpdated(QMailStore::instance(), SIGNAL(messageStatusUpdated(QMailMessageIdList, quint64, bool)));
++
+ 
+     QMailAccount account;
+     account.setName("Account");
+@@ -1299,12 +1343,41 @@ void tst_QMailStore::updateMessages()
+     }
+ 
+     //Verify that the signals are only emitted once
++    QCOMPARE(spyMessagesAdded.count(), 1);
+     QCOMPARE(spyMessagesUpdated.count(), 1);
+     QCOMPARE(spyMessagesDataUpdated.count(), 1);
++    // Verify that was not emitted since we didn't modify message metadata directly
++    QCOMPARE(spyMessagePropertyUpdated.count(),0);
++    QCOMPARE(spyMessageStatusUpdated.count(), 0);
++
++    QMailMessageMetaData data;
++    data.setCustomField("answer", "Fido");
++    data.setCustomField("bicycle", "fish");
++
++    QVERIFY(QMailStore::instance()->updateMessagesMetaData(QMailMessageKey(), QMailMessageKey::Custom, data));
++    QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
++
++    // Message was update
++    QCOMPARE(spyMessagesUpdated.count(), 2);
++    // Properties were updated
++    QCOMPARE(spyMessagePropertyUpdated.count(),1);
++    // Status was not updated
++    QCOMPARE(spyMessageStatusUpdated.count(), 0);
++
++    QVERIFY(QMailStore::instance()->updateMessagesMetaData(QMailMessageKey(), QMailMessage::Read, false));
++    QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
++    // Message was update
++    QCOMPARE(spyMessagesUpdated.count(), 3);
++    // Properties were not updated
++    QCOMPARE(spyMessagePropertyUpdated.count(),1);
++    // Status was updated
++    QCOMPARE(spyMessageStatusUpdated.count(), 1);
+ }
+ 
+ void tst_QMailStore::removeAccount()
+ {
++    QSignalSpy spyAccountRemoved(QMailStore::instance(), SIGNAL(accountsRemoved(QMailAccountIdList)));
++
+     QMailAccount account1;
+     account1.setName("Account 1");
+     account1.setFromAddress(QMailAddress("Account 1", "account1@example.org"));
+@@ -1347,12 +1420,21 @@ void tst_QMailStore::removeAccount()
+ 
+     QMailAccountConfiguration config2(account2.id());
+     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
++#ifdef USE_ACCOUNTS_QT
++    QCOMPARE(config2.services().toSet() - defaultMailServices, config1.services().toSet());
++    foreach (const QString &service, config2.services().toSet() - defaultMailServices) {
++        if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
++            QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
++        } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
++    }
++#else
+     QCOMPARE(config2.services(), config1.services());
+     foreach (const QString &service, config2.services()) {
+         if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
+             QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
+         } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
+     }
++#endif
+ 
+     // Verify that removal is successful 
+     QVERIFY(QMailStore::instance()->removeAccount(account1.id()));
+@@ -1360,9 +1442,12 @@ void tst_QMailStore::removeAccount()
+     QCOMPARE(QMailStore::instance()->countAccounts(), 0);
+     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
+ 
+-    // Verify that retrieval yields invalid result
++    // Verify that the removeAccount signal is emitted only once
++    QCOMPARE(spyAccountRemoved.count(), 1);
++
++    // Verify that retrieval yields no error and an invalid result
+     QMailAccount account3(account1.id());
+-    QCOMPARE(QMailStore::instance()->lastError(), QMailStore::InvalidId);
++    QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
+     QVERIFY(!account3.id().isValid());
+ 
+     QMailAccountConfiguration config3(account1.id());
+diff --git a/tests/tst_smtp/tst_smtp.pro b/tests/tst_smtp/tst_smtp.pro
+index 5807dc01..3a79d840 100644
+--- a/tests/tst_smtp/tst_smtp.pro
++++ b/tests/tst_smtp/tst_smtp.pro
+@@ -2,6 +2,10 @@ TEMPLATE = app
+ CONFIG += qmfclient qmfmessageserver
+ TARGET = tst_smtp
+ 
++contains(DEFINES,USE_ACCOUNTS_QT) {
++    PKGCONFIG += libsignon-qt5
++}
++
+ SRCDIR = $$PWD/../../src/plugins/messageservices/smtp
+ INCLUDEPATH += $$SRCDIR
+ QT += qmfclient qmfmessageserver

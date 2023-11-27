@@ -4,10 +4,12 @@ Date: Mon, 27 Oct 2014 09:49:12 +0200
 Subject: [PATCH] Use Qt5 booster to save memory.
 
 ---
- src/tools/messageserver/main.cpp          | 2 +-
- src/tools/messageserver/messageserver.pro | 6 ++++++
- src/tools/systemd/messageserver5.service  | 6 +++---
- 3 files changed, 10 insertions(+), 4 deletions(-)
+ src/tools/messageserver/main.cpp                        | 2 +-
+ src/tools/messageserver/messageserver.pro               | 6 ++++++
+ src/tools/systemd/messageserver5-accounts-check.service | 4 +++-
+ src/tools/systemd/messageserver5.service                | 6 +++---
+ src/tools/tools.pro                                     | 2 ++
+ 5 files changed, 15 insertions(+), 5 deletions(-)
 
 diff --git a/src/tools/messageserver/main.cpp b/src/tools/messageserver/main.cpp
 index 9c107629..d9a35c53 100644
@@ -39,6 +41,26 @@ index 9ab48893..1950e68b 100644
  CONFIG -= app_bundle
  target.path += $$QMF_INSTALL_ROOT/bin
  
+diff --git a/src/tools/systemd/messageserver5-accounts-check.service b/src/tools/systemd/messageserver5-accounts-check.service
+index c2ec29ea..f5194daa 100644
+--- a/src/tools/systemd/messageserver5-accounts-check.service
++++ b/src/tools/systemd/messageserver5-accounts-check.service
+@@ -1,12 +1,14 @@
+ [Unit]
+ Description=check accounts for messageserver5
++Requires=booster-qt5.service
+ After=oneshot-user.service
+ After=jolla-settings-accounts-update.service
+ Before=messageserver5.service
++After=booster-qt5.service
+ 
+ [Service]
+ Type=oneshot
+-ExecStart=/usr/bin/qmf-accountscheck
++ExecStart=/usr/bin/invoker -o --type=generic --global-syms /usr/bin/qmf-accountscheck
+ 
+ [Install]
+ WantedBy=user-session.target
 diff --git a/src/tools/systemd/messageserver5.service b/src/tools/systemd/messageserver5.service
 index 0d583d15..a5aa05a9 100644
 --- a/src/tools/systemd/messageserver5.service
@@ -60,3 +82,13 @@ index 0d583d15..a5aa05a9 100644
  Restart=on-failure
  RestartSec=1
  
+diff --git a/src/tools/tools.pro b/src/tools/tools.pro
+index 689ad320..15aa630e 100644
+--- a/src/tools/tools.pro
++++ b/src/tools/tools.pro
+@@ -4,3 +4,5 @@ SUBDIRS = messageserver
+ contains(DEFINES,USE_ACCOUNTS_QT) {
+     SUBDIRS += accountscheck
+ }
++
++OTHER_FILES += systemd/*.service

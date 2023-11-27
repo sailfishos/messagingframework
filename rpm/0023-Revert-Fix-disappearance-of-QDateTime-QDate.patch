@@ -18,7 +18,7 @@ This reverts commit a8db671f00ebf5aa56e57d1bdf1511d9af22c809.
  10 files changed, 92 insertions(+), 92 deletions(-)
 
 diff --git a/tests/tst_qmail_listmodels/tst_qmail_listmodels.cpp b/tests/tst_qmail_listmodels/tst_qmail_listmodels.cpp
-index 7d55aa9a..521e0d91 100644
+index 2ef9fb1c..a41b1789 100644
 --- a/tests/tst_qmail_listmodels/tst_qmail_listmodels.cpp
 +++ b/tests/tst_qmail_listmodels/tst_qmail_listmodels.cpp
 @@ -144,8 +144,8 @@ void tst_QMail_ListModels::initTestCase()
@@ -372,7 +372,7 @@ index 72cd1570..2248ce0e 100644
      message.setStatus(QMailMessage::New, false);
      message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailstore/tst_qmailstore.cpp b/tests/tst_qmailstore/tst_qmailstore.cpp
-index cd4fe210..0c4e2648 100644
+index 27d79101..e13d6207 100644
 --- a/tests/tst_qmailstore/tst_qmailstore.cpp
 +++ b/tests/tst_qmailstore/tst_qmailstore.cpp
 @@ -1822,8 +1822,8 @@ void tst_QMailStore::message()
