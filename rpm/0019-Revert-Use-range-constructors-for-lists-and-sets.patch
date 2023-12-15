@@ -343,10 +343,10 @@ index 7ebabdb7..c80774ef 100644
          transmissionInProgressIds = idSet;
          transmissionSetInitialized = true;
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 78094a35..5a3bb4e4 100644
+index 3e4dd422..54cca5bc 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1284,7 +1284,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
+@@ -1298,7 +1298,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
          bool external(false);
  
          // Are these messages being resolved for internal or external references?

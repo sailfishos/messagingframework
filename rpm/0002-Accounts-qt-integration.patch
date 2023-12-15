@@ -1737,7 +1737,7 @@ index bd858eba..6785f1f4 100644
 +}
 +#endif
 diff --git a/src/libraries/qmfclient/qmailstore_p.h b/src/libraries/qmfclient/qmailstore_p.h
-index bf192cf5..17539792 100644
+index ae3c25e6..b7898c7c 100644
 --- a/src/libraries/qmfclient/qmailstore_p.h
 +++ b/src/libraries/qmfclient/qmailstore_p.h
 @@ -51,6 +51,11 @@
@@ -1752,7 +1752,7 @@ index bf192cf5..17539792 100644
  //#define QMAILSTORE_LOG_SQL //define to enable SQL query logging
  //#define QMAILSTORE_USE_RTTI //define if RTTI is available to assist debugging
  
-@@ -243,6 +248,11 @@ public:
+@@ -281,6 +286,11 @@ public:
      static ValueType extractValue(const QVariant& var, const ValueType &defaultValue = ValueType());
  
      enum AttemptResult { Success = 0, Failure, DatabaseFailure };
@@ -1764,7 +1764,7 @@ index bf192cf5..17539792 100644
  public slots:
      void unloadDatabase();
      
-@@ -336,8 +346,11 @@ private:
+@@ -374,8 +384,11 @@ private:
      QSqlQuery batchQuery(const QString& statement, const QVariantList& bindValues, const QList<Key>& keys, const QString& descriptor);
  
      bool idValueExists(quint64 id, const QString& table);
@@ -1777,7 +1777,7 @@ index bf192cf5..17539792 100644
      bool idExists(const QMailFolderId& id, const QString& table = QString());
      bool idExists(const QMailMessageId& id, const QString& table = QString());
  
-@@ -413,6 +426,12 @@ private:
+@@ -451,6 +464,12 @@ private:
      AttemptResult updateLatestInConversation(quint64 threadId, QMailMessageIdList *messagesUpdated, quint64 *updatedTo = Q_NULLPTR);
      AttemptResult updateLatestInConversation(const QSet<quint64> &threadIds, QMailMessageIdList *messagesUpdated);
  
@@ -1790,7 +1790,7 @@ index bf192cf5..17539792 100644
      AttemptResult addCustomFields(quint64 id, const QMap<QString, QString> &fields, const QString &tableName);
      AttemptResult updateCustomFields(quint64 id, const QMap<QString, QString> &fields, const QString &tableName);
      AttemptResult customFields(quint64 id, QMap<QString, QString> *fields, const QString &tableName);
-@@ -710,7 +729,11 @@ private:
+@@ -748,7 +767,11 @@ private:
  
      AttemptResult registerSubject(const QString &baseSubject, quint64 messageId, const QMailMessageId &predecessorId, bool missingAncestor);
  
@@ -1802,7 +1802,7 @@ index bf192cf5..17539792 100644
      QMailThread extractThread(const QSqlRecord &r);
      QMailFolder extractFolder(const QSqlRecord& r);
      QMailMessageMetaData extractMessageMetaData(const QSqlRecord& r, QMailMessageKey::Properties recordProperties, const QMailMessageKey::Properties& properties = allMessageProperties());
-@@ -749,10 +772,26 @@ private:
+@@ -792,10 +815,26 @@ private:
  
      static void extractMessageMetaData(const QSqlRecord& r, QMailMessageKey::Properties recordProperties, const QMailMessageKey::Properties& properties, QMailMessageMetaData* metaData);
  

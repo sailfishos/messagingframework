@@ -28,7 +28,7 @@ index be6ca85a..6a4e9adf 100644
  
  contains(DEFINES,QT_QMF_USE_ALIGNEDTIMER) {
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 72a59e07..49597d67 100644
+index 0be2260b..5dac1a15 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -447,7 +447,8 @@ ImapClient::ImapClient(QObject* parent)
@@ -232,7 +232,7 @@ index f29335c6..b04660ed 100644
      QMultiMap<QMailMessageId,QString> detachedTempFiles;
  
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 9591fa65..12fb8b39 100644
+index 55c09d91..1dbd54c0 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -46,6 +46,12 @@
@@ -248,7 +248,7 @@ index 9591fa65..12fb8b39 100644
  namespace { 
  
  const QString serviceKey("imap4");
-@@ -1520,12 +1526,6 @@ ImapService::ImapService(const QMailAccountId &accountId)
+@@ -1534,12 +1540,6 @@ ImapService::ImapService(const QMailAccountId &accountId)
        _networkSession(0),
        _networkSessionTimer(new QTimer(this))
  {
@@ -261,7 +261,7 @@ index 9591fa65..12fb8b39 100644
      QMailAccount account(accountId);
      if (!(account.status() & QMailAccount::CanSearchOnServer)) {
          account.setStatus(QMailAccount::CanSearchOnServer, true);
-@@ -1540,6 +1540,24 @@ ImapService::ImapService(const QMailAccountId &accountId)
+@@ -1554,6 +1554,24 @@ ImapService::ImapService(const QMailAccountId &accountId)
      connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
              this, SLOT(accountsUpdated(const QMailAccountIdList&)));
      connect(_initiatePushEmailTimer, SIGNAL(timeout()), this, SLOT(initiatePushEmail()));
@@ -286,7 +286,7 @@ index 9591fa65..12fb8b39 100644
  }
  
  void ImapService::enable()
-@@ -1559,15 +1577,32 @@ void ImapService::enable()
+@@ -1573,15 +1591,32 @@ void ImapService::enable()
  
      QMailAccountConfiguration accountCfg(_accountId);
      ImapConfiguration imapCfg(accountCfg);
@@ -322,7 +322,7 @@ index 9591fa65..12fb8b39 100644
          if (!_initiatePushDelay.contains(_accountId)) {
              _initiatePushDelay.insert(_accountId, 0);
          } else if (_initiatePushDelay[_accountId] == 0) {
-@@ -1593,7 +1628,7 @@ void ImapService::disable()
+@@ -1607,7 +1642,7 @@ void ImapService::disable()
      _initiatePushEmailTimer->stop();
      setPersistentConnectionStatus(false);
      _accountWasEnabled = false;
@@ -331,7 +331,7 @@ index 9591fa65..12fb8b39 100644
      _previousPushFolders = imapCfg.pushFolders();
      _previousConnectionSettings = connectionSettings(imapCfg);
      _source->setIntervalTimer(0);
-@@ -1615,7 +1650,7 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
+@@ -1629,7 +1664,7 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
      QMailAccountConfiguration accountCfg(_accountId);
      ImapConfiguration imapCfg(accountCfg);
      bool isEnabled(account.status() & QMailAccount::Enabled);
@@ -340,7 +340,7 @@ index 9591fa65..12fb8b39 100644
      QStringList pushFolders(imapCfg.pushFolders());
      QString newConnectionSettings(connectionSettings(imapCfg));
      bool loggingIn = false;
-@@ -1650,7 +1685,7 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
+@@ -1664,7 +1699,7 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
          }
      } else {
          // Update the settings
@@ -349,7 +349,7 @@ index 9591fa65..12fb8b39 100644
          _previousPushFolders = imapCfg.pushFolders();
          _previousConnectionSettings = connectionSettings(imapCfg);
      }
-@@ -1731,6 +1766,12 @@ void ImapService::initiatePushEmail()
+@@ -1745,6 +1780,12 @@ void ImapService::initiatePushEmail()
  
      qMailLog(Messaging) << "Attempting to establish push email for account" << _accountId
                          << QMailAccount(_accountId).name();
@@ -362,7 +362,7 @@ index 9591fa65..12fb8b39 100644
      QMailFolderIdList ids(_client->configurationIdleFolderIds());
      if (ids.count()) {
          _establishingPushEmail = true;
-@@ -1783,6 +1824,18 @@ void ImapService::updateStatus(const QString &text)
+@@ -1797,6 +1838,18 @@ void ImapService::updateStatus(const QString &text)
      updateStatus(QMailServiceAction::Status::ErrNoError, text, _accountId);
  }
  
@@ -381,7 +381,7 @@ index 9591fa65..12fb8b39 100644
  void ImapService::createIdleSession()
  {
      // Fail after 10 sec if no network reply is received
-@@ -1918,9 +1971,15 @@ void ImapService::onSessionConnectionTimeout()
+@@ -1932,9 +1985,15 @@ void ImapService::onSessionConnectionTimeout()
  
  bool ImapService::accountPushEnabled()
  {
@@ -398,7 +398,7 @@ index 9591fa65..12fb8b39 100644
  }
  
  void ImapService::setPersistentConnectionStatus(bool status)
-@@ -1955,6 +2014,31 @@ void ImapService::startStopBackgroundActivity()
+@@ -1969,6 +2028,31 @@ void ImapService::startStopBackgroundActivity()
          _backgroundActivity->stop();
      }
  }
@@ -431,7 +431,7 @@ index 9591fa65..12fb8b39 100644
  
  class ImapConfigurator : public QMailMessageServiceConfigurator
 diff --git a/src/plugins/messageservices/imap/imapservice.h b/src/plugins/messageservices/imap/imapservice.h
-index 21eac44a..11b593ed 100644
+index 3089401f..d8230c91 100644
 --- a/src/plugins/messageservices/imap/imapservice.h
 +++ b/src/plugins/messageservices/imap/imapservice.h
 @@ -83,6 +83,8 @@ protected slots:
