@@ -29,34 +29,33 @@ BuildRequires:  fdupes
 BuildRequires:  gpgme-devel
 Requires:       buteo-syncfw-qt5 >= 0.7.16 
 
-Patch1:  0001-Introduce-acceptUntrustedCertificates-configuration.patch
-Patch2:  0002-fix-tests-installation-path.patch
-Patch3:  0003-Accounts-qt-integration.patch
-Patch4:  0004-SSO-integration.patch
-Patch5:  0005-Start-messageserver-on-system-startup-in-case-there-.patch
-Patch6:  0006-Add-keepalive-timer-to-IMAP-IDLE-service.patch
-Patch7:  0007-Use-Qt5-booster-to-save-memory.patch
-Patch8:  0008-Recreate-SSO-identity-for-smtp-in-case-of-failure.patch
-Patch9:  0009-Listen-to-sync-schedule-changes-from-buteo-sync-fram.patch
-Patch10:  0010-Prevent-push-enabled-status-to-go-out-of-sync.patch
-Patch11:  0011-Add-signature-settings-in-account.patch
-Patch12:  0012-Use-EightBit-encoding-instead-of-Base64-for-text-typ.patch
-Patch13:  0013-Retrieve-message-lists-based-on-the-folder-sync-poli.patch
-Patch14:  0014-Apply-folder-policy-to-always-on-connection.patch
-Patch15:  0015-Allow-a-service-provided-folder-to-be-set-as-the-sta.patch
-Patch16:  0016-Use-a-queued-connection-to-handle-accountsUpdated-si.patch
-Patch17:  0017-Adjust-for-Qt-5.6.patch
-Patch18:  0018-Revert-Fix-bundled-zlib-detection.patch
-Patch19:  0019-Revert-Use-QRandomGenerator-instead-of-qrand.patch
-Patch20:  0020-Revert-Use-range-constructors-for-lists-and-sets.patch
-Patch21:  0021-Revert-Adjust-to-Qt6-QMetaType-API-changes.patch
-Patch22:  0022-Revert-Replace-deprecated-QString-SplitBehavior.patch
-Patch23:  0023-Revert-Fix-disappearance-of-QDateTime-QDate.patch
-Patch24:  0024-Revert-core5compat-addition.patch
-Patch25:  0025-Adjust-qmflist-for-missing-bits-in-5.6.patch
-Patch26:  0026-Revert-loadRelax.patch
-Patch27:  0027-Revert-Set-PLUGIN_CLASS_NAME-in-plugin-.pro-files.patch
-Patch28:  0028-Revert-Bump-version-to-6.0.0-since-we-build-against-.patch
+Patch1:  0001-fix-tests-installation-path.patch
+Patch2:  0002-Accounts-qt-integration.patch
+Patch3:  0003-SSO-integration.patch
+Patch4:  0004-Start-messageserver-on-system-startup-in-case-there-.patch
+Patch5:  0005-Add-keepalive-timer-to-IMAP-IDLE-service.patch
+Patch6:  0006-Use-Qt5-booster-to-save-memory.patch
+Patch7:  0007-Recreate-SSO-identity-for-smtp-in-case-of-failure.patch
+Patch8:  0008-Listen-to-sync-schedule-changes-from-buteo-sync-fram.patch
+Patch9:  0009-Prevent-push-enabled-status-to-go-out-of-sync.patch
+Patch10:  0010-Add-signature-settings-in-account.patch
+Patch11:  0011-Use-EightBit-encoding-instead-of-Base64-for-text-typ.patch
+Patch12:  0012-Retrieve-message-lists-based-on-the-folder-sync-poli.patch
+Patch13:  0013-Apply-folder-policy-to-always-on-connection.patch
+Patch14:  0014-Allow-a-service-provided-folder-to-be-set-as-the-sta.patch
+Patch15:  0015-Use-a-queued-connection-to-handle-accountsUpdated-si.patch
+Patch16:  0016-Adjust-for-Qt-5.6.patch
+Patch17:  0017-Revert-Fix-bundled-zlib-detection.patch
+Patch18:  0018-Revert-Use-QRandomGenerator-instead-of-qrand.patch
+Patch19:  0019-Revert-Use-range-constructors-for-lists-and-sets.patch
+Patch20:  0020-Revert-Adjust-to-Qt6-QMetaType-API-changes.patch
+Patch21:  0021-Revert-Replace-deprecated-QString-SplitBehavior.patch
+Patch22:  0022-Revert-Fix-disappearance-of-QDateTime-QDate.patch
+Patch23:  0023-Revert-core5compat-addition.patch
+Patch24:  0024-Adjust-qmflist-for-missing-bits-in-5.6.patch
+Patch25:  0025-Revert-loadRelax.patch
+Patch26:  0026-Revert-Set-PLUGIN_CLASS_NAME-in-plugin-.pro-files.patch
+Patch27:  0027-Revert-Bump-version-to-6.0.0-since-we-build-against-.patch
 
 
 %description

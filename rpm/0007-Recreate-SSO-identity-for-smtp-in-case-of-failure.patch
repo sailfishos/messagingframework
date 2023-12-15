@@ -10,7 +10,7 @@ Similar to what is already done for IMAP.
  2 files changed, 12 insertions(+)
 
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 8e00bd52..b056599e 100644
+index 358f7416..3caac7f6 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -117,6 +117,8 @@ SmtpClient::SmtpClient(QObject* parent)
@@ -22,7 +22,7 @@ index 8e00bd52..b056599e 100644
  #endif
  {
      connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
-@@ -668,6 +670,9 @@ void SmtpClient::nextAction(const QString &response)
+@@ -663,6 +665,9 @@ void SmtpClient::nextAction(const QString &response)
                      operationFailed(QMailServiceAction::Status::ErrLoginFailed, response);
                  }
              }
@@ -32,7 +32,7 @@ index 8e00bd52..b056599e 100644
          } else {
              if (!ssoSessionManager->waitForSso()) {
                  QByteArray authCmd(SmtpAuthenticator::getAuthentication(config.serviceConfiguration("smtp"), capabilities, ssoLogin));
-@@ -1193,6 +1198,8 @@ void SmtpClient::onSsoSessionResponse(const QMap<QString, QList<QByteArray> > &s
+@@ -1188,6 +1193,8 @@ void SmtpClient::onSsoSessionResponse(const QMap<QString, QList<QByteArray> > &s
          ssoLogin = ssoCredentials;
          if (sendLogin) {
              sendLogin = false;
@@ -41,7 +41,7 @@ index 8e00bd52..b056599e 100644
              QByteArray authCmd(SmtpAuthenticator::getAuthentication(config.serviceConfiguration("smtp"), capabilities, ssoLogin));
              if (!authCmd.isEmpty()) {
                  sendCommand(authCmd);
-@@ -1210,6 +1217,9 @@ void SmtpClient::onSsoSessionError(const QString &error)
+@@ -1205,6 +1212,9 @@ void SmtpClient::onSsoSessionError(const QString &error)
      // Reset vars
      loginFailed = false;
      sendLogin = false;

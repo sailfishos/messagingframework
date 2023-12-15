@@ -18,7 +18,7 @@ code which caused the database change, otherwise crashes can result
  6 files changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 49597d67..c3506c62 100644
+index 5dac1a15..e4995480 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -505,7 +505,8 @@ ImapClient::ImapClient(QObject* parent)
@@ -32,10 +32,10 @@ index 49597d67..c3506c62 100644
  }
  
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index c68dd0b4..78094a35 100644
+index e2d4a3d4..3e4dd422 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1555,7 +1555,7 @@ ImapService::ImapService(const QMailAccountId &accountId)
+@@ -1569,7 +1569,7 @@ ImapService::ImapService(const QMailAccountId &accountId)
      }
      connect(_restartPushEmailTimer, SIGNAL(timeout()), this, SLOT(restartPushEmail()));
      connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
@@ -45,7 +45,7 @@ index c68dd0b4..78094a35 100644
  
  #ifdef USE_KEEPALIVE
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index ca8d9c8a..ce5eb934 100644
+index 397566cc..086b4f63 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
 @@ -87,7 +87,8 @@ PopClient::PopClient(QObject* parent)
@@ -59,10 +59,10 @@ index ca8d9c8a..ce5eb934 100644
  }
  
 diff --git a/src/plugins/messageservices/pop/popservice.cpp b/src/plugins/messageservices/pop/popservice.cpp
-index 7b6492ab..45197adf 100644
+index 8c661941..d80b3c39 100644
 --- a/src/plugins/messageservices/pop/popservice.cpp
 +++ b/src/plugins/messageservices/pop/popservice.cpp
-@@ -341,7 +341,7 @@ PopService::PopService(const QMailAccountId &accountId)
+@@ -348,7 +348,7 @@ PopService::PopService(const QMailAccountId &accountId)
      connect(&_client, SIGNAL(errorOccurred(QMailServiceAction::Status::ErrorCode, QString)), this, SLOT(errorOccurred(QMailServiceAction::Status::ErrorCode, QString)));
      connect(&_client, SIGNAL(updateStatus(QString)), this, SLOT(updateStatus(QString)));
      connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
@@ -72,7 +72,7 @@ index 7b6492ab..45197adf 100644
      _client.setAccount(accountId);
      QMailAccountConfiguration accountCfg(accountId);
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index b056599e..f38feae9 100644
+index 3caac7f6..95440556 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -122,7 +122,7 @@ SmtpClient::SmtpClient(QObject* parent)
@@ -85,7 +85,7 @@ index b056599e..f38feae9 100644
  
  SmtpClient::~SmtpClient()
 diff --git a/src/plugins/messageservices/smtp/smtpservice.cpp b/src/plugins/messageservices/smtp/smtpservice.cpp
-index 8c7ab73f..0eee2b7e 100644
+index 38fd54ab..bdc8a67f 100644
 --- a/src/plugins/messageservices/smtp/smtpservice.cpp
 +++ b/src/plugins/messageservices/smtp/smtpservice.cpp
 @@ -214,7 +214,7 @@ void SmtpService::onCapabilityFetchingActivityChanged(QMailServiceAction::Activi

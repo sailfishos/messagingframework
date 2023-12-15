@@ -5,9 +5,32 @@ Subject: [PATCH] Adjust for Qt 5.6
 
 Change-Id: Ia5853d84f5ef4dad30b3b7a6bbf64a9f0f81bb31
 ---
- tests/tst_smtp/tst_smtp.cpp | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ .../qmfmessageserver/qmailtransport.cpp        |  4 ++--
+ tests/tst_smtp/tst_smtp.cpp                    | 18 +++++++++---------
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
+diff --git a/src/libraries/qmfmessageserver/qmailtransport.cpp b/src/libraries/qmfmessageserver/qmailtransport.cpp
+index 6f603653..481a1f4d 100644
+--- a/src/libraries/qmfmessageserver/qmailtransport.cpp
++++ b/src/libraries/qmfmessageserver/qmailtransport.cpp
+@@ -213,7 +213,7 @@ void QMailTransport::createSocket(EncryptType encryptType)
+ #ifndef QT_NO_SSL
+     encryption = encryptType;
+     connect(mSocket, &QSslSocket::encrypted, this, &QMailTransport::encryptionEstablished);
+-    connect(mSocket, &QSslSocket::sslErrors, this, &QMailTransport::connectionFailed);
++    connect(mSocket, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(connectionFailed(QList<QSslError>)));
+ #else
+     Q_UNUSED(encryptType);
+ #endif
+@@ -222,7 +222,7 @@ void QMailTransport::createSocket(EncryptType encryptType)
+     mSocket->setReadBufferSize( bufferLimit );
+     mSocket->setObjectName(QString::fromUtf8(mName) + QString::fromLatin1("-socket"));
+     connect(mSocket, &QAbstractSocket::connected, this, &QMailTransport::connectionEstablished);
+-    connect(mSocket, &QAbstractSocket::errorOccurred, this, &QMailTransport::socketError);
++    connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
+     connect(mSocket, &QAbstractSocket::readyRead, this, &QMailTransport::readyRead);
+     connect(mSocket, &QAbstractSocket::bytesWritten, this, &QMailTransport::bytesWritten);
+ 
 diff --git a/tests/tst_smtp/tst_smtp.cpp b/tests/tst_smtp/tst_smtp.cpp
 index 74360d1a..ebeaa0cf 100644
 --- a/tests/tst_smtp/tst_smtp.cpp
