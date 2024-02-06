@@ -79,7 +79,7 @@ index 0cf2f524..7293c83f 100644
  
  void ImapConfiguration::setCapabilities(const QStringList &s)
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index ab8de4e3..4ebf95f2 100644
+index 5b38d064..7ea349e8 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -410,10 +410,10 @@ void ImapState::untaggedResponse(ImapContext *c, const QString &line)
@@ -104,7 +104,7 @@ index ab8de4e3..4ebf95f2 100644
          c->protocol()->setCapabilities(capabilities);
      } else {
          ImapState::untaggedResponse(c, line);
-@@ -655,7 +655,7 @@ void LoginState::taggedResponse(ImapContext *c, const QString &line)
+@@ -632,7 +632,7 @@ void LoginState::taggedResponse(ImapContext *c, const QString &line)
      if (line.indexOf("[CAPABILITY", Qt::CaseInsensitive) != -1) {
          int start = 0;
          QString temp = token(line, '[', ']', &start);
@@ -113,7 +113,7 @@ index ab8de4e3..4ebf95f2 100644
          c->protocol()->setCapabilities(capabilities);
      }
  
-@@ -1448,7 +1448,7 @@ void SelectedState::untaggedResponse(ImapContext *c, const QString &line)
+@@ -1425,7 +1425,7 @@ void SelectedState::untaggedResponse(ImapContext *c, const QString &line)
      } else if (line.indexOf("PERMANENTFLAGS", 0, Qt::CaseInsensitive) != -1) {
          int start = 0;
          QString temp = token(line, '(', ')', &start);
@@ -136,10 +136,10 @@ index 346dd7d3..7ef0989f 100644
          bool ok = false;
          int index = s.indexOf(":");
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 12cd1b23..b630de7d 100644
+index b3f82697..208bec98 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
-@@ -547,7 +547,7 @@ void SmtpClient::nextAction(const QString &response)
+@@ -540,7 +540,7 @@ void SmtpClient::nextAction(const QString &response)
                      QStringList authCaps;
                      foreach (QString const& capability, capabilities) {
                          if (capability.startsWith("AUTH", Qt::CaseInsensitive)) {
