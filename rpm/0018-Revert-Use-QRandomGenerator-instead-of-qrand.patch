@@ -5,13 +5,13 @@ Subject: [PATCH] Revert "Use QRandomGenerator instead of qrand"
 
 This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
 ---
- src/libraries/qmfclient/qmailmessage.cpp      | 27 ++++++++++++++-----
+ src/libraries/qmfclient/qmailmessage.cpp      | 22 +++++++++++++++++--
  .../qmfstoragemanager/qmfstoragemanager.cpp   |  3 +--
- .../messageservices/smtp/smtpclient.cpp       | 12 +++++++--
- 3 files changed, 31 insertions(+), 11 deletions(-)
+ .../messageservices/smtp/smtpclient.cpp       | 12 ++++++++--
+ 3 files changed, 31 insertions(+), 6 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index 847cdc2d..26dd99cc 100644
+index 038b5be9..4b81629e 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
 @@ -53,7 +53,6 @@
@@ -22,28 +22,7 @@ index 847cdc2d..26dd99cc 100644
  #include <qtextstream.h>
  #include <QTextCodec>
  #include <QtDebug>
-@@ -6338,11 +6337,6 @@ void QMailMessagePart::setReferenceResolution(const QString &uri)
-     impl(this)->setReferenceResolution(uri);
- }
- 
--static int randomNumber()
--{
--    return QRandomGenerator::global()->generate();
--}
--
- static QString randomString(int length)
- {
-     if (length <= 0) 
-@@ -6353,7 +6347,7 @@ static QString randomString(int length)
- 
-     int i = 0;
-     while (length--){
--        int r=randomNumber() % 62;
-+        int r=qrand() % 62;
-         r+=48;
-         if (r>57) r+=7;
-         if (r>90) r+=6;
-@@ -7992,6 +7986,25 @@ uint QMailMessagePrivate::indicativeSize() const
+@@ -7974,6 +7973,25 @@ uint QMailMessagePrivate::indicativeSize() const
      return (size + 1);
  }
  
@@ -69,6 +48,15 @@ index 847cdc2d..26dd99cc 100644
  static QByteArray gBoundaryString;
  
  void QMF_EXPORT setQMailMessageBoundaryString(const QByteArray &boundary)
+@@ -7990,7 +8008,7 @@ static QByteArray boundaryString(const QByteArray &hash)
+         return gBoundaryString;
+ 
+     // Formulate a boundary that is very unlikely to clash with the content
+-    return boundaryLeader + "qmf:" + QByteArray::number(QRandomGenerator::global()->generate()) + hash.toBase64() + boundaryTrailer;
++    return boundaryLeader + "qmf:" + QByteArray::number(randomNumber()) + hash.toBase64() + boundaryTrailer;
+ }
+ 
+ template <typename F>
 diff --git a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
 index 60def58c..d5043ea5 100644
 --- a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
