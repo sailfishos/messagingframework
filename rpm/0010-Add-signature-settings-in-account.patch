@@ -114,7 +114,7 @@ index 8ba3efa9..9306dd9c 100644
      void setLastSynchronized(const QMailTimeStamp &synced);
  
 diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
-index 6785f1f4..ea3c8cc0 100644
+index e6c51a1f..a3f9b814 100644
 --- a/src/libraries/qmfclient/qmailstore_p.cpp
 +++ b/src/libraries/qmfclient/qmailstore_p.cpp
 @@ -2675,6 +2675,10 @@ bool SSOAccountSatisfyTheProperty(Accounts::Account* ssoAccount, const QMailAcco

@@ -18,10 +18,10 @@ code which caused the database change, otherwise crashes can result
  6 files changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 5dac1a15..e4995480 100644
+index 891ce113..5d51085c 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -505,7 +505,8 @@ ImapClient::ImapClient(QObject* parent)
+@@ -488,7 +488,8 @@ ImapClient::ImapClient(QObject* parent)
  
      connect(QMailMessageBuffer::instance(), SIGNAL(flushed()), this, SLOT(messageBufferFlushed()));
  #ifdef USE_ACCOUNTS_QT
@@ -45,7 +45,7 @@ index e2d4a3d4..3e4dd422 100644
  
  #ifdef USE_KEEPALIVE
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index 397566cc..086b4f63 100644
+index 1be54f9a..13a52ca4 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
 @@ -87,7 +87,8 @@ PopClient::PopClient(QObject* parent)
@@ -72,7 +72,7 @@ index 8c661941..d80b3c39 100644
      _client.setAccount(accountId);
      QMailAccountConfiguration accountCfg(accountId);
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 3caac7f6..95440556 100644
+index 5cb3df9d..62256d3c 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -122,7 +122,7 @@ SmtpClient::SmtpClient(QObject* parent)

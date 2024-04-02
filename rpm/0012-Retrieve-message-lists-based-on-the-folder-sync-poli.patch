@@ -72,7 +72,7 @@ index 9306dd9c..933cfa0c 100644
      void setStatus(quint64 newStatus);
      void setStatus(quint64 mask, bool set);
 diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
-index ea3c8cc0..9d74a874 100644
+index a3f9b814..ce8efe29 100644
 --- a/src/libraries/qmfclient/qmailstore_p.cpp
 +++ b/src/libraries/qmfclient/qmailstore_p.cpp
 @@ -3710,6 +3710,42 @@ bool QMailStorePrivate::messageExists(const QString &serveruid, const QMailAccou

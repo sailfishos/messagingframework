@@ -86,33 +86,17 @@ base-qmf-oauth2-plugin/oauth2plugin.cpp
 
 Change-Id: Id90fddd10e205da7b807000e042f4a5b13edd4c0
 ---
- common.pri                                    |    5 +
  .../qmfclient/qmailaccountlistmodel.cpp       |   44 +-
- src/libraries/qmfclient/qmailstore_p.cpp      | 1234 ++++++++++++++++-
+ src/libraries/qmfclient/qmailstore_p.cpp      | 1235 ++++++++++++++++-
  src/libraries/qmfclient/qmailstore_p.h        |   41 +-
  src/libraries/qmfclient/qmfclient.pro         |   18 +
  src/libraries/qmfclient/share/email.provider  |   12 +
  src/libraries/qmfclient/share/email.service   |   65 +
- 7 files changed, 1378 insertions(+), 41 deletions(-)
+ tests/tests.pri                               |    6 +
+ 7 files changed, 1380 insertions(+), 41 deletions(-)
  create mode 100644 src/libraries/qmfclient/share/email.provider
  create mode 100644 src/libraries/qmfclient/share/email.service
 
-diff --git a/common.pri b/common.pri
-index c690ce66..9c17355c 100644
---- a/common.pri
-+++ b/common.pri
-@@ -2,6 +2,11 @@ CONFIG(debug,debug|release) {
-     DEFINES += QMF_ENABLE_LOGGING
- }
- 
-+contains(DEFINES,USE_ACCOUNTS_QT) {
-+    CONFIG += link_pkgconfig
-+    QT += xml
-+    PKGCONFIG += accounts-qt5
-+}
- 
- win32 | macx {
- 
 diff --git a/src/libraries/qmfclient/qmailaccountlistmodel.cpp b/src/libraries/qmfclient/qmailaccountlistmodel.cpp
 index 28f566cb..63d98c53 100644
 --- a/src/libraries/qmfclient/qmailaccountlistmodel.cpp
@@ -175,7 +159,7 @@ index 28f566cb..63d98c53 100644
  }
  
 diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
-index bd858eba..6785f1f4 100644
+index bd858eba..e6c51a1f 100644
 --- a/src/libraries/qmfclient/qmailstore_p.cpp
 +++ b/src/libraries/qmfclient/qmailstore_p.cpp
 @@ -48,6 +48,10 @@
@@ -1627,7 +1611,7 @@ index bd858eba..6785f1f4 100644
      // Do not report any deleted entities as updated
      for (QMailMessageIdList::iterator mit = updatedMessageIds.begin(); mit != updatedMessageIds.end(); ) {
          if (deletedMessageIds.contains(*mit)) {
-@@ -9821,3 +10908,108 @@ void QMailStorePrivate::reconnectIpc()
+@@ -9821,3 +10908,109 @@ void QMailStorePrivate::reconnectIpc()
          ipcLastDbUpdated = lastDbUpdated;
      }
  }
@@ -1687,7 +1671,7 @@ index bd858eba..6785f1f4 100644
 +    ids << QMailAccountId(id);
 +    Q_Q(QMailStore);
 +
-+    ENFORCE(QMetaObject::invokeMethod(q, "accountsAdded", Qt::QueuedConnection, Q_ARG(QMailAccountIdList, ids)));
++    QMetaObject::invokeMethod(q, "accountsAdded", Qt::QueuedConnection, Q_ARG(QMailAccountIdList, ids));
 +}
 +
 +void QMailStorePrivate::accountRemoved(Accounts::AccountId id)
@@ -1697,7 +1681,7 @@ index bd858eba..6785f1f4 100644
 +        return;
 +
 +    const QMailAccountId& qId = QMailAccountId(id);
-+    ENFORCE(QMetaObject::invokeMethod(this, "onAccountRemovedFinished", Qt::QueuedConnection, Q_ARG(QMailAccountId, qId)));
++    QMetaObject::invokeMethod(this, "onAccountRemovedFinished", Qt::QueuedConnection, Q_ARG(QMailAccountId, qId));
 +}
 +
 +void QMailStorePrivate::onAccountRemovedFinished(const QMailAccountId &id)
@@ -1717,7 +1701,8 @@ index bd858eba..6785f1f4 100644
 +    const QMailAccountId& qId = QMailAccountId(id);
 +    accountCache.remove(qId);
 +    Q_Q(QMailStore);
-+    ENFORCE(QMetaObject::invokeMethod(q, "accountsUpdated", Qt::QueuedConnection, Q_ARG(QMailAccountIdList, QMailAccountIdList() << qId)));
++    QMetaObject::invokeMethod(q, "accountsUpdated", Qt::QueuedConnection,
++                              Q_ARG(QMailAccountIdList, QMailAccountIdList() << qId));
 +}
 +
 +bool QMailStorePrivate::accountValid(Accounts::AccountId id) const
@@ -1830,7 +1815,7 @@ index ae3c25e6..b7898c7c 100644
      class Cache
      {
 diff --git a/src/libraries/qmfclient/qmfclient.pro b/src/libraries/qmfclient/qmfclient.pro
-index 95cd2bd8..ea2f00fb 100644
+index 73f10b76..62e6415d 100644
 --- a/src/libraries/qmfclient/qmfclient.pro
 +++ b/src/libraries/qmfclient/qmfclient.pro
 @@ -2,6 +2,24 @@ TARGET     = QmfClient
@@ -1947,3 +1932,18 @@ index 00000000..9f6ef320
 +     -->
 +  </template>
 +</service>
+diff --git a/tests/tests.pri b/tests/tests.pri
+index 872fa50b..e81f4e07 100644
+--- a/tests/tests.pri
++++ b/tests/tests.pri
+@@ -5,4 +5,10 @@ CONFIG += testcase
+ QT += qmfclient qmfclient-private
+ target.path += /opt/tests/qmf-qt5
+ 
++contains(DEFINES, USE_ACCOUNTS_QT) {
++    CONFIG += link_pkgconfig
++    QT += xml
++    PKGCONFIG += accounts-qt5
++}
++
+ INSTALLS += target

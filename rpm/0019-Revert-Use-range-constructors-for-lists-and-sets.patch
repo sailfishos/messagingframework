@@ -224,7 +224,7 @@ index 9522c05a..bbde2106 100644
          d->notifyMessageRemovalRecordsChange(type, idList);
  
 diff --git a/src/libraries/qmfclient/qmailstoreimplementation_p.cpp b/src/libraries/qmfclient/qmailstoreimplementation_p.cpp
-index 7ebabdb7..c80774ef 100644
+index 3c274119..0b18aaa5 100644
 --- a/src/libraries/qmfclient/qmailstoreimplementation_p.cpp
 +++ b/src/libraries/qmfclient/qmailstoreimplementation_p.cpp
 @@ -116,11 +116,11 @@ void emitIpcUpdates(MailstoreAdaptor &adaptor, const QMailMessageIdList& ids,  q
@@ -261,7 +261,7 @@ index 7ebabdb7..c80774ef 100644
          }
          data.clear();
      }
-@@ -312,7 +311,7 @@ void QMailStoreImplementationBase::notifyAccountsChange(QMailStore::ChangeType c
+@@ -315,7 +314,7 @@ void QMailStoreImplementationBase::notifyAccountsChange(QMailStore::ChangeType c
              flushTimer.start(flushTimeout);
          }
  
@@ -270,7 +270,7 @@ index 7ebabdb7..c80774ef 100644
          switch (changeType)
          {
          case QMailStore::Added:
-@@ -349,7 +348,7 @@ void QMailStoreImplementationBase::notifyMessagesChange(QMailStore::ChangeType c
+@@ -352,7 +351,7 @@ void QMailStoreImplementationBase::notifyMessagesChange(QMailStore::ChangeType c
              flushTimer.start(flushTimeout);
          }
  
@@ -279,7 +279,7 @@ index 7ebabdb7..c80774ef 100644
          switch (changeType)
          {
          case QMailStore::Added:
-@@ -415,7 +414,7 @@ void QMailStoreImplementationBase::notifyMessagesDataChange(const QMailMessageId
+@@ -418,7 +417,7 @@ void QMailStoreImplementationBase::notifyMessagesDataChange(const QMailMessageId
              flushTimer.start(flushTimeout);
          }
  
@@ -288,7 +288,7 @@ index 7ebabdb7..c80774ef 100644
          messagesPropertiesBuffer.append(props);;
  
      } else {
-@@ -435,7 +434,7 @@ void QMailStoreImplementationBase::notifyMessagesDataChange(const QMailMessageId
+@@ -438,7 +437,7 @@ void QMailStoreImplementationBase::notifyMessagesDataChange(const QMailMessageId
          }
  
          MessagesStatus messageStatus(status, set);
@@ -297,7 +297,7 @@ index 7ebabdb7..c80774ef 100644
  
      } else {
          emitIpcUpdates(*ipcAdaptor, ids, status, set, messageStatusUpdatedSig());
-@@ -455,7 +454,7 @@ void QMailStoreImplementationBase::notifyThreadsChange(QMailStore::ChangeType ch
+@@ -458,7 +457,7 @@ void QMailStoreImplementationBase::notifyThreadsChange(QMailStore::ChangeType ch
              flushTimer.start(flushTimeout);
          }
  
@@ -306,7 +306,7 @@ index 7ebabdb7..c80774ef 100644
          switch (changeType)
          {
          case QMailStore::Added:
-@@ -493,7 +492,7 @@ void QMailStoreImplementationBase::notifyFoldersChange(QMailStore::ChangeType ch
+@@ -496,7 +495,7 @@ void QMailStoreImplementationBase::notifyFoldersChange(QMailStore::ChangeType ch
              flushTimer.start(flushTimeout);
          }
  
@@ -315,7 +315,7 @@ index 7ebabdb7..c80774ef 100644
          switch (changeType)
          {
          case QMailStore::Added:
-@@ -530,7 +529,7 @@ void QMailStoreImplementationBase::notifyMessageRemovalRecordsChange(QMailStore:
+@@ -533,7 +532,7 @@ void QMailStoreImplementationBase::notifyMessageRemovalRecordsChange(QMailStore:
              flushTimer.start(flushTimeout);
          }
  
@@ -324,7 +324,7 @@ index 7ebabdb7..c80774ef 100644
          switch (changeType)
          {
          case QMailStore::Added:
-@@ -568,7 +567,7 @@ void QMailStoreImplementationBase::notifyTransmissionInProgress(const QMailAccou
+@@ -571,7 +570,7 @@ void QMailStoreImplementationBase::notifyTransmissionInProgress(const QMailAccou
  
  bool QMailStoreImplementationBase::setRetrievalInProgress(const QMailAccountIdList& ids)
  {
@@ -333,7 +333,7 @@ index 7ebabdb7..c80774ef 100644
      if ((idSet != retrievalInProgressIds) || !retrievalSetInitialized) {
          retrievalInProgressIds = idSet;
          retrievalSetInitialized = true;
-@@ -580,7 +579,7 @@ bool QMailStoreImplementationBase::setRetrievalInProgress(const QMailAccountIdLi
+@@ -583,7 +582,7 @@ bool QMailStoreImplementationBase::setRetrievalInProgress(const QMailAccountIdLi
  
  bool QMailStoreImplementationBase::setTransmissionInProgress(const QMailAccountIdList& ids)
  {
