@@ -12,7 +12,7 @@ DEFINES+=USE_KEEPALIVE
  3 files changed, 38 insertions(+)
 
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
-index 6c161169..be6ca85a 100644
+index 88680e95..04e64e63 100644
 --- a/src/plugins/messageservices/imap/imap.pro
 +++ b/src/plugins/messageservices/imap/imap.pro
 @@ -6,6 +6,10 @@ load(qt_plugin)
@@ -23,9 +23,9 @@ index 6c161169..be6ca85a 100644
 +    PKGCONFIG += keepalive
 +}
 +
- contains(DEFINES,QT_QMF_USE_ALIGNEDTIMER) {
-     QT += alignedtimer
- }
+ contains(DEFINES,USE_ACCOUNTS_QT) {
+     CONFIG += link_pkgconfig
+     QT += xml
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
 index 3660c2be..55c09d91 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp

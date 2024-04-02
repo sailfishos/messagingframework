@@ -13,7 +13,7 @@ Subject: [PATCH] fix tests installation path.
  6 files changed, 536 insertions(+), 536 deletions(-)
 
 diff --git a/benchmarks/tst_messageserver/tst_messageserver.pro b/benchmarks/tst_messageserver/tst_messageserver.pro
-index 2d50131a..1dc2ddd5 100644
+index a389e4ae..e4364c28 100644
 --- a/benchmarks/tst_messageserver/tst_messageserver.pro
 +++ b/benchmarks/tst_messageserver/tst_messageserver.pro
 @@ -2,7 +2,7 @@ TEMPLATE = app
@@ -23,8 +23,8 @@ index 2d50131a..1dc2ddd5 100644
 -target.path += $$QMF_INSTALL_ROOT/tests5
 +target.path += /opt/tests/qmf-qt5
  
- BASE=../../
- include($$BASE/common.pri)
+ DEPENDPATH += . 3rdparty
+ 
 diff --git a/tests/qt5/tests.xml b/tests/qt5/tests.xml
 index ffbb593f..ac9464a6 100644
 --- a/tests/qt5/tests.xml
@@ -1462,18 +1462,17 @@ index ffbb593f..ac9464a6 100644
           <environments>
              <scratchbox>true</scratchbox>
 diff --git a/tests/tests.pri b/tests/tests.pri
-index 623b19ca..1d3ba39e 100644
+index 11065508..872fa50b 100644
 --- a/tests/tests.pri
 +++ b/tests/tests.pri
-@@ -3,7 +3,7 @@ QT += testlib
+@@ -3,6 +3,6 @@ QT += testlib
  CONFIG += testcase
  
  QT += qmfclient qmfclient-private
 -target.path += $$QMF_INSTALL_ROOT/tests5
 +target.path += /opt/tests/qmf-qt5
  
- include(../common.pri)
- 
+ INSTALLS += target
 diff --git a/tests/tests.pro b/tests/tests.pro
 index f9127b7f..85499a4f 100644
 --- a/tests/tests.pro

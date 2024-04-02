@@ -5,11 +5,11 @@ Subject: [PATCH] Use Qt5 booster to save memory.
 
 ---
  src/tools/messageserver/main.cpp                        | 2 +-
- src/tools/messageserver/messageserver.pro               | 6 ++++++
+ src/tools/messageserver/messageserver.pro               | 7 +++++++
  src/tools/systemd/messageserver5-accounts-check.service | 4 +++-
  src/tools/systemd/messageserver5.service                | 6 +++---
  src/tools/tools.pro                                     | 2 ++
- 5 files changed, 15 insertions(+), 5 deletions(-)
+ 5 files changed, 16 insertions(+), 5 deletions(-)
 
 diff --git a/src/tools/messageserver/main.cpp b/src/tools/messageserver/main.cpp
 index 9c107629..d9a35c53 100644
@@ -25,14 +25,15 @@ index 9c107629..d9a35c53 100644
  #ifdef USE_HTML_PARSER
      // Need for html parsing by <QTextdocument> in qmailmessage.cpp, but don't need real UI
 diff --git a/src/tools/messageserver/messageserver.pro b/src/tools/messageserver/messageserver.pro
-index 9ab48893..1950e68b 100644
+index 70b20f49..73482096 100644
 --- a/src/tools/messageserver/messageserver.pro
 +++ b/src/tools/messageserver/messageserver.pro
-@@ -17,6 +17,12 @@ contains(DEFINES, USE_HTML_PARSER) {
+@@ -11,6 +11,13 @@ contains(DEFINES, USE_HTML_PARSER) {
      QT += gui widgets
  }
  
 +packagesExist(qt5-boostable) {
++    CONFIG += link_pkgconfig
 +    PKGCONFIG += qt5-boostable
 +} else {
 +    warning("qt5-boostable not available; startup times will be slower")

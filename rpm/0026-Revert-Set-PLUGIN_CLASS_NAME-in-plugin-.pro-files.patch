@@ -15,7 +15,7 @@ This reverts commit 2051e62107bb25c43d228241a2e054c02d440d2f.
  7 files changed, 7 deletions(-)
 
 diff --git a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.pro b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.pro
-index a60b7ac4..d7720127 100644
+index 60fdd366..e34de9d4 100644
 --- a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.pro
 +++ b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.pro
 @@ -1,7 +1,6 @@
@@ -51,7 +51,7 @@ index 80e9d53d..257549b5 100644
  QT = core qmfclient
  
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
-index a67092c7..34fc4e92 100644
+index ecb0621b..87a9cc15 100644
 --- a/src/plugins/messageservices/imap/imap.pro
 +++ b/src/plugins/messageservices/imap/imap.pro
 @@ -1,7 +1,6 @@
