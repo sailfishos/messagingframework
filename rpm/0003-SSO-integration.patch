@@ -104,12 +104,12 @@ Change-Id: If6e92e95a3a5c53ac46fe300906508804f0fd9ce
  .../messageservices/smtp/smtpservice.cpp      |   8 +
  src/plugins/plugins.pro                       |   3 +
  src/plugins/ssoauth/password/password.pro     |  21 +
- .../ssoauth/password/passwordplugin.cpp       | 231 +++++++++++
+ .../ssoauth/password/passwordplugin.cpp       | 216 ++++++++++
  src/plugins/ssoauth/password/passwordplugin.h |  78 ++++
  src/tools/messageserver/servicehandler.cpp    |  13 +
  tests/tst_qmailstore/tst_qmailstore.cpp       |  93 ++++-
  tests/tst_smtp/tst_smtp.pro                   |   4 +
- 38 files changed, 2414 insertions(+), 35 deletions(-)
+ 38 files changed, 2399 insertions(+), 35 deletions(-)
  create mode 100644 src/libraries/qmfclient/ssoaccountmanager.cpp
  create mode 100644 src/libraries/qmfclient/ssoaccountmanager.h
  create mode 100644 src/libraries/qmfclient/ssoauthplugin.cpp
@@ -1248,7 +1248,7 @@ index 3a9bdf8d..02b3d67c 100644
  
  #endif
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 2db0af46..4b0e627a 100644
+index 1c4918a0..78dd42d3 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -177,16 +177,23 @@ class IdleProtocol : public ImapProtocol {
@@ -3190,10 +3190,10 @@ index 00000000..f41e80ad
 +
 diff --git a/src/plugins/ssoauth/password/passwordplugin.cpp b/src/plugins/ssoauth/password/passwordplugin.cpp
 new file mode 100644
-index 00000000..00ad7e73
+index 00000000..3eca67cd
 --- /dev/null
 +++ b/src/plugins/ssoauth/password/passwordplugin.cpp
-@@ -0,0 +1,231 @@
+@@ -0,0 +1,216 @@
 +/****************************************************************************
 +**
 +** Copyright (c) 2013-2020 Jolla Ltd.
@@ -3259,24 +3259,9 @@ index 00000000..00ad7e73
 +
 +    // We need to quote this string because it is not an atom
 +    QString result(input);
-+
-+    QString::iterator begin = result.begin(), it = begin;
-+    while (it != result.end()) {
-+        // We need to escape any characters specially treated in quotes
-+        if ((*it) == '\\' || (*it) == '"') {
-+            int pos = (it - begin);
-+            result.insert(pos, '\\');
-+            it = result.begin() + (pos + 1);
-+        }
-+        ++it;
-+    }
++    result.replace('\\', QString::fromLatin1("\\\\")).replace('\"', QString::fromLatin1("\\\""));
 +
 +    return QMail::quoteString(result);
-+}
-+
-+QByteArray quoteIMAPString(const QByteArray& input)
-+{
-+    return quoteIMAPString(QString::fromLatin1(input)).toLatin1();
 +}
 +
 +SSOPasswordPlugin::SSOPasswordPlugin(QObject *parent)
@@ -3304,8 +3289,8 @@ index 00000000..00ad7e73
 +    result.insert(QString::fromLatin1("PLAIN"), plainAuth);
 +
 +    // Add LOGIN auth
-+    result.insert(QString::fromLatin1("LOGIN"), QList<QByteArray>() << QByteArray("LOGIN") + ' ' + quoteIMAPString(username.toUtf8())
-+                  + ' ' + quoteIMAPString(password.toUtf8()));
++    result.insert(QString::fromLatin1("LOGIN"), QList<QByteArray>() << QByteArray("LOGIN") + ' ' + quoteIMAPString(username).toUtf8()
++                  + ' ' + quoteIMAPString(password).toUtf8());
 +
 +    // Add CRAM_MD5
 +    QList<QByteArray> cramAuth;
