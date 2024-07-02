@@ -172,7 +172,7 @@ index b7898c7c..5c831f6d 100644
  #endif
  
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 37037867..e2d4a3d4 100644
+index c065bbaf..c750d0dd 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -241,7 +241,7 @@ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, co
@@ -253,7 +253,7 @@ index 37037867..e2d4a3d4 100644
      if(!_unavailable)
          return initiateStrategy();
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index 29748913..cb37e5a9 100644
+index 429079eb..dc1e5aaa 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
 @@ -2366,14 +2366,53 @@ void ImapSynchronizeBaseStrategy::previewDiscoveredMessages(ImapStrategyContextB
@@ -352,7 +352,7 @@ index 4880b2b1..9a79e4b7 100644
      uint _total;
  };
 diff --git a/src/plugins/messageservices/pop/popservice.cpp b/src/plugins/messageservices/pop/popservice.cpp
-index d1c6ceeb..8c661941 100644
+index 49b35a53..742881a3 100644
 --- a/src/plugins/messageservices/pop/popservice.cpp
 +++ b/src/plugins/messageservices/pop/popservice.cpp
 @@ -103,6 +103,7 @@ private:

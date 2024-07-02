@@ -8,7 +8,7 @@ Subject: [PATCH] Prevent push enabled status to go out of sync.
  1 file changed, 33 insertions(+), 24 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 1dbd54c0..37037867 100644
+index fda577ed..c065bbaf 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -64,7 +64,10 @@ QString connectionSettings(ImapConfiguration &config)
@@ -77,7 +77,7 @@ index 1dbd54c0..37037867 100644
      if (!isEnabled) {
          if (_accountWasEnabled) {
              // Account changed from enabled to disabled
-@@ -1783,7 +1787,7 @@ void ImapService::initiatePushEmail()
+@@ -1778,7 +1782,7 @@ void ImapService::initiatePushEmail()
  #ifdef USE_KEEPALIVE
      QMailAccountConfiguration accountCfg(_accountId);
      ImapConfiguration imapCfg(accountCfg);
@@ -86,7 +86,7 @@ index 1dbd54c0..37037867 100644
      _previousPushFolders = imapCfg.pushFolders();
  #endif
      QMailFolderIdList ids(_client->configurationIdleFolderIds());
-@@ -2033,23 +2037,28 @@ void ImapService::pushEnabledStatus(uint accountId, const QString &profileType,
+@@ -2028,23 +2032,28 @@ void ImapService::pushEnabledStatus(uint accountId, const QString &profileType,
  {
      qMailLog(Messaging) << "Received new idleState for account: " << accountId << "state: " << state << "profile type: " << profileType;
      if (accountId == _accountId.toULongLong() && profileType == QLatin1String("syncemail")) {

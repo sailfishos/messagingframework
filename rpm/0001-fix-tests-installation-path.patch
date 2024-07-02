@@ -1474,10 +1474,10 @@ index 11065508..872fa50b 100644
  
  INSTALLS += target
 diff --git a/tests/tests.pro b/tests/tests.pro
-index f9127b7f..85499a4f 100644
+index 78ea966d..7e9659f7 100644
 --- a/tests/tests.pro
 +++ b/tests/tests.pro
-@@ -42,5 +42,5 @@ CONFIG += unittest
+@@ -44,5 +44,5 @@ CONFIG += unittest
  
  # Install test file description
  test_description.files = qt5/tests.xml

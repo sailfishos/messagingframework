@@ -12,10 +12,10 @@ qt gets updated.
  1 file changed, 11 insertions(+), 3 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
-index 7d567a85..ecb0621b 100644
+index 18608bae..7e10c2d5 100644
 --- a/src/plugins/messageservices/imap/imap.pro
 +++ b/src/plugins/messageservices/imap/imap.pro
-@@ -57,9 +57,17 @@ SOURCES += imapclient.cpp \
+@@ -50,9 +50,17 @@ SOURCES += imapclient.cpp \
      RESOURCES += imap.qrc
  }
  
