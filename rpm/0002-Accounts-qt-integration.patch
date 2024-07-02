@@ -89,13 +89,23 @@ Change-Id: Id90fddd10e205da7b807000e042f4a5b13edd4c0
  .../qmfclient/qmailaccountlistmodel.cpp       |   44 +-
  src/libraries/qmfclient/qmailstore_p.cpp      | 1235 ++++++++++++++++-
  src/libraries/qmfclient/qmailstore_p.h        |   41 +-
- src/libraries/qmfclient/qmfclient.pro         |   18 +
+ src/libraries/qmfclient/qmfclient.pro         |   22 +
  src/libraries/qmfclient/share/email.provider  |   12 +
  src/libraries/qmfclient/share/email.service   |   65 +
+ src/libraries/qmfclient/ssoaccountmanager.cpp |   66 +
+ src/libraries/qmfclient/ssoaccountmanager.h   |   75 +
+ .../messageservices/imap/imapclient.cpp       |   39 +
+ src/plugins/messageservices/imap/imapclient.h |    4 +
+ src/plugins/messageservices/pop/popclient.cpp |   17 +
+ src/plugins/messageservices/pop/popclient.h   |    4 +
+ src/tools/messageserver/servicehandler.cpp    |   13 +
  tests/tests.pri                               |    6 +
- 7 files changed, 1380 insertions(+), 41 deletions(-)
+ tests/tst_qmailstore/tst_qmailstore.cpp       |   93 +-
+ 15 files changed, 1691 insertions(+), 45 deletions(-)
  create mode 100644 src/libraries/qmfclient/share/email.provider
  create mode 100644 src/libraries/qmfclient/share/email.service
+ create mode 100644 src/libraries/qmfclient/ssoaccountmanager.cpp
+ create mode 100644 src/libraries/qmfclient/ssoaccountmanager.h
 
 diff --git a/src/libraries/qmfclient/qmailaccountlistmodel.cpp b/src/libraries/qmfclient/qmailaccountlistmodel.cpp
 index 28f566cb..63d98c53 100644
@@ -1815,10 +1825,10 @@ index ae3c25e6..b7898c7c 100644
      class Cache
      {
 diff --git a/src/libraries/qmfclient/qmfclient.pro b/src/libraries/qmfclient/qmfclient.pro
-index 73f10b76..62e6415d 100644
+index 73f10b76..2b8158cf 100644
 --- a/src/libraries/qmfclient/qmfclient.pro
 +++ b/src/libraries/qmfclient/qmfclient.pro
-@@ -2,6 +2,24 @@ TARGET     = QmfClient
+@@ -2,6 +2,28 @@ TARGET     = QmfClient
  QT         = core dbus sql network core5compat
  CONFIG    += warn_on
  
@@ -1828,6 +1838,10 @@ index 73f10b76..62e6415d 100644
 +contains(DEFINES,USE_ACCOUNTS_QT) {
 +    CONFIG += link_pkgconfig
 +    PKGCONFIG += accounts-qt5
++
++    HEADERS += ssoaccountmanager.h
++
++    SOURCES += ssoaccountmanager.cpp
 +
 +    # Install email SSO provider description
 +    sso_providers.files = share/email.provider
@@ -1932,6 +1946,304 @@ index 00000000..9f6ef320
 +     -->
 +  </template>
 +</service>
+diff --git a/src/libraries/qmfclient/ssoaccountmanager.cpp b/src/libraries/qmfclient/ssoaccountmanager.cpp
+new file mode 100644
+index 00000000..e113f40b
+--- /dev/null
++++ b/src/libraries/qmfclient/ssoaccountmanager.cpp
+@@ -0,0 +1,66 @@
++/****************************************************************************
++**
++** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/legal
++**
++** This file is part of the Qt Messaging Framework.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and Digia.  For licensing terms and
++** conditions see http://qt.digia.com/licensing.  For further information
++** use the contact form at http://qt.digia.com/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 as published by the Free Software
++** Foundation and appearing in the file LICENSE.LGPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU Lesser General Public License version 2.1 requirements
++** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Digia gives you certain additional
++** rights.  These rights are described in the Digia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 3.0 as published by the Free Software
++** Foundation and appearing in the file LICENSE.GPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU General Public License version 3.0 requirements will be
++** met: http://www.gnu.org/copyleft/gpl.html.
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "ssoaccountmanager.h"
++
++using namespace Accounts;
++
++Manager* SSOAccountManager::_manager = 0;
++int SSOAccountManager::_refCount = 0;
++
++SSOAccountManager::SSOAccountManager()
++{
++    if (!_manager) {
++        Q_ASSERT(!_refCount);
++        _manager = new Manager(QLatin1String("e-mail"));
++        _manager->setAbortOnTimeout(true);
++    }
++
++    ++_refCount;
++}
++
++SSOAccountManager::~SSOAccountManager()
++{
++    if (--_refCount == 0) {
++        delete _manager;
++        _manager = 0;
++    }
++}
+diff --git a/src/libraries/qmfclient/ssoaccountmanager.h b/src/libraries/qmfclient/ssoaccountmanager.h
+new file mode 100644
+index 00000000..aa756828
+--- /dev/null
++++ b/src/libraries/qmfclient/ssoaccountmanager.h
+@@ -0,0 +1,75 @@
++/****************************************************************************
++**
++** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
++** Contact: http://www.qt-project.org/legal
++**
++** This file is part of the Qt Messaging Framework.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and Digia.  For licensing terms and
++** conditions see http://qt.digia.com/licensing.  For further information
++** use the contact form at http://qt.digia.com/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 as published by the Free Software
++** Foundation and appearing in the file LICENSE.LGPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU Lesser General Public License version 2.1 requirements
++** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** In addition, as a special exception, Digia gives you certain additional
++** rights.  These rights are described in the Digia Qt LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 3.0 as published by the Free Software
++** Foundation and appearing in the file LICENSE.GPL included in the
++** packaging of this file.  Please review the following information to
++** ensure the GNU General Public License version 3.0 requirements will be
++** met: http://www.gnu.org/copyleft/gpl.html.
++**
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#ifndef SSOACCOUNTMANAGER_H
++#define SSOACCOUNTMANAGER_H
++
++#include <qglobal.h>
++#include "qmailglobal.h"
++
++// Accounts
++#include <Accounts/Manager>
++
++/// Accounts::Manager wrapper.
++class QMF_EXPORT SSOAccountManager
++{
++public:
++    SSOAccountManager();
++    ~SSOAccountManager();
++
++    Accounts::Manager* operator ->() const
++    {
++        Q_ASSERT (_manager);
++        return _manager;
++    }
++
++    operator Accounts::Manager*() const
++    {
++        Q_ASSERT (_manager);
++        return _manager;
++    }
++
++private:
++    Q_DISABLE_COPY (SSOAccountManager);
++    static Accounts::Manager* _manager;
++    static int _refCount;
++};
++#endif // SSOACCOUNTMANAGER_H
+diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
+index 10e1a058..a5492abd 100644
+--- a/src/plugins/messageservices/imap/imapclient.cpp
++++ b/src/plugins/messageservices/imap/imapclient.cpp
+@@ -436,6 +436,9 @@ ImapClient::ImapClient(QObject* parent)
+             this, SLOT(connectionInactive()));
+ 
+     connect(QMailMessageBuffer::instance(), SIGNAL(flushed()), this, SLOT(messageBufferFlushed()));
++#ifdef USE_ACCOUNTS_QT
++    connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)), this, SLOT(onAccountsUpdated(QMailAccountIdList)));
++#endif
+ }
+ 
+ ImapClient::~ImapClient()
+@@ -1826,4 +1829,40 @@ void ImapClient::onCredentialsError(const QString &error)
+     }
+ }
+ 
++void ImapClient::onAccountsUpdated(const QMailAccountIdList &list)
++{
++    if (list.contains(_config.id()) && !loggingIn()) {
++        ImapConfiguration imapCfg1(_config);
++        // copying here as the data is shared
++        QMailAccountConfiguration config = QMailAccountConfiguration(_config.id());
++        ImapConfiguration imapCfg2(config);
++
++        if (!imapCfg1.isValid()) {
++            qMailLog(IMAP) << Q_FUNC_INFO << "current config is invalid";
++            return;
++        }
++
++        if (!imapCfg2.isValid()) {
++            qMailLog(IMAP) << Q_FUNC_INFO << "invalid config from db";
++            return;
++        }
++
++        qMailLog(IMAP) << Q_FUNC_INFO << imapCfg1.mailUserName() ;
++        // compare config modified by the User
++        const bool& notEqual = (imapCfg1.mailUserName() != imapCfg2.mailUserName()) ||
++                               (imapCfg1.mailPassword() != imapCfg2.mailPassword()) ||
++                               (imapCfg1.mailServer() != imapCfg2.mailServer()) ||
++                               (imapCfg1.mailPort() != imapCfg2.mailPort()) ||
++                               (imapCfg1.mailEncryption() != imapCfg2.mailEncryption()) ||
++                               (imapCfg1.pushEnabled() != imapCfg2.pushEnabled());
++        if (notEqual)
++            closeIdleConnections();
++
++        if (imapCfg1.pushEnabled() != imapCfg2.pushEnabled()) {
++            if (imapCfg2.pushEnabled())
++                emit restartPushEmail();
++        }
++    }
++}
++
+ #include "imapclient.moc"
+diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
+index 7376588f..92f77f1e 100644
+--- a/src/plugins/messageservices/imap/imapclient.h
++++ b/src/plugins/messageservices/imap/imapclient.h
+@@ -146,6 +146,10 @@ protected slots:
+     void onCredentialsError(const QString &error);
+     void onCredentialsReady();
+ 
++#ifdef USE_ACCOUNTS_QT
++    void onAccountsUpdated(const QMailAccountIdList& list);
++#endif
++
+ private:
+     friend class ImapStrategyContextBase;
+ 
+diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
+index a0839de7..02de7fff 100644
+--- a/src/plugins/messageservices/pop/popclient.cpp
++++ b/src/plugins/messageservices/pop/popclient.cpp
+@@ -83,6 +83,9 @@ PopClient::PopClient(QObject* parent)
+     inactiveTimer.setSingleShot(true);
+     connect(&inactiveTimer, SIGNAL(timeout()), this, SLOT(connectionInactive()));
+     connect(QMailMessageBuffer::instance(), SIGNAL(flushed()), this, SLOT(messageBufferFlushed()));
++#ifdef USE_ACCOUNTS_QT
++    connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)), this, SLOT(onAccountsUpdated(QMailAccountIdList)));
++#endif
+ }
+ 
+ PopClient::~PopClient()
+@@ -1394,3 +1397,17 @@ void PopClient::onCredentialsReady()
+         nextAction();
+     }
+ }
++
++#ifdef USE_ACCOUNTS_QT
++void PopClient::onAccountsUpdated(const QMailAccountIdList &list)
++{
++    if (!list.contains(accountId()))
++        return;
++
++    QMailAccount acc(accountId());
++    bool isEnabled(acc.status() & QMailAccount::Enabled);
++    if (!isEnabled)
++        return;
++    setAccount(accountId());
++}
++#endif
+diff --git a/src/plugins/messageservices/pop/popclient.h b/src/plugins/messageservices/pop/popclient.h
+index 39dcef5b..6d03a888 100644
+--- a/src/plugins/messageservices/pop/popclient.h
++++ b/src/plugins/messageservices/pop/popclient.h
+@@ -102,6 +102,10 @@ protected slots:
+     void connected(QMailTransport::EncryptType encryptType);
+     void transportError(int, QString msg);
+ 
++#ifdef USE_ACCOUNTS_QT
++    void onAccountsUpdated(const QMailAccountIdList& list);
++#endif
++
+     void onCredentialsError(const QString &error);
+     void onCredentialsReady();
+ 
+diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
+index 93ebace0..ca105660 100644
+--- a/src/tools/messageserver/servicehandler.cpp
++++ b/src/tools/messageserver/servicehandler.cpp
+@@ -801,10 +801,23 @@ void ServiceHandler::accountsAdded(const QMailAccountIdList &ids)
+ 
+ void ServiceHandler::accountsUpdated(const QMailAccountIdList &ids)
+ {
++#ifdef USE_ACCOUNTS_QT
++    QMailAccountIdList idList;
++    foreach (const QMailAccountId &id, ids) {
++        if (!sourceMap.contains(id) && !sinkMap.contains(id)) {
++                idList << id;
++        }
++    }
++    if (!idList.isEmpty()) {
++        registerAccountServices(idList);
++    }
++
++#else
+     // Only respond to updates that were generated by other processes
+     if (QMailStore::instance()->asynchronousEmission()) {
+         reregisterAccountServices(ids, QMailServiceAction::Status::ErrInternalStateReset, tr("Account updated by other process"));
+     }
++#endif
+ }
+ 
+ void ServiceHandler::accountsRemoved(const QMailAccountIdList &ids)
 diff --git a/tests/tests.pri b/tests/tests.pri
 index 872fa50b..e81f4e07 100644
 --- a/tests/tests.pri
@@ -1947,3 +2259,214 @@ index 872fa50b..e81f4e07 100644
 +}
 +
  INSTALLS += target
+diff --git a/tests/tst_qmailstore/tst_qmailstore.cpp b/tests/tst_qmailstore/tst_qmailstore.cpp
+index 61635b8c..27d79101 100644
+--- a/tests/tst_qmailstore/tst_qmailstore.cpp
++++ b/tests/tst_qmailstore/tst_qmailstore.cpp
+@@ -48,6 +48,9 @@
+     This class tests that QMailStore correctly handles addition, updates, removal, counting and
+     querying of QMailMessages and QMailFolders.
+ */
++
++Q_DECLARE_METATYPE(QMailMessageKey::Properties)
++
+ class tst_QMailStore : public QObject
+ {
+     Q_OBJECT
+@@ -78,8 +81,19 @@ private slots:
+     void removeMessageWithInResponse();
+     void message();
+     void implementationbase();
++
++#ifdef USE_ACCOUNTS_QT
++private:
++    static const QSet<QString> defaultMailServices;
++#endif
+ };
+ 
++#ifdef USE_ACCOUNTS_QT
++// Keep in sync with src/libraries/qmfclient/share/email.service
++const QSet<QString> tst_QMailStore::defaultMailServices =
++    QSet<QString>() << "auth" << "crypto";
++#endif
++
+ QTEST_MAIN(tst_QMailStore)
+ 
+ #include "tst_qmailstore.moc"
+@@ -97,6 +111,7 @@ tst_QMailStore::~tst_QMailStore()
+ void tst_QMailStore::initTestCase()
+ {
+     QMailStore::instance()->clearContent();
++    qRegisterMetaType<QMailMessageKey::Properties>("QMailMessageKeyProperties");
+ }
+ 
+ void tst_QMailStore::cleanup()
+@@ -110,6 +125,9 @@ void tst_QMailStore::cleanupTestCase()
+ 
+ void tst_QMailStore::addAccount()
+ {
++
++    QSignalSpy spyAccountAdded(QMailStore::instance(), SIGNAL(accountsAdded(QMailAccountIdList)));
++
+     QMailAccount account1;
+     account1.setName("Account 1");
+     account1.setFromAddress(QMailAddress("Account 1", "account1@example.org"));
+@@ -132,9 +150,9 @@ void tst_QMailStore::addAccount()
+         svcCfg->setValue("username", "account1");
+     }
+ 
+-    // Verify that invalid retrieval fails
++    // Verify that invalid retrieval succeeds but returns an invalid account
+     QMailAccount accountX(account1.id());
+-    QCOMPARE(QMailStore::instance()->lastError(), QMailStore::InvalidId);
++    QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
+     QVERIFY(!accountX.id().isValid());
+     
+     // Verify that addition is successful
+@@ -147,6 +165,9 @@ void tst_QMailStore::addAccount()
+     QCOMPARE(QMailStore::instance()->countAccounts(), 1);
+     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
+ 
++    // Verify that the addAccount signal is emitted only once
++    QCOMPARE(spyAccountAdded.count(), 1);
++
+     // Verify that retrieval yields matching result
+     QMailAccount account2(account1.id());
+     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
+@@ -162,12 +183,22 @@ void tst_QMailStore::addAccount()
+ 
+     QMailAccountConfiguration config2(account1.id());
+     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
++
++#ifdef USE_ACCOUNTS_QT
++    QCOMPARE(config2.services().toSet() - defaultMailServices, config1.services().toSet());
++    foreach (const QString &service, config2.services().toSet() - defaultMailServices) {
++        if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
++            QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
++        } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
++    }
++#else
+     QCOMPARE(config2.services(), config1.services());
+     foreach (const QString &service, config2.services()) {
+         if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
+             QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
+         } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
+     }
++#endif
+ 
+     QCOMPARE(QMailStore::instance()->countAccounts(QMailAccountKey::id(account1.id())), 1);
+     QCOMPARE(QMailStore::instance()->countAccounts(QMailAccountKey::id(account1.id(), QMailDataComparator::NotEqual)), 0);
+@@ -707,12 +738,21 @@ void tst_QMailStore::updateAccount()
+ 
+     QMailAccountConfiguration config2(account1.id());
+     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
++#ifdef USE_ACCOUNTS_QT
++    QCOMPARE(config2.services().toSet() - defaultMailServices, config1.services().toSet());
++    foreach (const QString &service, config2.services().toSet() - defaultMailServices) {
++        if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
++            QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
++        } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
++    }
++#else
+     QCOMPARE(config2.services(), config1.services());
+     foreach (const QString &service, config2.services()) {
+         if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
+             QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
+         } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
+     }
++#endif
+ }
+ 
+ void tst_QMailStore::updateFolder()
+@@ -1222,8 +1262,12 @@ void tst_QMailStore::updateMessage()
+ 
+ void tst_QMailStore::updateMessages()
+ {
++    QSignalSpy spyMessagesAdded(QMailStore::instance(), SIGNAL(messagesAdded(QMailMessageIdList)));
+     QSignalSpy spyMessagesUpdated(QMailStore::instance(), SIGNAL(messagesUpdated(QMailMessageIdList)));
+     QSignalSpy spyMessagesDataUpdated(QMailStore::instance(), SIGNAL(messageDataUpdated(QMailMessageMetaDataList)));
++    QSignalSpy spyMessagePropertyUpdated(QMailStore::instance(), SIGNAL(messagePropertyUpdated(QMailMessageIdList, QMailMessageKeyProperties, QMailMessageMetaData)));
++    QSignalSpy spyMessageStatusUpdated(QMailStore::instance(), SIGNAL(messageStatusUpdated(QMailMessageIdList, quint64, bool)));
++
+ 
+     QMailAccount account;
+     account.setName("Account");
+@@ -1299,12 +1343,41 @@ void tst_QMailStore::updateMessages()
+     }
+ 
+     //Verify that the signals are only emitted once
++    QCOMPARE(spyMessagesAdded.count(), 1);
+     QCOMPARE(spyMessagesUpdated.count(), 1);
+     QCOMPARE(spyMessagesDataUpdated.count(), 1);
++    // Verify that was not emitted since we didn't modify message metadata directly
++    QCOMPARE(spyMessagePropertyUpdated.count(),0);
++    QCOMPARE(spyMessageStatusUpdated.count(), 0);
++
++    QMailMessageMetaData data;
++    data.setCustomField("answer", "Fido");
++    data.setCustomField("bicycle", "fish");
++
++    QVERIFY(QMailStore::instance()->updateMessagesMetaData(QMailMessageKey(), QMailMessageKey::Custom, data));
++    QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
++
++    // Message was update
++    QCOMPARE(spyMessagesUpdated.count(), 2);
++    // Properties were updated
++    QCOMPARE(spyMessagePropertyUpdated.count(),1);
++    // Status was not updated
++    QCOMPARE(spyMessageStatusUpdated.count(), 0);
++
++    QVERIFY(QMailStore::instance()->updateMessagesMetaData(QMailMessageKey(), QMailMessage::Read, false));
++    QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
++    // Message was update
++    QCOMPARE(spyMessagesUpdated.count(), 3);
++    // Properties were not updated
++    QCOMPARE(spyMessagePropertyUpdated.count(),1);
++    // Status was updated
++    QCOMPARE(spyMessageStatusUpdated.count(), 1);
+ }
+ 
+ void tst_QMailStore::removeAccount()
+ {
++    QSignalSpy spyAccountRemoved(QMailStore::instance(), SIGNAL(accountsRemoved(QMailAccountIdList)));
++
+     QMailAccount account1;
+     account1.setName("Account 1");
+     account1.setFromAddress(QMailAddress("Account 1", "account1@example.org"));
+@@ -1347,12 +1420,21 @@ void tst_QMailStore::removeAccount()
+ 
+     QMailAccountConfiguration config2(account2.id());
+     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
++#ifdef USE_ACCOUNTS_QT
++    QCOMPARE(config2.services().toSet() - defaultMailServices, config1.services().toSet());
++    foreach (const QString &service, config2.services().toSet() - defaultMailServices) {
++        if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
++            QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
++        } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
++    }
++#else
+     QCOMPARE(config2.services(), config1.services());
+     foreach (const QString &service, config2.services()) {
+         if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
+             QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
+         } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
+     }
++#endif
+ 
+     // Verify that removal is successful 
+     QVERIFY(QMailStore::instance()->removeAccount(account1.id()));
+@@ -1360,9 +1442,12 @@ void tst_QMailStore::removeAccount()
+     QCOMPARE(QMailStore::instance()->countAccounts(), 0);
+     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
+ 
+-    // Verify that retrieval yields invalid result
++    // Verify that the removeAccount signal is emitted only once
++    QCOMPARE(spyAccountRemoved.count(), 1);
++
++    // Verify that retrieval yields no error and an invalid result
+     QMailAccount account3(account1.id());
+-    QCOMPARE(QMailStore::instance()->lastError(), QMailStore::InvalidId);
++    QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
+     QVERIFY(!account3.id().isValid());
+ 
+     QMailAccountConfiguration config3(account1.id());
