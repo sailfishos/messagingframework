@@ -18,6 +18,7 @@ BuildRequires: 	pkgconfig(Qt5Network)
 BuildRequires:  pkgconfig(Qt5Sql)
 BuildRequires:  pkgconfig(accounts-qt5) >= 1.13
 BuildRequires:  pkgconfig(libsignon-qt5)
+BuildRequires:  pkgconfig(signon-oauth2plugin)
 BuildRequires:  pkgconfig(keepalive)
 BuildRequires:  pkgconfig(qt5-boostable)
 BuildRequires:  pkgconfig(systemd)
@@ -31,11 +32,11 @@ Requires:       buteo-syncfw-qt5 >= 0.7.16
 
 Patch1:  0001-fix-tests-installation-path.patch
 Patch2:  0002-Accounts-qt-integration.patch
-Patch3:  0003-SSO-integration.patch
-Patch4:  0004-Start-messageserver-on-system-startup-in-case-there-.patch
-Patch5:  0005-Add-keepalive-timer-to-IMAP-IDLE-service.patch
-Patch6:  0006-Use-Qt5-booster-to-save-memory.patch
-Patch7:  0007-Recreate-SSO-identity-for-smtp-in-case-of-failure.patch
+Patch3:  0003-Use-a-specific-retry-delay-for-IMAP-idle-connections.patch
+Patch4:  0004-Don-t-save-settings-during-IMAP-logging-in.patch
+Patch5:  0005-Start-messageserver-on-system-startup-in-case-there-.patch
+Patch6:  0006-Add-keepalive-timer-to-IMAP-IDLE-service.patch
+Patch7:  0007-Use-Qt5-booster-to-save-memory.patch
 Patch8:  0008-Listen-to-sync-schedule-changes-from-buteo-sync-fram.patch
 Patch9:  0009-Prevent-push-enabled-status-to-go-out-of-sync.patch
 Patch10:  0010-Add-signature-settings-in-account.patch
@@ -56,6 +57,10 @@ Patch24:  0024-Adjust-qmflist-for-missing-bits-in-5.6.patch
 Patch25:  0025-Revert-loadRelax.patch
 Patch26:  0026-Revert-Set-PLUGIN_CLASS_NAME-in-plugin-.pro-files.patch
 Patch27:  0027-Revert-Bump-version-to-6.0.0-since-we-build-against-.patch
+Patch28:  0028-Protect-service.patch
+Patch29:  0029-Save-account-before-config.patch
+Patch30:  0030-Don-t-fetch-capabilities-on-smtp-creation.patch
+Patch31:  0031-Fallback-to-sso-credential-plugin.patch
 
 
 %description
@@ -226,6 +231,7 @@ install -m 644 -p %{SOURCE2} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 %{_datadir}/mapplauncherd/privileges.d/*
 %{_libdir}/libQmfMessageServer.so.*
 %{_libdir}/qt5/plugins/messageservices
+%{_libdir}/qt5/plugins/credentials
 %{_userunitdir}/*.service
 %{_userunitdir}/user-session.target.wants/*.service
 
@@ -234,7 +240,6 @@ install -m 644 -p %{SOURCE2} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 %license LICENSE.LGPLv* LGPL_EXCEPTION.txt
 %{_libdir}/libQmfClient.so.*
 %{_libdir}/qt5/plugins/contentmanagers
-%{_libdir}/qt5/plugins/ssoauth
 
 %files -n libqmfclient1-qt5-cryptoplugins
 %{_libdir}/qt5/plugins/crypto

@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Damien Caliste <dcaliste@free.fr>
+Date: Mon, 7 Oct 2024 12:28:42 +0200
+Subject: [PATCH] Save account before config.
+
+---
+ src/plugins/messageservices/imap/imapclient.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
+index 9df0d4e1..d538b924 100644
+--- a/src/plugins/messageservices/imap/imapclient.cpp
++++ b/src/plugins/messageservices/imap/imapclient.cpp
+@@ -715,7 +715,8 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
+                 account.setStatus(QMailAccount::CanReferenceExternalData, supportsReferences);
+                 imapCfg.setPushCapable(_protocol.supportsCapability("IDLE"));
+                 imapCfg.setCapabilities(_protocol.capabilities());
+-                if (!QMailStore::instance()->updateAccount(&account, &_config)) {
++                if ((!QMailStore::instance()->updateAccount(&account)) ||
++                    (!QMailStore::instance()->updateAccount(&account, &_config))) {
+                     qWarning() << "Unable to update account" << account.id() << "to set imap4 configuration";
+                 }
+             }

@@ -1,0 +1,99 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Damien Caliste <dcaliste@free.fr>
+Date: Mon, 1 Jul 2024 12:28:42 +0200
+Subject: [PATCH] Use a specific retry delay for IMAP idle connections.
+
+---
+ .../messageservices/imap/imapclient.cpp       | 32 +++++++++++++------
+ src/plugins/messageservices/imap/imapclient.h |  2 +-
+ 2 files changed, 23 insertions(+), 11 deletions(-)
+
+diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
+index bf2f9394..14ff6f8b 100644
+--- a/src/plugins/messageservices/imap/imapclient.cpp
++++ b/src/plugins/messageservices/imap/imapclient.cpp
+@@ -182,11 +182,12 @@ public:
+ 
+     virtual void handleIdling() { _client->idling(_folder.id()); }
+     bool open(const ImapConfiguration& config, qint64 bufferSize = 10*1024) override;
++    int idleRetryDelay() { return _idleRetryDelay; }
+ 
+ signals:
+     void idleNewMailNotification(QMailFolderId);
+     void idleFlagsChangedNotification(QMailFolderId);
+-    void openRequest();
++    void openRequest(IdleProtocol*);
+ 
+ protected slots:
+     virtual void idleContinuation(ImapCommand, const QString &);
+@@ -202,6 +203,8 @@ protected:
+ private:
+     QTimer _idleTimer; // Send a DONE command every 29 minutes
+     QTimer _idleRecoveryTimer; // Check command hasn't hung
++    int _idleRetryDelay; // Try to restablish IDLE state
++    enum IdleRetryDelay { InitialIdleRetryDelay = 30 }; //seconds
+     QMailCredentialsInterface *_credentials;
+ };
+ 
+@@ -369,9 +372,18 @@ void IdleProtocol::idleErrorRecovery()
+     const int oneHour = 60*60;
+     _idleRecoveryTimer.stop();
+ 
+-    _client->setIdleRetryDelay(qMin( oneHour, _client->idleRetryDelay()*2 ));
++    if (connected() && _idleTimer.isActive()) {
++        qMailLog(IMAP) << objectName() << "IDLE: IMAP IDLE error recovery was successful. About to check for new mail.";
++        _idleRetryDelay = InitialIdleRetryDelay;
++        emit idleNewMailNotification(_folder.id()); // Check for new messages arriving while idle connection was down
++        emit idleFlagsChangedNotification(_folder.id());
++        return;
++    }
++    updateStatus(tr("Idle Error occurred"));
++
++    QTimer::singleShot(_idleRetryDelay*1000, this, SLOT(idleErrorRecovery()));
++    _idleRetryDelay = qMin( oneHour, _idleRetryDelay*2 );
+ 
+-    emit openRequest();
+ }
+ 
+ ImapClient::ImapClient(QObject* parent)
+@@ -1748,20 +1760,20 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
+                     this, SIGNAL(idleNewMailNotification(QMailFolderId)));
+             connect(protocol, SIGNAL(idleFlagsChangedNotification(QMailFolderId)),
+                     this, SIGNAL(idleFlagsChangedNotification(QMailFolderId)));
+-            connect(protocol, SIGNAL(openRequest()),
+-                    this, SLOT(idleOpenRequested()));
++            connect(protocol, SIGNAL(openRequest(IdleProtocol *)),
++                    this, SLOT(idleOpenRequested(IdleProtocol *)));
+             protocol->open(imapCfg);
+         }
+     }
+ }
+ 
+-void ImapClient::idleOpenRequested()
++void ImapClient::idleOpenRequested(IdleProtocol *idleProtocol)
+ {
+     if (_protocol.inUse()) { // Setting up new idle connection may be in progress
+-        qMailLog(IMAP) << _protocol.objectName() 
+-                       << "IDLE: IMAP IDLE error recovery detected that the primary connection is "
+-                          "busy. Retrying to establish IDLE state in" 
+-                       << idleRetryDelay()/2 << "seconds.";
++        qMailLog(IMAP) << _protocol.objectName()
++               << "IDLE: IMAP IDLE error recovery detected that the primary connection is "
++                  "busy. Retrying to establish IDLE state in"
++               << idleProtocol->idleRetryDelay()/2 << "seconds.";
+         return;
+     }
+     _protocol.close();
+diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
+index 92f77f1e..0ae29084 100644
+--- a/src/plugins/messageservices/imap/imapclient.h
++++ b/src/plugins/messageservices/imap/imapclient.h
+@@ -141,7 +141,7 @@ protected slots:
+     void checkCommandResponse(const ImapCommand, const OperationStatus);
+     void commandTransition(const ImapCommand, const OperationStatus);
+     void transportStatus(const QString& status);
+-    void idleOpenRequested();
++    void idleOpenRequested(IdleProtocol*);
+     void messageBufferFlushed();
+     void onCredentialsError(const QString &error);
+     void onCredentialsReady();
