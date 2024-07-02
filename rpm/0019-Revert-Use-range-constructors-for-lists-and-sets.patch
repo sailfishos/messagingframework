@@ -343,10 +343,10 @@ index 3c274119..0b18aaa5 100644
          transmissionInProgressIds = idSet;
          transmissionSetInitialized = true;
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 3e4dd422..54cca5bc 100644
+index 3376fcd4..500437cd 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1298,7 +1298,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
+@@ -1240,7 +1240,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
          bool external(false);
  
          // Are these messages being resolved for internal or external references?
@@ -356,7 +356,7 @@ index 3e4dd422..54cca5bc 100644
  
          for (const QMailMessageMetaData &metaData : QMailStore::instance()->messagesMetaData(key, props)) {
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index cb37e5a9..4eb8546f 100644
+index a49c6ef9..4165a9bc 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
 @@ -347,15 +347,13 @@ QSet<QMailFolderId> foldersApplicableTo(QMailMessageKey const& messagekey, QSet<
@@ -425,7 +425,7 @@ index bfcd4625..f51e0563 100644
          } else {
              completionList.clear();
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index ca105660..5423302a 100644
+index 5d58ff30..7082d882 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
 @@ -1004,11 +1004,6 @@ QSet<QMailMessageService*> ServiceHandler::sourceServiceSet(const QSet<QMailAcco
@@ -547,7 +547,7 @@ index ca105660..5423302a 100644
  
          QSet<QMailMessageService*> sources(sourceServiceSet(searchAccountIds));
          if (sources.isEmpty()) {
-@@ -3166,7 +3161,7 @@ void ServiceHandler::setRetrievalInProgress(const QMailAccountId &accountId, boo
+@@ -3171,7 +3166,7 @@ void ServiceHandler::setRetrievalInProgress(const QMailAccountId &accountId, boo
      }
  
      if (modified) {
@@ -556,7 +556,7 @@ index ca105660..5423302a 100644
      }
  }
  
-@@ -3183,7 +3178,7 @@ void ServiceHandler::setTransmissionInProgress(const QMailAccountId &accountId,
+@@ -3188,7 +3183,7 @@ void ServiceHandler::setTransmissionInProgress(const QMailAccountId &accountId,
      }
  
      if (modified) {
@@ -566,10 +566,10 @@ index ca105660..5423302a 100644
  }
  
 diff --git a/src/tools/messageserver/servicehandler.h b/src/tools/messageserver/servicehandler.h
-index 8ea398f4..6b5ad7cb 100644
+index 5bfe48af..23d28ac4 100644
 --- a/src/tools/messageserver/servicehandler.h
 +++ b/src/tools/messageserver/servicehandler.h
-@@ -231,7 +231,6 @@ private:
+@@ -233,7 +233,6 @@ private:
  
      QSet<QMailMessageService*> sourceServiceSet(const QMailAccountId &id) const;
      QSet<QMailMessageService*> sourceServiceSet(const QSet<QMailAccountId> &ids) const;
@@ -591,7 +591,7 @@ index a2641bc5..60a9369a 100644
      QMailDisconnected::copyToFolder(QMailMessageIdList() << inboxMessage1, archivedId1);
      QMailDisconnected::copyToStandardFolder(QMailMessageIdList() << inboxMessage1, QMailFolder::JunkFolder);
 diff --git a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
-index 7b59924e..d48e73be 100644
+index a0ae627b..bf598269 100644
 --- a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
 +++ b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
 @@ -412,7 +412,7 @@ void tst_QMailServiceAction::test_retrievalaction()
@@ -604,7 +604,7 @@ index 7b59924e..d48e73be 100644
  
      action.exportUpdates(accountId1);
 diff --git a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
-index c17ad816..2c0650a0 100644
+index e7adfb07..36efc83d 100644
 --- a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
 +++ b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
 @@ -97,8 +97,7 @@ private:

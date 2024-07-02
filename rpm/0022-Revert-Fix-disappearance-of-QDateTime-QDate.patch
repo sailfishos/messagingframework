@@ -162,7 +162,7 @@ index 60a9369a..bc6f10ed 100644
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailmessageset/tst_qmailmessageset.cpp b/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
-index b3bccba9..168fb891 100644
+index fe040695..7fc7083d 100644
 --- a/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
 +++ b/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
 @@ -271,8 +271,8 @@ void tst_QMailMessageSet::initTestCase()
@@ -221,7 +221,7 @@ index b3bccba9..168fb891 100644
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
-index d48e73be..e206479f 100644
+index bf598269..338d7ea6 100644
 --- a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
 +++ b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
 @@ -269,8 +269,8 @@ void tst_QMailServiceAction::initTestCase()
@@ -280,7 +280,7 @@ index d48e73be..e206479f 100644
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
-index 72cd1570..2248ce0e 100644
+index 81562147..37a1b3de 100644
 --- a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
 +++ b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
 @@ -357,8 +357,8 @@ void tst_QMailStorageAction::initTestCase()
@@ -372,7 +372,7 @@ index 72cd1570..2248ce0e 100644
      message.setStatus(QMailMessage::New, false);
      message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailstore/tst_qmailstore.cpp b/tests/tst_qmailstore/tst_qmailstore.cpp
-index 27d79101..e13d6207 100644
+index 24d24a83..b568eccb 100644
 --- a/tests/tst_qmailstore/tst_qmailstore.cpp
 +++ b/tests/tst_qmailstore/tst_qmailstore.cpp
 @@ -1822,8 +1822,8 @@ void tst_QMailStore::message()
@@ -387,7 +387,7 @@ index 27d79101..e13d6207 100644
      msg2.setStatus(QMailMessage::New, true);
      msg2.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
-index 2c0650a0..cd8c1709 100644
+index 36efc83d..338979b4 100644
 --- a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
 +++ b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
 @@ -343,8 +343,8 @@ void tst_QMailStoreKeys::initTestCase()

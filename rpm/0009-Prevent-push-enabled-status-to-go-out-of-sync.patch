@@ -8,7 +8,7 @@ Subject: [PATCH] Prevent push enabled status to go out of sync.
  1 file changed, 33 insertions(+), 24 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 1dbd54c0..37037867 100644
+index 90f0d21e..04a62a7c 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -64,7 +64,10 @@ QString connectionSettings(ImapConfiguration &config)
@@ -22,7 +22,7 @@ index 1dbd54c0..37037867 100644
      return result.join(QChar('\x0A')); // 0x0A is not a valid character in any connection setting
  }
  
-@@ -1540,6 +1543,11 @@ ImapService::ImapService(const QMailAccountId &accountId)
+@@ -1479,6 +1482,11 @@ ImapService::ImapService(const QMailAccountId &accountId)
        _networkSession(0),
        _networkSessionTimer(new QTimer(this))
  {
@@ -34,7 +34,7 @@ index 1dbd54c0..37037867 100644
      QMailAccount account(accountId);
      if (!(account.status() & QMailAccount::CanSearchOnServer)) {
          account.setStatus(QMailAccount::CanSearchOnServer, true);
-@@ -1562,8 +1570,6 @@ ImapService::ImapService(const QMailAccountId &accountId)
+@@ -1501,8 +1509,6 @@ ImapService::ImapService(const QMailAccountId &accountId)
  
      // Connect to dbus signals emitted by buteo notifying schedule changes
      QDBusConnection m_dBusConnection(QDBusConnection::sessionBus());
@@ -43,7 +43,7 @@ index 1dbd54c0..37037867 100644
  
      if(!m_dBusConnection.isConnected()) {
          qWarning() << Q_FUNC_INFO << "Cannot connect to Dbus";
-@@ -1593,22 +1599,19 @@ void ImapService::enable()
+@@ -1532,22 +1538,19 @@ void ImapService::enable()
      ImapConfiguration imapCfg(accountCfg);
      bool pushEnabled = accountPushEnabled();
  #ifdef USE_KEEPALIVE
@@ -69,7 +69,7 @@ index 1dbd54c0..37037867 100644
      _previousPushFolders = imapCfg.pushFolders();
      _previousConnectionSettings = connectionSettings(imapCfg);
      
-@@ -1671,6 +1674,7 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
+@@ -1610,6 +1613,7 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
      if (_client) {
          loggingIn = _client->loggingIn();
      }
@@ -77,7 +77,7 @@ index 1dbd54c0..37037867 100644
      if (!isEnabled) {
          if (_accountWasEnabled) {
              // Account changed from enabled to disabled
-@@ -1783,7 +1787,7 @@ void ImapService::initiatePushEmail()
+@@ -1717,7 +1721,7 @@ void ImapService::initiatePushEmail()
  #ifdef USE_KEEPALIVE
      QMailAccountConfiguration accountCfg(_accountId);
      ImapConfiguration imapCfg(accountCfg);
@@ -86,7 +86,7 @@ index 1dbd54c0..37037867 100644
      _previousPushFolders = imapCfg.pushFolders();
  #endif
      QMailFolderIdList ids(_client->configurationIdleFolderIds());
-@@ -2033,23 +2037,28 @@ void ImapService::pushEnabledStatus(uint accountId, const QString &profileType,
+@@ -1967,23 +1971,28 @@ void ImapService::pushEnabledStatus(uint accountId, const QString &profileType,
  {
      qMailLog(Messaging) << "Received new idleState for account: " << accountId << "state: " << state << "profile type: " << profileType;
      if (accountId == _accountId.toULongLong() && profileType == QLatin1String("syncemail")) {

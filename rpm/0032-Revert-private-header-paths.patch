@@ -1,0 +1,232 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Damien Caliste <dcaliste@free.fr>
+Date: Thu, 21 Nov 2024 15:31:07 +0100
+Subject: [PATCH] Revert private header paths
+
+---
+ src/libraries/qmfmessageserver/qmailmessageservice.cpp          | 2 +-
+ src/plugins/messageservices/imap/imapclient.cpp                 | 2 +-
+ src/plugins/messageservices/imap/imapprotocol.h                 | 2 +-
+ src/plugins/messageservices/imap/imapstrategy.cpp               | 2 +-
+ src/plugins/messageservices/pop/popclient.cpp                   | 2 +-
+ src/tools/messageserver/servicehandler.cpp                      | 2 +-
+ tests/tst_locks/tst_locks.cpp                                   | 2 +-
+ tests/tst_longstream/tst_longstream.cpp                         | 2 +-
+ tests/tst_longstring/tst_longstring.cpp                         | 2 +-
+ tests/tst_python_email/tst_python_email.cpp                     | 2 +-
+ tests/tst_qmailmessageset/tst_qmailmessageset.cpp               | 2 +-
+ tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp         | 2 +-
+ tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp         | 2 +-
+ tests/tst_qmailstore/tst_qmailstore.cpp                         | 2 +-
+ tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp                 | 2 +-
+ tests/tst_qprivateimplementation/tst_qprivateimplementation.cpp | 2 +-
+ 16 files changed, 16 insertions(+), 16 deletions(-)
+
+diff --git a/src/libraries/qmfmessageserver/qmailmessageservice.cpp b/src/libraries/qmfmessageserver/qmailmessageservice.cpp
+index c1404aab..ac9e9077 100644
+--- a/src/libraries/qmfmessageserver/qmailmessageservice.cpp
++++ b/src/libraries/qmfmessageserver/qmailmessageservice.cpp
+@@ -32,7 +32,7 @@
+ ****************************************************************************/
+ 
+ #include "qmailmessageservice.h"
+-#include <longstream_p.h>
++#include <private/longstream_p.h>
+ #include <QAbstractSocket>
+ #include <QCoreApplication>
+ #include <QList>
+diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
+index 1b7e642e..2b40f962 100644
+--- a/src/plugins/messageservices/imap/imapclient.cpp
++++ b/src/plugins/messageservices/imap/imapclient.cpp
+@@ -35,7 +35,7 @@
+ #include "imapauthenticator.h"
+ #include "imapconfiguration.h"
+ #include "imapstrategy.h"
+-#include <longstream_p.h>
++#include <private/longstream_p.h>
+ #include <qmaillog.h>
+ #include <qmailmessagebuffer.h>
+ #include <qmailfolder.h>
+diff --git a/src/plugins/messageservices/imap/imapprotocol.h b/src/plugins/messageservices/imap/imapprotocol.h
+index 1f35578d..f09d18bd 100644
+--- a/src/plugins/messageservices/imap/imapprotocol.h
++++ b/src/plugins/messageservices/imap/imapprotocol.h
+@@ -35,7 +35,7 @@
+ #define IMAPPROTOCOL_H
+ 
+ #include "imapmailboxproperties.h"
+-#include <longstream_p.h>
++#include <private/longstream_p.h>
+ #include <qobject.h>
+ #include <qstring.h>
+ #include <qstringlist.h>
+diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
+index 4165a9bc..92dfc5e5 100644
+--- a/src/plugins/messageservices/imap/imapstrategy.cpp
++++ b/src/plugins/messageservices/imap/imapstrategy.cpp
+@@ -34,7 +34,7 @@
+ #include "imapstrategy.h"
+ #include "imapclient.h"
+ #include "imapconfiguration.h"
+-#include <longstream_p.h>
++#include <private/longstream_p.h>
+ #include <qobject.h>
+ #include <qmaillog.h>
+ #include <qmailaccount.h>
+diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
+index 32010a8e..5a69db4a 100644
+--- a/src/plugins/messageservices/pop/popclient.cpp
++++ b/src/plugins/messageservices/pop/popclient.cpp
+@@ -36,7 +36,7 @@
+ #include "popconfiguration.h"
+ #include <QFileInfo>
+ #include <QRegExp>
+-#include <longstream_p.h>
++#include <private/longstream_p.h>
+ #include <qmailstore.h>
+ #include <qmailmessagebuffer.h>
+ #include <qmailtransport.h>
+diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
+index 7082d882..3ba85da3 100644
+--- a/src/tools/messageserver/servicehandler.cpp
++++ b/src/tools/messageserver/servicehandler.cpp
+@@ -33,7 +33,7 @@
+ 
+ 
+ #include "servicehandler.h"
+-#include <longstream_p.h>
++#include <private/longstream_p.h>
+ #include <qmflist.h>
+ #include <qmailmessageserver.h>
+ #include <qmailserviceconfiguration.h>
+diff --git a/tests/tst_locks/tst_locks.cpp b/tests/tst_locks/tst_locks.cpp
+index 8d5364cd..339aeb9c 100644
+--- a/tests/tst_locks/tst_locks.cpp
++++ b/tests/tst_locks/tst_locks.cpp
+@@ -34,7 +34,7 @@
+ #include <QObject>
+ #include <QTest>
+ #include <qmailaddress.h>
+-#include <locks_p.h>
++#include <private/locks_p.h>
+ #include "qmailaccountkey.h"
+ #include <ctype.h>
+ 
+diff --git a/tests/tst_longstream/tst_longstream.cpp b/tests/tst_longstream/tst_longstream.cpp
+index 4184691e..26d042f7 100644
+--- a/tests/tst_longstream/tst_longstream.cpp
++++ b/tests/tst_longstream/tst_longstream.cpp
+@@ -33,7 +33,7 @@
+ 
+ #include <QObject>
+ #include <QTest>
+-#include <longstream_p.h>
++#include <private/longstream_p.h>
+ #include <ctype.h>
+ #include <QDir>
+ #include <QRegularExpression>
+diff --git a/tests/tst_longstring/tst_longstring.cpp b/tests/tst_longstring/tst_longstring.cpp
+index 76c60f78..e18523b3 100644
+--- a/tests/tst_longstring/tst_longstring.cpp
++++ b/tests/tst_longstring/tst_longstring.cpp
+@@ -34,7 +34,7 @@
+ #include <QObject>
+ #include <QTest>
+ #include <qmailaddress.h>
+-#include <longstring_p.h>
++#include <private/longstring_p.h>
+ #include <ctype.h>
+ 
+ 
+diff --git a/tests/tst_python_email/tst_python_email.cpp b/tests/tst_python_email/tst_python_email.cpp
+index 224a7895..1eb8e570 100644
+--- a/tests/tst_python_email/tst_python_email.cpp
++++ b/tests/tst_python_email/tst_python_email.cpp
+@@ -34,7 +34,7 @@
+ #include <QObject>
+ #include <QTest>
+ #include <qmailmessage.h>
+-#include <longstring_p.h>
++#include <private/longstring_p.h>
+ #include <qmailnamespace.h>
+ #include <ctype.h>
+ 
+diff --git a/tests/tst_qmailmessageset/tst_qmailmessageset.cpp b/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
+index 7fc7083d..168fb891 100644
+--- a/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
++++ b/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
+@@ -35,7 +35,7 @@
+ #include <QTest>
+ #include <ctype.h>
+ #include "qmailmessageset.h"
+-#include <qmailmessageset_p.h>
++#include <private/qmailmessageset_p.h>
+ #include "qmailstore.h"
+ 
+ /*
+diff --git a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
+index 338d7ea6..e206479f 100644
+--- a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
++++ b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
+@@ -36,7 +36,7 @@
+ #include <QTest>
+ #include <QSignalSpy>
+ #include <qmailserviceaction.h>
+-#include <qmailserviceaction_p.h>
++#include <private/qmailserviceaction_p.h>
+ #include <qmailaccount.h>
+ 
+ 
+diff --git a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
+index 37a1b3de..2248ce0e 100644
+--- a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
++++ b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
+@@ -34,7 +34,7 @@
+ #include <QObject>
+ #include <QTest>
+ #include <qmailserviceaction.h>
+-#include <qmailserviceaction_p.h>
++#include <private/qmailserviceaction_p.h>
+ #include <qmailaccount.h>
+ #include <qmaildisconnected.h>
+ #include <qmailnamespace.h>
+diff --git a/tests/tst_qmailstore/tst_qmailstore.cpp b/tests/tst_qmailstore/tst_qmailstore.cpp
+index b568eccb..e13d6207 100644
+--- a/tests/tst_qmailstore/tst_qmailstore.cpp
++++ b/tests/tst_qmailstore/tst_qmailstore.cpp
+@@ -38,7 +38,7 @@
+ #include <qmailstore.h>
+ #include <QSettings>
+ #include <qmailnamespace.h>
+-#include <qmailstoreimplementation_p.h>
++#include <private/qmailstoreimplementation_p.h>
+ 
+ //TESTED_CLASS=QMailStore
+ //TESTED_FILES=src/libraries/qtopiamail/qmailstore.cpp
+diff --git a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
+index 338979b4..cd8c1709 100644
+--- a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
++++ b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
+@@ -38,7 +38,7 @@
+ #include <qmailstore.h>
+ #include <QSettings>
+ #include <qmailnamespace.h>
+-#include <locks_p.h>
++#include <private/locks_p.h>
+ 
+ class tst_QMailStoreKeys : public QObject
+ {
+diff --git a/tests/tst_qprivateimplementation/tst_qprivateimplementation.cpp b/tests/tst_qprivateimplementation/tst_qprivateimplementation.cpp
+index 4a96d78f..abb3d23f 100644
+--- a/tests/tst_qprivateimplementation/tst_qprivateimplementation.cpp
++++ b/tests/tst_qprivateimplementation/tst_qprivateimplementation.cpp
+@@ -33,7 +33,7 @@
+ 
+ // We're effectively part of the QMF library for this test:
+ #define QMF_INTERNAL
+-#include <qprivateimplementationdef_p.h>
++#include <private/qprivateimplementationdef_p.h>
+ 
+ #include <QObject>
+ #include <QString>

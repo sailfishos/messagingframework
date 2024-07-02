@@ -12,7 +12,7 @@ DEFINES+=USE_KEEPALIVE
  3 files changed, 38 insertions(+)
 
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
-index 88680e95..04e64e63 100644
+index 4b65fc1e..03c19785 100644
 --- a/src/plugins/messageservices/imap/imap.pro
 +++ b/src/plugins/messageservices/imap/imap.pro
 @@ -6,6 +6,10 @@ load(qt_plugin)
@@ -23,14 +23,14 @@ index 88680e95..04e64e63 100644
 +    PKGCONFIG += keepalive
 +}
 +
- contains(DEFINES,USE_ACCOUNTS_QT) {
-     CONFIG += link_pkgconfig
-     QT += xml
+ HEADERS += imapclient.h \
+            imapconfiguration.h \
+            imapmailboxproperties.h \
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 3660c2be..55c09d91 100644
+index b1831448..01d18717 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1534,6 +1534,12 @@ ImapService::ImapService(const QMailAccountId &accountId)
+@@ -1473,6 +1473,12 @@ ImapService::ImapService(const QMailAccountId &accountId)
        _networkSession(0),
        _networkSessionTimer(new QTimer(this))
  {
@@ -43,7 +43,7 @@ index 3660c2be..55c09d91 100644
      QMailAccount account(accountId);
      if (!(account.status() & QMailAccount::CanSearchOnServer)) {
          account.setStatus(QMailAccount::CanSearchOnServer, true);
-@@ -1946,7 +1952,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
+@@ -1880,7 +1886,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
          }
      }
      _idling = status;
