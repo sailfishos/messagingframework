@@ -10,7 +10,7 @@ Subject: [PATCH] Revert core5compat addition
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmfclient.pro b/src/libraries/qmfclient/qmfclient.pro
-index da650b33..c827d16f 100644
+index 62e6415d..d97bdf03 100644
 --- a/src/libraries/qmfclient/qmfclient.pro
 +++ b/src/libraries/qmfclient/qmfclient.pro
 @@ -1,5 +1,5 @@
@@ -21,7 +21,7 @@ index da650b33..c827d16f 100644
  
  # FIXME this will result in prl file having explicit linkage against qt-xml and accounts+signon.
 diff --git a/src/plugins/messageservices/pop/pop.pro b/src/plugins/messageservices/pop/pop.pro
-index bdef288d..798a7079 100644
+index edcc1220..56b5d88e 100644
 --- a/src/plugins/messageservices/pop/pop.pro
 +++ b/src/plugins/messageservices/pop/pop.pro
 @@ -4,7 +4,7 @@ PLUGIN_TYPE = messageservices
@@ -31,10 +31,10 @@ index bdef288d..798a7079 100644
 -QT = core core5compat network qmfclient qmfclient-private qmfmessageserver
 +QT = core network qmfclient qmfclient-private qmfmessageserver
  
- contains(DEFINES,USE_ACCOUNTS_QT) {
-     CONFIG += link_pkgconfig
+ HEADERS += popclient.h \
+            popconfiguration.h \
 diff --git a/src/plugins/messageservices/smtp/smtp.pro b/src/plugins/messageservices/smtp/smtp.pro
-index 62f60541..c736842b 100644
+index a987d84a..bcae20cd 100644
 --- a/src/plugins/messageservices/smtp/smtp.pro
 +++ b/src/plugins/messageservices/smtp/smtp.pro
 @@ -4,7 +4,7 @@ PLUGIN_TYPE = messageservices
@@ -44,5 +44,5 @@ index 62f60541..c736842b 100644
 -QT = core core5compat network qmfclient qmfmessageserver
 +QT = core network qmfclient qmfmessageserver
  
- contains(DEFINES,USE_ACCOUNTS_QT) {
-     CONFIG += link_pkgconfig
+ HEADERS += smtpauthenticator.h \
+            smtpclient.h \

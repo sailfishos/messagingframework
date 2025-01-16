@@ -1,0 +1,289 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Damien Caliste <dcaliste@free.fr>
+Date: Mon, 7 Oct 2024 12:28:42 +0200
+Subject: [PATCH] Protect service pointer access.
+
+Ensure that service pointer is not null before using it.
+---
+ .../messageservices/imap/imapservice.cpp      | 61 +++++++++++++++++++
+ .../messageservices/pop/popservice.cpp        | 20 ++++++
+ 2 files changed, 81 insertions(+)
+
+diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
+index 500437cd..6cfb59ed 100644
+--- a/src/plugins/messageservices/imap/imapservice.cpp
++++ b/src/plugins/messageservices/imap/imapservice.cpp
+@@ -221,6 +221,12 @@ private:
+ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, const QMailFolderId &folderId, bool descending)
+ {
+     Q_ASSERT(!_unavailable);
++    // Make sure service is still available, for e.g
++    // long sync operation is ongoing and account
++    // is disabled in the meantime.
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -294,6 +300,9 @@ bool ImapService::Source::retrieveNewMessages(const QMailAccountId &accountId, c
+ bool ImapService::Source::retrieveMessageLists(const QMailAccountId &accountId, const QMailFolderIdList &_folderIds, uint minimum, const QMailMessageSortKey &sort, bool accountCheck)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -340,6 +349,9 @@ bool ImapService::Source::retrieveMessageLists(const QMailAccountId &accountId,
+ bool ImapService::Source::retrieveMessages(const QMailMessageIdList &messageIds, QMailRetrievalAction::RetrievalSpecification spec)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -388,6 +400,9 @@ bool ImapService::Source::retrieveMessages(const QMailMessageIdList &messageIds,
+ bool ImapService::Source::retrieveMessagePart(const QMailMessagePart::Location &partLocation)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -425,6 +440,9 @@ bool ImapService::Source::retrieveMessagePart(const QMailMessagePart::Location &
+ bool ImapService::Source::retrieveMessageRange(const QMailMessageId &messageId, uint minimum)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -466,6 +484,9 @@ bool ImapService::Source::retrieveMessageRange(const QMailMessageId &messageId,
+ bool ImapService::Source::retrieveMessagePartRange(const QMailMessagePart::Location &partLocation, uint minimum)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -508,6 +529,9 @@ bool ImapService::Source::retrieveMessagePartRange(const QMailMessagePart::Locat
+ bool ImapService::Source::retrieveAll(const QMailAccountId &accountId)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -563,6 +587,9 @@ void ImapService::Source::queueDisconnectedOperations(const QMailAccountId &acco
+ bool ImapService::Source::exportUpdates(const QMailAccountId &accountId)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -615,6 +642,8 @@ bool ImapService::Source::synchronize(const QMailAccountId &accountId)
+ bool ImapService::Source::deleteMessages(const QMailMessageIdList &allIds)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
+     // If a server crash has occurred duplicate messages may exist in the store.
+     // A duplicate message is one that refers to the same serverUid as another message in the same account & folder.
+     // Ensure that when a duplicate message is deleted no message is deleted from the server.
+@@ -674,6 +703,9 @@ bool ImapService::Source::deleteMessages(const QMailMessageIdList &allIds)
+ bool ImapService::Source::doDelete(const QMailMessageIdList &ids)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -699,6 +731,9 @@ bool ImapService::Source::doDelete(const QMailMessageIdList &ids)
+ bool ImapService::Source::copyMessages(const QMailMessageIdList &messageIds, const QMailFolderId &destinationId)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -730,6 +765,9 @@ bool ImapService::Source::copyMessages(const QMailMessageIdList &messageIds, con
+ bool ImapService::Source::moveMessages(const QMailMessageIdList &messageIds, const QMailFolderId &destinationId)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -796,6 +834,9 @@ bool ImapService::Source::moveMessages(const QMailMessageIdList &messageIds, con
+ bool ImapService::Source::flagMessages(const QMailMessageIdList &messageIds, quint64 setMask, quint64 unsetMask)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -991,6 +1032,9 @@ bool ImapService::Source::flagMessages(const QMailMessageIdList &messageIds, qui
+ bool ImapService::Source::createFolder(const QString &name, const QMailAccountId &accountId, const QMailFolderId &parentId)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -1078,6 +1122,9 @@ bool ImapService::Source::createStandardFolders(const QMailAccountId &accountId)
+ bool ImapService::Source::deleteFolder(const QMailFolderId &folderId)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -1103,6 +1150,9 @@ bool ImapService::Source::deleteFolder(const QMailFolderId &folderId)
+ bool ImapService::Source::renameFolder(const QMailFolderId &folderId, const QString &name)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -1175,6 +1225,8 @@ bool ImapService::Source::countMessages(const QMailMessageKey &searchCriteria, c
+ bool ImapService::Source::searchMessages(const QMailMessageKey &searchCriteria, const QString &bodyText, quint64 limit, const QMailMessageSortKey &sort, bool count)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -1195,6 +1247,9 @@ bool ImapService::Source::searchMessages(const QMailMessageKey &searchCriteria,
+ 
+ bool ImapService::Source::cancelSearch()
+ {
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -1210,6 +1265,9 @@ bool ImapService::Source::cancelSearch()
+ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Location, QMailMessagePart::Location> > &messageIds)
+ {
+     Q_ASSERT(!_unavailable);
++    if (!_service)
++        return false;
++
+     if (!_service->_client) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrFrameworkFault, tr("Account disabled"));
+         return false;
+@@ -1304,6 +1362,9 @@ bool ImapService::Source::initiateStrategy()
+ // Copy or Move Completed
+ void ImapService::Source::messageCopyCompleted(QMailMessage &message, const QMailMessage &original)
+ {
++    if (!_service)
++        return;
++
+     if (_service->_client->strategy()->error()) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrInvalidData, tr("Destination message failed to match source message"));
+         return;
+diff --git a/src/plugins/messageservices/pop/popservice.cpp b/src/plugins/messageservices/pop/popservice.cpp
+index b8215eb3..02045c2b 100644
+--- a/src/plugins/messageservices/pop/popservice.cpp
++++ b/src/plugins/messageservices/pop/popservice.cpp
+@@ -109,6 +109,9 @@ private:
+ 
+ bool PopService::Source::retrieveFolderList(const QMailAccountId &accountId, const QMailFolderId &folderId, bool descending)
+ {
++    if (!_service)
++        return false;
++
+     if (!accountId.isValid()) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrInvalidData, tr("No account specified"));
+         return false;
+@@ -131,6 +134,8 @@ bool PopService::Source::retrieveFolderList(const QMailAccountId &accountId, con
+ 
+ bool PopService::Source::retrieveMessageLists(const QMailAccountId &accountId, const QMailFolderIdList &folderIds, uint minimum, const QMailMessageSortKey &sort)
+ {
++    if (!_service)
++        return false;
+     if (folderIds.isEmpty()) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrInvalidData, tr("No folders specified"));
+         return false;
+@@ -141,6 +146,9 @@ bool PopService::Source::retrieveMessageLists(const QMailAccountId &accountId, c
+ 
+ bool PopService::Source::retrieveMessageList(const QMailAccountId &accountId, const QMailFolderId &folderId, uint minimum, const QMailMessageSortKey &sort)
+ {
++    if (!_service)
++        return false;
++
+     if (!accountId.isValid()) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrInvalidData, tr("No account specified"));
+         return false;
+@@ -174,6 +182,9 @@ bool PopService::Source::retrieveMessageList(const QMailAccountId &accountId, co
+ 
+ bool PopService::Source::retrieveMessages(const QMailMessageIdList &messageIds, QMailRetrievalAction::RetrievalSpecification spec)
+ {
++    if (!_service)
++        return false;
++
+     if (messageIds.isEmpty()) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrInvalidData, tr("No messages to retrieve"));
+         return false;
+@@ -200,6 +211,9 @@ bool PopService::Source::retrieveMessages(const QMailMessageIdList &messageIds,
+ 
+ bool PopService::Source::retrieveAll(const QMailAccountId &accountId)
+ {
++    if (!_service)
++        return false;
++
+     if (!accountId.isValid()) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrInvalidData, tr("No account specified"));
+         return false;
+@@ -216,6 +230,9 @@ bool PopService::Source::retrieveAll(const QMailAccountId &accountId)
+ 
+ bool PopService::Source::exportUpdates(const QMailAccountId &accountId)
+ {
++    if (!_service)
++        return false;
++
+     if (!accountId.isValid()) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrInvalidData, tr("No account specified"));
+         return false;
+@@ -233,6 +250,9 @@ bool PopService::Source::synchronize(const QMailAccountId &accountId)
+ 
+ bool PopService::Source::deleteMessages(const QMailMessageIdList &messageIds)
+ {
++    if (!_service)
++        return false;
++
+     if (messageIds.isEmpty()) {
+         _service->errorOccurred(QMailServiceAction::Status::ErrInvalidData, tr("No messages to delete"));
+         return false;

@@ -1,0 +1,145 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Damien Caliste <dcaliste@free.fr>
+Date: Mon, 7 Oct 2024 12:28:42 +0200
+Subject: [PATCH] Don't save settings during IMAP logging in.
+
+---
+ .../messageservices/imap/imapclient.cpp       | 11 +++++-
+ src/plugins/messageservices/imap/imapclient.h |  1 +
+ .../messageservices/imap/imapprotocol.cpp     |  7 +++-
+ .../messageservices/imap/imapprotocol.h       |  1 +
+ .../messageservices/imap/imapservice.cpp      | 35 +++++++++++++------
+ 5 files changed, 42 insertions(+), 13 deletions(-)
+
+diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
+index e7f0399b..02dce5b8 100644
+--- a/src/plugins/messageservices/imap/imapclient.cpp
++++ b/src/plugins/messageservices/imap/imapclient.cpp
+@@ -1690,6 +1690,15 @@ void ImapClient::updateFolderCountStatus(QMailFolder *folder)
+     folder->setStatus(QMailFolder::PartialContent, (count < folder->serverCount()));
+ }
+ 
++bool ImapClient::loggingIn() const
++{
++    if (_protocol.inUse()) {
++        return _protocol.loggingIn();
++    } else {
++       return false;
++    }
++}
++
+ bool ImapClient::idlesEstablished()
+ {
+     ImapConfiguration imapCfg(_config);
+@@ -1779,7 +1788,7 @@ void ImapClient::idleOpenRequested(IdleProtocol *idleProtocol)
+         delete protocol;
+     }
+     _idlesEstablished = false;
+-    qMailLog(IMAP) << _protocol.objectName() 
++    qMailLog(IMAP) << _protocol.objectName()
+                    << "IDLE: IMAP IDLE error recovery trying to establish IDLE state now.";
+     emit restartPushEmail();
+ }
+diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
+index 7d8ac008..490d64cf 100644
+--- a/src/plugins/messageservices/imap/imapclient.h
++++ b/src/plugins/messageservices/imap/imapclient.h
+@@ -84,6 +84,7 @@ public:
+     QMailMessageKey trashKey(const QMailFolderId &folderId) const;
+     QStringList deletedMessages(const QMailFolderId &folderId) const;
+ 
++    bool loggingIn() const;
+     bool idlesEstablished();
+     void idling(const QMailFolderId &id);
+     QMailFolderIdList configurationIdleFolderIds();
+diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
+index 2d6a29e0..b179178f 100644
+--- a/src/plugins/messageservices/imap/imapprotocol.cpp
++++ b/src/plugins/messageservices/imap/imapprotocol.cpp
+@@ -3206,6 +3206,11 @@ void ImapProtocol::setReceivedCapabilities(bool received)
+     _receivedCapabilities = received;
+ }
+ 
++bool ImapProtocol::loggingIn() const
++{
++    return _fsm->state() == &_fsm->loginState;
++}
++
+ bool ImapProtocol::loggingOut() const
+ {
+     return _fsm->state() == &_fsm->logoutState;
+@@ -3865,7 +3870,7 @@ QString ImapProtocol::quoteString(const QString& input)
+ 
+ QByteArray ImapProtocol::quoteString(const QByteArray& input)
+ {
+-    return quoteString(QString(input)).toLatin1();
++    return quoteString(QString::fromLatin1(input)).toLatin1();
+ }
+ 
+ void ImapProtocol::createMail(const QString &uid, const QDateTime &timeStamp, int size, uint flags, const QString &detachedFile, const QStringList& structure)
+diff --git a/src/plugins/messageservices/imap/imapprotocol.h b/src/plugins/messageservices/imap/imapprotocol.h
+index a8c825fb..1f35578d 100644
+--- a/src/plugins/messageservices/imap/imapprotocol.h
++++ b/src/plugins/messageservices/imap/imapprotocol.h
+@@ -145,6 +145,7 @@ public:
+     bool connected() const;
+     bool encrypted() const;
+     bool inUse() const;
++    bool loggingIn() const;
+     bool loggingOut() const;
+ 
+     bool delimiterUnknown() const;
+diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
+index e6fe5ec4..b1831448 100644
+--- a/src/plugins/messageservices/imap/imapservice.cpp
++++ b/src/plugins/messageservices/imap/imapservice.cpp
+@@ -1565,6 +1565,10 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
+     bool isPushEnabled(imapCfg.pushEnabled());
+     QStringList pushFolders(imapCfg.pushFolders());
+     QString newConnectionSettings(connectionSettings(imapCfg));
++    bool loggingIn = false;
++    if (_client) {
++        loggingIn = _client->loggingIn();
++    }
+     if (!isEnabled) {
+         if (_accountWasEnabled) {
+             // Account changed from enabled to disabled
+@@ -1575,18 +1579,27 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
+         return;
+     }
+ 
+-    if ((_accountWasPushEnabled != isPushEnabled)
+-        || (_previousPushFolders != pushFolders) 
+-        || (_previousConnectionSettings != newConnectionSettings)) {
+-        // push email or connection settings have changed, restart client
+-        _initiatePushDelay.remove(_accountId);
+-        if (_accountWasEnabled) {
+-            disable();
++    // if we are in logging state let it fail first before removing the connections
++    // update settings anyway
++    if (!loggingIn) {
++        if ((_accountWasPushEnabled != isPushEnabled)
++            || (_previousPushFolders != pushFolders)
++            || (_previousConnectionSettings != newConnectionSettings)) {
++            // push email or connection settings have changed, restart client
++            _initiatePushDelay.remove(_accountId);
++            if (_accountWasEnabled) {
++                disable();
++            }
++            enable();
++        } else if (!_accountWasEnabled) {
++            // account changed from disabled to enabled
++            enable();
+         }
+-        enable();
+-    } else if (!_accountWasEnabled) {
+-        // account changed from disabled to enabled
+-        enable();
++    } else {
++        // Update the settings
++        _accountWasPushEnabled = imapCfg.pushEnabled();
++        _previousPushFolders = imapCfg.pushFolders();
++        _previousConnectionSettings = connectionSettings(imapCfg);
+     }
+     
+     // account was enabled and still is, update checkinterval 
