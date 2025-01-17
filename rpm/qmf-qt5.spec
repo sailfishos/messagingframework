@@ -60,9 +60,8 @@ Patch26:  0026-Revert-Set-PLUGIN_CLASS_NAME-in-plugin-.pro-files.patch
 Patch27:  0027-Revert-Bump-version-to-6.0.0-since-we-build-against-.patch
 Patch28:  0028-Protect-service-pointer-access.patch
 Patch29:  0029-Save-account-before-config.patch
-Patch30:  0030-Don-t-fetch-capabilities-on-smtp-creation.patch
-Patch31:  0031-Fallback-to-sso-credential-plugin.patch
-Patch32:  0032-Revert-private-header-paths.patch
+Patch30:  0030-Fallback-to-sso-credential-plugin.patch
+Patch31:  0031-Revert-private-header-paths.patch
 
 
 %description

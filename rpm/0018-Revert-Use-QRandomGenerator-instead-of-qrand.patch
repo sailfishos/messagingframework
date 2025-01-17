@@ -79,7 +79,7 @@ index 60def58c..d5043ea5 100644
          if (r>57) r+=7;
          if (r>90) r+=6;
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index fe8d28e3..9e40af12 100644
+index 69e5d351..2033e669 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -43,7 +43,6 @@
