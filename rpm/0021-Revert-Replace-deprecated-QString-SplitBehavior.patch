@@ -79,7 +79,7 @@ index 0cf2f524..7293c83f 100644
  
  void ImapConfiguration::setCapabilities(const QStringList &s)
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index b179178f..75c54a82 100644
+index eb334854..654c78f1 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -409,10 +409,10 @@ void ImapState::untaggedResponse(ImapContext *c, const QString &line)
