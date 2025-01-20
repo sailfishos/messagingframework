@@ -6,10 +6,10 @@ Subject: [PATCH] Don't save settings during IMAP logging in.
 ---
  .../messageservices/imap/imapclient.cpp       | 11 +++++-
  src/plugins/messageservices/imap/imapclient.h |  1 +
- .../messageservices/imap/imapprotocol.cpp     |  7 +++-
+ .../messageservices/imap/imapprotocol.cpp     |  5 +++
  .../messageservices/imap/imapprotocol.h       |  1 +
  .../messageservices/imap/imapservice.cpp      | 35 +++++++++++++------
- 5 files changed, 42 insertions(+), 13 deletions(-)
+ 5 files changed, 41 insertions(+), 12 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
 index e7f0399b..02dce5b8 100644
@@ -53,7 +53,7 @@ index 7d8ac008..490d64cf 100644
      void idling(const QMailFolderId &id);
      QMailFolderIdList configurationIdleFolderIds();
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index 2d6a29e0..b179178f 100644
+index 073e7b19..eb334854 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -3206,6 +3206,11 @@ void ImapProtocol::setReceivedCapabilities(bool received)
@@ -68,17 +68,8 @@ index 2d6a29e0..b179178f 100644
  bool ImapProtocol::loggingOut() const
  {
      return _fsm->state() == &_fsm->logoutState;
-@@ -3865,7 +3870,7 @@ QString ImapProtocol::quoteString(const QString& input)
- 
- QByteArray ImapProtocol::quoteString(const QByteArray& input)
- {
--    return quoteString(QString(input)).toLatin1();
-+    return quoteString(QString::fromLatin1(input)).toLatin1();
- }
- 
- void ImapProtocol::createMail(const QString &uid, const QDateTime &timeStamp, int size, uint flags, const QString &detachedFile, const QStringList& structure)
 diff --git a/src/plugins/messageservices/imap/imapprotocol.h b/src/plugins/messageservices/imap/imapprotocol.h
-index a8c825fb..1f35578d 100644
+index 8f014828..70ccbd91 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.h
 +++ b/src/plugins/messageservices/imap/imapprotocol.h
 @@ -145,6 +145,7 @@ public:

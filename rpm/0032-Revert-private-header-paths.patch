@@ -49,7 +49,7 @@ index 1b7e642e..2b40f962 100644
  #include <qmailmessagebuffer.h>
  #include <qmailfolder.h>
 diff --git a/src/plugins/messageservices/imap/imapprotocol.h b/src/plugins/messageservices/imap/imapprotocol.h
-index 1f35578d..f09d18bd 100644
+index 70ccbd91..0e77a74f 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.h
 +++ b/src/plugins/messageservices/imap/imapprotocol.h
 @@ -35,7 +35,7 @@
