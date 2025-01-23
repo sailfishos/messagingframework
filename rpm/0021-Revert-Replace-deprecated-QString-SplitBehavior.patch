@@ -136,10 +136,10 @@ index 346dd7d3..7ef0989f 100644
          bool ok = false;
          int index = s.indexOf(":");
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 9e40af12..9427ee8e 100644
+index 2033e669..5d9ca89f 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
-@@ -520,7 +520,7 @@ void SmtpClient::nextAction(const QString &response)
+@@ -561,7 +561,7 @@ void SmtpClient::nextAction(const QString &response)
                      QStringList authCaps;
                      foreach (QString const& capability, capabilities) {
                          if (capability.startsWith("AUTH", Qt::CaseInsensitive)) {

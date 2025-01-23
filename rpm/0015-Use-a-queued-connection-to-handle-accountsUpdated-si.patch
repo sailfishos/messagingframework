@@ -14,8 +14,7 @@ code which caused the database change, otherwise crashes can result
  src/plugins/messageservices/pop/popclient.cpp    | 3 ++-
  src/plugins/messageservices/pop/popservice.cpp   | 2 +-
  src/plugins/messageservices/smtp/smtpclient.cpp  | 2 +-
- src/plugins/messageservices/smtp/smtpservice.cpp | 2 +-
- 6 files changed, 8 insertions(+), 6 deletions(-)
+ 5 files changed, 7 insertions(+), 5 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
 index 69313fbb..3db91fca 100644
@@ -71,29 +70,3 @@ index 98be8300..b8215eb3 100644
  
      _client.setAccount(accountId);
      QMailAccountConfiguration accountCfg(accountId);
-diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 5dfc3fb2..fe8d28e3 100644
---- a/src/plugins/messageservices/smtp/smtpclient.cpp
-+++ b/src/plugins/messageservices/smtp/smtpclient.cpp
-@@ -116,7 +116,7 @@ SmtpClient::SmtpClient(QObject* parent)
-     , credentials(nullptr)
- {
-     connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
--            this, SLOT(accountsUpdated(const QMailAccountIdList&)));
-+            this, SLOT(accountsUpdated(const QMailAccountIdList&)), Qt::QueuedConnection);
- }
- 
- SmtpClient::~SmtpClient()
-diff --git a/src/plugins/messageservices/smtp/smtpservice.cpp b/src/plugins/messageservices/smtp/smtpservice.cpp
-index cf4ad0ff..44d085af 100644
---- a/src/plugins/messageservices/smtp/smtpservice.cpp
-+++ b/src/plugins/messageservices/smtp/smtpservice.cpp
-@@ -211,7 +211,7 @@ void SmtpService::onCapabilityFetchingActivityChanged(QMailServiceAction::Activi
-                            << "Disconnect and reconnect the network connection or"
-                            << "update the account to try again";
-             connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)),
--                    this, SLOT(onAccountsUpdated(QMailAccountIdList)));
-+                    this, SLOT(onAccountsUpdated(QMailAccountIdList)), Qt::QueuedConnection);
-         }
-     }
- }
