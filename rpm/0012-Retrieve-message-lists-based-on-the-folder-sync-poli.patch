@@ -172,7 +172,7 @@ index e8563c39..3a41a1c1 100644
  #endif
  
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 04a62a7c..89831407 100644
+index c92a5f5d..26ba5610 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -235,7 +235,7 @@ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, co
@@ -352,7 +352,7 @@ index 4880b2b1..9a79e4b7 100644
      uint _total;
  };
 diff --git a/src/plugins/messageservices/pop/popservice.cpp b/src/plugins/messageservices/pop/popservice.cpp
-index 32b234d4..98be8300 100644
+index 56743f80..ef7cbf45 100644
 --- a/src/plugins/messageservices/pop/popservice.cpp
 +++ b/src/plugins/messageservices/pop/popservice.cpp
 @@ -103,6 +103,7 @@ private:

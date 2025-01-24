@@ -12,10 +12,10 @@ Subject: [PATCH] Don't save settings during IMAP logging in.
  5 files changed, 41 insertions(+), 12 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index e7f0399b..02dce5b8 100644
+index 344d2ab5..bafef831 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -1690,6 +1690,15 @@ void ImapClient::updateFolderCountStatus(QMailFolder *folder)
+@@ -1683,6 +1683,15 @@ void ImapClient::updateFolderCountStatus(QMailFolder *folder)
      folder->setStatus(QMailFolder::PartialContent, (count < folder->serverCount()));
  }
  
@@ -31,7 +31,7 @@ index e7f0399b..02dce5b8 100644
  bool ImapClient::idlesEstablished()
  {
      ImapConfiguration imapCfg(_config);
-@@ -1779,7 +1788,7 @@ void ImapClient::idleOpenRequested(IdleProtocol *idleProtocol)
+@@ -1772,7 +1781,7 @@ void ImapClient::idleOpenRequested(IdleProtocol *idleProtocol)
          delete protocol;
      }
      _idlesEstablished = false;
@@ -41,10 +41,10 @@ index e7f0399b..02dce5b8 100644
      emit restartPushEmail();
  }
 diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
-index 7d8ac008..490d64cf 100644
+index 64b5fe8f..8362043d 100644
 --- a/src/plugins/messageservices/imap/imapclient.h
 +++ b/src/plugins/messageservices/imap/imapclient.h
-@@ -84,6 +84,7 @@ public:
+@@ -83,6 +83,7 @@ public:
      QMailMessageKey trashKey(const QMailFolderId &folderId) const;
      QStringList deletedMessages(const QMailFolderId &folderId) const;
  
@@ -81,10 +81,10 @@ index 8f014828..70ccbd91 100644
  
      bool delimiterUnknown() const;
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index e6fe5ec4..b1831448 100644
+index 76c8e2a4..ac9e5033 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1565,6 +1565,10 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
+@@ -1564,6 +1564,10 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
      bool isPushEnabled(imapCfg.pushEnabled());
      QStringList pushFolders(imapCfg.pushFolders());
      QString newConnectionSettings(connectionSettings(imapCfg));
@@ -95,7 +95,7 @@ index e6fe5ec4..b1831448 100644
      if (!isEnabled) {
          if (_accountWasEnabled) {
              // Account changed from enabled to disabled
-@@ -1575,18 +1579,27 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
+@@ -1574,18 +1578,27 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
          return;
      }
  
