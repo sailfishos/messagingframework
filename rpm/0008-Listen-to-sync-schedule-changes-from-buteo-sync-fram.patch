@@ -8,12 +8,12 @@ react to changes in the account schedule related to always-on mode
 and activate/deactivate IMAP IDLE.
 ---
  src/plugins/messageservices/imap/imap.pro     |   1 +
- .../messageservices/imap/imapclient.cpp       |  43 ++++++-
+ .../messageservices/imap/imapclient.cpp       |  32 ++++-
  src/plugins/messageservices/imap/imapclient.h |   3 +
  .../messageservices/imap/imapservice.cpp      | 110 +++++++++++++++---
  .../messageservices/imap/imapservice.h        |   4 +
  src/tools/systemd/messageserver5.service      |   2 +-
- 6 files changed, 143 insertions(+), 20 deletions(-)
+ 6 files changed, 132 insertions(+), 20 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
 index 03c19785..18608bae 100644
@@ -28,7 +28,7 @@ index 03c19785..18608bae 100644
  
  HEADERS += imapclient.h \
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index d3e7ade5..9359f1ad 100644
+index 036c4bcd..0f6294fe 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -432,6 +432,7 @@ ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
@@ -39,7 +39,7 @@ index d3e7ade5..9359f1ad 100644
        _credentials(QMailCredentialsFactory::getCredentialsHandlerForAccount(_config)),
        _loginFailed(false)
  {
-@@ -668,7 +669,6 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
+@@ -665,7 +666,6 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
              }
  
              // We are now connected
@@ -47,7 +47,7 @@ index d3e7ade5..9359f1ad 100644
              _waitingForIdleFolderIds = configurationIdleFolderIds();
  
              if (!_idlesEstablished
-@@ -679,7 +679,7 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
+@@ -676,7 +676,7 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
                  emit updateStatus( tr("Logging in idle connection" ) );
                  monitor(_waitingForIdleFolderIds);
              } else {
@@ -56,7 +56,7 @@ index d3e7ade5..9359f1ad 100644
                      foreach(const QMailFolderId &id, _monitored.keys()) {
                          IdleProtocol *protocol = _monitored.take(id);
                          protocol->close();
-@@ -1709,8 +1709,7 @@ bool ImapClient::loggingIn() const
+@@ -1706,8 +1706,7 @@ bool ImapClient::loggingIn() const
  
  bool ImapClient::idlesEstablished()
  {
@@ -66,7 +66,7 @@ index d3e7ade5..9359f1ad 100644
          return true;
  
      return _idlesEstablished;
-@@ -1733,8 +1732,9 @@ QMailFolderIdList ImapClient::configurationIdleFolderIds()
+@@ -1730,8 +1729,9 @@ QMailFolderIdList ImapClient::configurationIdleFolderIds()
  {
      ImapConfiguration imapCfg(_config);            
      QMailFolderIdList folderIds;
@@ -77,7 +77,7 @@ index d3e7ade5..9359f1ad 100644
      foreach(QString folderName, imapCfg.pushFolders()) {
          QMailFolderId idleFolderId(mailboxId(folderName));
          if (idleFolderId.isValid()) {
-@@ -1750,7 +1750,7 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
+@@ -1747,7 +1747,7 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
      
      ImapConfiguration imapCfg(_config);
      if (!_protocol.supportsCapability("IDLE")
@@ -86,7 +86,7 @@ index d3e7ade5..9359f1ad 100644
          return;
      }
      
-@@ -1826,6 +1826,26 @@ void ImapClient::removeAllFromBuffer(QMailMessage *message)
+@@ -1823,6 +1823,26 @@ void ImapClient::removeAllFromBuffer(QMailMessage *message)
      }
  }
  
@@ -113,40 +113,8 @@ index d3e7ade5..9359f1ad 100644
  void ImapClient::logIn()
  {
      emit updateStatus( tr("Logging in" ) );
-@@ -1880,6 +1900,14 @@ void ImapClient::onAccountsUpdated(const QMailAccountIdList &list)
-         }
- 
-         qMailLog(IMAP) << Q_FUNC_INFO << imapCfg1.mailUserName() ;
-+#ifdef USE_KEEPALIVE
-+        // compare config modified by the User
-+        const bool& notEqual = (imapCfg1.mailUserName() != imapCfg2.mailUserName()) ||
-+                               (imapCfg1.mailPassword() != imapCfg2.mailPassword()) ||
-+                               (imapCfg1.mailServer() != imapCfg2.mailServer()) ||
-+                               (imapCfg1.mailPort() != imapCfg2.mailPort()) ||
-+                               (imapCfg1.mailEncryption() != imapCfg2.mailEncryption());
-+#else
-         // compare config modified by the User
-         const bool& notEqual = (imapCfg1.mailUserName() != imapCfg2.mailUserName()) ||
-                                (imapCfg1.mailPassword() != imapCfg2.mailPassword()) ||
-@@ -1887,13 +1915,16 @@ void ImapClient::onAccountsUpdated(const QMailAccountIdList &list)
-                                (imapCfg1.mailPort() != imapCfg2.mailPort()) ||
-                                (imapCfg1.mailEncryption() != imapCfg2.mailEncryption()) ||
-                                (imapCfg1.pushEnabled() != imapCfg2.pushEnabled());
-+#endif
-         if (notEqual)
-             closeIdleConnections();
- 
-+#ifndef USE_KEEPALIVE
-         if (imapCfg1.pushEnabled() != imapCfg2.pushEnabled()) {
-             if (imapCfg2.pushEnabled())
-                 emit restartPushEmail();
-         }
-+#endif
-     }
- }
- 
 diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
-index d1cecad5..0bfa035d 100644
+index 9330e033..47615c57 100644
 --- a/src/plugins/messageservices/imap/imapclient.h
 +++ b/src/plugins/messageservices/imap/imapclient.h
 @@ -94,6 +94,8 @@ public:
@@ -158,7 +126,7 @@ index d1cecad5..0bfa035d 100644
  
  signals:
      void errorOccurred(int, const QString &);
-@@ -187,6 +189,7 @@ private:
+@@ -183,6 +185,7 @@ private:
      QList<QMailMessageBufferFlushCallback*> callbacks;
      QVector<QMailMessage*> _bufferedMessages;
      int _pushConnectionsReserved;
