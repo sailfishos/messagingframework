@@ -94,13 +94,11 @@ base-qmf-oauth2-plugin/oauth2plugin.cpp
  src/plugins/credentials/sso/sso.pro           |    2 +-
  .../messageservices/imap/imapclient.cpp       |   39 +
  src/plugins/messageservices/imap/imapclient.h |    4 +
- src/plugins/messageservices/pop/popclient.cpp |   17 +
- src/plugins/messageservices/pop/popclient.h   |    4 +
  src/plugins/plugins.pro                       |    4 +
  src/tools/messageserver/servicehandler.cpp    |   13 +
  tests/tests.pri                               |    6 +
  tests/tst_qmailstore/tst_qmailstore.cpp       |   93 +-
- 16 files changed, 1661 insertions(+), 67 deletions(-)
+ 14 files changed, 1640 insertions(+), 67 deletions(-)
  create mode 100644 src/libraries/qmfclient/share/email.provider
  create mode 100644 src/libraries/qmfclient/share/email.service
 
@@ -2122,20 +2120,20 @@ index 9abae1c7..ac8c2902 100644
  HEADERS += plugin.h \
             ssomanager.h
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index c9bb6f94..6e997893 100644
+index 4aaa48a1..bef0b027 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -435,6 +435,9 @@ ImapClient::ImapClient(QObject* parent)
-             this, SLOT(connectionInactive()));
- 
+@@ -438,6 +438,9 @@ ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
      connect(QMailMessageBuffer::instance(), SIGNAL(flushed()), this, SLOT(messageBufferFlushed()));
+ 
+     setupAccount();
 +#ifdef USE_ACCOUNTS_QT
 +    connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)), this, SLOT(onAccountsUpdated(QMailAccountIdList)));
 +#endif
  }
  
  ImapClient::~ImapClient()
-@@ -1814,4 +1817,40 @@ void ImapClient::onCredentialsStatusChanged()
+@@ -1807,4 +1810,56 @@ void ImapClient::onCredentialsStatusChanged()
      }
  }
  
@@ -2175,12 +2173,36 @@ index c9bb6f94..6e997893 100644
 +    }
 +}
 +
++void ImapClient::closeIdleConnections()
++{
++    qMailLog(IMAP) << Q_FUNC_INFO << "Account was modified. Closing connections";
++
++    closeConnection();
++    // closing idle connections
++    foreach(const QMailFolderId &id, _monitored.keys()) {
++        IdleProtocol *protocol = _monitored.take(id);
++        if (protocol->inUse()) {
++            protocol->close();
++        }
++        delete protocol;
++    }
++    _idlesEstablished = false;
++}
++
  #include "imapclient.moc"
 diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
-index e568ce84..f7029514 100644
+index dbf5abec..64cb362f 100644
 --- a/src/plugins/messageservices/imap/imapclient.h
 +++ b/src/plugins/messageservices/imap/imapclient.h
-@@ -145,6 +145,10 @@ protected slots:
+@@ -67,6 +67,7 @@ public:
+     void newConnection();
+     void cancelTransfer(QMailServiceAction::Status::ErrorCode code, const QString &text);
+     void closeConnection();
++    void closeIdleConnections();
+ 
+     ImapStrategyContext *strategyContext();
+ 
+@@ -144,6 +144,10 @@ protected slots:
      void messageBufferFlushed();
      void onCredentialsStatusChanged();
  
@@ -2191,53 +2213,6 @@ index e568ce84..f7029514 100644
  private:
      friend class ImapStrategyContextBase;
  
-diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index 6843889c..966fe609 100644
---- a/src/plugins/messageservices/pop/popclient.cpp
-+++ b/src/plugins/messageservices/pop/popclient.cpp
-@@ -83,6 +83,9 @@ PopClient::PopClient(QObject* parent)
-     inactiveTimer.setSingleShot(true);
-     connect(&inactiveTimer, SIGNAL(timeout()), this, SLOT(connectionInactive()));
-     connect(QMailMessageBuffer::instance(), SIGNAL(flushed()), this, SLOT(messageBufferFlushed()));
-+#ifdef USE_ACCOUNTS_QT
-+    connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)), this, SLOT(onAccountsUpdated(QMailAccountIdList)));
-+#endif
- }
- 
- PopClient::~PopClient()
-@@ -1372,3 +1375,17 @@ void PopClient::onCredentialsStatusChanged()
-                this, &PopClient::onCredentialsStatusChanged);
-     nextAction();
- }
-+
-+#ifdef USE_ACCOUNTS_QT
-+void PopClient::onAccountsUpdated(const QMailAccountIdList &list)
-+{
-+    if (!list.contains(accountId()))
-+        return;
-+
-+    QMailAccount acc(accountId());
-+    bool isEnabled(acc.status() & QMailAccount::Enabled);
-+    if (!isEnabled)
-+        return;
-+    setAccount(accountId());
-+}
-+#endif
-diff --git a/src/plugins/messageservices/pop/popclient.h b/src/plugins/messageservices/pop/popclient.h
-index ca7054b3..9edc1656 100644
---- a/src/plugins/messageservices/pop/popclient.h
-+++ b/src/plugins/messageservices/pop/popclient.h
-@@ -102,6 +102,10 @@ protected slots:
-     void connected(QMailTransport::EncryptType encryptType);
-     void transportError(int, QString msg);
- 
-+#ifdef USE_ACCOUNTS_QT
-+    void onAccountsUpdated(const QMailAccountIdList& list);
-+#endif
-+
-     void onCredentialsStatusChanged();
- 
-     void connectionInactive();
 diff --git a/src/plugins/plugins.pro b/src/plugins/plugins.pro
 index 6c9464c2..a647ade7 100644
 --- a/src/plugins/plugins.pro

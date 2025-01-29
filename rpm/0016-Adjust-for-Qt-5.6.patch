@@ -31,10 +31,10 @@ index 6f603653..481a1f4d 100644
      connect(mSocket, &QAbstractSocket::bytesWritten, this, &QMailTransport::bytesWritten);
  
 diff --git a/tests/tst_smtp/tst_smtp.cpp b/tests/tst_smtp/tst_smtp.cpp
-index 74360d1a..ebeaa0cf 100644
+index 8dcfbe3a..7defc685 100644
 --- a/tests/tst_smtp/tst_smtp.cpp
 +++ b/tests/tst_smtp/tst_smtp.cpp
-@@ -99,9 +99,9 @@ void tst_SmtpClient::test_connection()
+@@ -98,9 +98,9 @@ void tst_SmtpClient::test_connection()
      QVERIFY(completed.wait());
  
      QCOMPARE(updateStatus.count(), 3);
@@ -47,7 +47,7 @@ index 74360d1a..ebeaa0cf 100644
  }
  
  void tst_SmtpClient::test_auth()
-@@ -120,9 +120,9 @@ void tst_SmtpClient::test_auth()
+@@ -119,9 +119,9 @@ void tst_SmtpClient::test_auth()
      QVERIFY(!completed.wait(250)); // Fails with wrong credentials
  
      QCOMPARE(updateStatus.count(), 3);
@@ -60,7 +60,7 @@ index 74360d1a..ebeaa0cf 100644
  
      smtp.setSmtpAuthentication(QMail::PlainMechanism);
      QVERIFY(QMailStore::instance()->updateAccountConfiguration(&config));
-@@ -131,7 +131,7 @@ void tst_SmtpClient::test_auth()
+@@ -130,7 +130,7 @@ void tst_SmtpClient::test_auth()
      QVERIFY(!completed.wait(250)); // Fails with wrong credentials
  
      QCOMPARE(updateStatus.count(), 3);

@@ -11,18 +11,16 @@ code which caused the database change, otherwise crashes can result
 ---
  src/plugins/messageservices/imap/imapclient.cpp  | 3 ++-
  src/plugins/messageservices/imap/imapservice.cpp | 2 +-
- src/plugins/messageservices/pop/popclient.cpp    | 3 ++-
  src/plugins/messageservices/pop/popservice.cpp   | 2 +-
- src/plugins/messageservices/smtp/smtpclient.cpp  | 2 +-
- 5 files changed, 7 insertions(+), 5 deletions(-)
+ 3 files changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 69313fbb..3db91fca 100644
+index e71325f2..894feb08 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -449,7 +449,8 @@ ImapClient::ImapClient(QObject* parent)
+@@ -452,7 +452,8 @@ ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
  
-     connect(QMailMessageBuffer::instance(), SIGNAL(flushed()), this, SLOT(messageBufferFlushed()));
+     setupAccount();
  #ifdef USE_ACCOUNTS_QT
 -    connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)), this, SLOT(onAccountsUpdated(QMailAccountIdList)));
 +    connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)),
@@ -31,7 +29,7 @@ index 69313fbb..3db91fca 100644
  }
  
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 89831407..3376fcd4 100644
+index 26ba5610..be9bbd32 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -1508,7 +1508,7 @@ ImapService::ImapService(const QMailAccountId &accountId)
@@ -43,22 +41,8 @@ index 89831407..3376fcd4 100644
      connect(_initiatePushEmailTimer, SIGNAL(timeout()), this, SLOT(initiatePushEmail()));
  
  #ifdef USE_KEEPALIVE
-diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index 966fe609..32010a8e 100644
---- a/src/plugins/messageservices/pop/popclient.cpp
-+++ b/src/plugins/messageservices/pop/popclient.cpp
-@@ -84,7 +84,8 @@ PopClient::PopClient(QObject* parent)
-     connect(&inactiveTimer, SIGNAL(timeout()), this, SLOT(connectionInactive()));
-     connect(QMailMessageBuffer::instance(), SIGNAL(flushed()), this, SLOT(messageBufferFlushed()));
- #ifdef USE_ACCOUNTS_QT
--    connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)), this, SLOT(onAccountsUpdated(QMailAccountIdList)));
-+    connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)),
-+            this, SLOT(onAccountsUpdated(QMailAccountIdList)), Qt::QueuedConnection);
- #endif
- }
- 
 diff --git a/src/plugins/messageservices/pop/popservice.cpp b/src/plugins/messageservices/pop/popservice.cpp
-index 98be8300..b8215eb3 100644
+index ef7cbf45..bb1fbc5f 100644
 --- a/src/plugins/messageservices/pop/popservice.cpp
 +++ b/src/plugins/messageservices/pop/popservice.cpp
 @@ -328,7 +328,7 @@ PopService::PopService(const QMailAccountId &accountId)
@@ -68,5 +52,5 @@ index 98be8300..b8215eb3 100644
 -            this, SLOT(accountsUpdated(const QMailAccountIdList&)));
 +            this, SLOT(accountsUpdated(const QMailAccountIdList&)), Qt::QueuedConnection);
  
-     _client.setAccount(accountId);
      QMailAccountConfiguration accountCfg(accountId);
+     PopConfiguration popCfg(accountCfg);

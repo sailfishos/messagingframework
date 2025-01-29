@@ -9,7 +9,7 @@ Subject: [PATCH] Use a specific retry delay for IMAP idle connections.
  2 files changed, 23 insertions(+), 11 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 6e997893..e7f0399b 100644
+index bef0b027..344d2ab5 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -182,11 +182,12 @@ public:
@@ -55,8 +55,8 @@ index 6e997893..e7f0399b 100644
 -    emit openRequest();
  }
  
- ImapClient::ImapClient(QObject* parent)
-@@ -1743,20 +1755,20 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
+ ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
+@@ -1736,20 +1748,20 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
                      this, SIGNAL(idleNewMailNotification(QMailFolderId)));
              connect(protocol, SIGNAL(idleFlagsChangedNotification(QMailFolderId)),
                      this, SIGNAL(idleFlagsChangedNotification(QMailFolderId)));
@@ -85,10 +85,10 @@ index 6e997893..e7f0399b 100644
      }
      _protocol.close();
 diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
-index f7029514..7d8ac008 100644
+index 64cb362f..64b5fe8f 100644
 --- a/src/plugins/messageservices/imap/imapclient.h
 +++ b/src/plugins/messageservices/imap/imapclient.h
-@@ -141,7 +141,7 @@ protected slots:
+@@ -140,7 +140,7 @@ protected slots:
      void checkCommandResponse(const ImapCommand, const OperationStatus);
      void commandTransition(const ImapCommand, const OperationStatus);
      void transportStatus(const QString& status);

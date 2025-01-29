@@ -343,7 +343,7 @@ index 3c274119..0b18aaa5 100644
          transmissionInProgressIds = idSet;
          transmissionSetInitialized = true;
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 3376fcd4..500437cd 100644
+index be9bbd32..215c4c00 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -1240,7 +1240,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
