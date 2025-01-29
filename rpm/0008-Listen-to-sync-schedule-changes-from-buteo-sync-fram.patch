@@ -8,12 +8,12 @@ react to changes in the account schedule related to always-on mode
 and activate/deactivate IMAP IDLE.
 ---
  src/plugins/messageservices/imap/imap.pro     |   1 +
- .../messageservices/imap/imapclient.cpp       |  59 +++++++++-
- src/plugins/messageservices/imap/imapclient.h |   4 +
+ .../messageservices/imap/imapclient.cpp       |  43 ++++++-
+ src/plugins/messageservices/imap/imapclient.h |   3 +
  .../messageservices/imap/imapservice.cpp      | 110 +++++++++++++++---
  .../messageservices/imap/imapservice.h        |   4 +
  src/tools/systemd/messageserver5.service      |   2 +-
- 6 files changed, 160 insertions(+), 20 deletions(-)
+ 6 files changed, 143 insertions(+), 20 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
 index 03c19785..18608bae 100644
@@ -28,10 +28,10 @@ index 03c19785..18608bae 100644
  
  HEADERS += imapclient.h \
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index bafef831..e71325f2 100644
+index d3e7ade5..9359f1ad 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -397,6 +397,7 @@ ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
+@@ -432,6 +432,7 @@ ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
        _rapidClosing(false),
        _idleRetryDelay(InitialIdleRetryDelay),
        _pushConnectionsReserved(0),
@@ -39,7 +39,7 @@ index bafef831..e71325f2 100644
        _credentials(QMailCredentialsFactory::getCredentialsHandlerForAccount(_config)),
        _loginFailed(false)
  {
-@@ -633,7 +634,6 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
+@@ -668,7 +669,6 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
              }
  
              // We are now connected
@@ -47,7 +47,7 @@ index bafef831..e71325f2 100644
              _waitingForIdleFolderIds = configurationIdleFolderIds();
  
              if (!_idlesEstablished
-@@ -644,7 +644,7 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
+@@ -679,7 +679,7 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
                  emit updateStatus( tr("Logging in idle connection" ) );
                  monitor(_waitingForIdleFolderIds);
              } else {
@@ -56,7 +56,7 @@ index bafef831..e71325f2 100644
                      foreach(const QMailFolderId &id, _monitored.keys()) {
                          IdleProtocol *protocol = _monitored.take(id);
                          protocol->close();
-@@ -1694,8 +1694,7 @@ bool ImapClient::loggingIn() const
+@@ -1709,8 +1709,7 @@ bool ImapClient::loggingIn() const
  
  bool ImapClient::idlesEstablished()
  {
@@ -66,7 +66,7 @@ index bafef831..e71325f2 100644
          return true;
  
      return _idlesEstablished;
-@@ -1718,8 +1717,9 @@ QMailFolderIdList ImapClient::configurationIdleFolderIds()
+@@ -1733,8 +1732,9 @@ QMailFolderIdList ImapClient::configurationIdleFolderIds()
  {
      ImapConfiguration imapCfg(_config);            
      QMailFolderIdList folderIds;
@@ -77,7 +77,7 @@ index bafef831..e71325f2 100644
      foreach(QString folderName, imapCfg.pushFolders()) {
          QMailFolderId idleFolderId(mailboxId(folderName));
          if (idleFolderId.isValid()) {
-@@ -1735,7 +1735,7 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
+@@ -1750,7 +1750,7 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
      
      ImapConfiguration imapCfg(_config);
      if (!_protocol.supportsCapability("IDLE")
@@ -86,7 +86,7 @@ index bafef831..e71325f2 100644
          return;
      }
      
-@@ -1811,6 +1811,26 @@ void ImapClient::removeAllFromBuffer(QMailMessage *message)
+@@ -1826,6 +1826,26 @@ void ImapClient::removeAllFromBuffer(QMailMessage *message)
      }
  }
  
@@ -110,10 +110,10 @@ index bafef831..e71325f2 100644
 +    }
 +}
 +
- void ImapClient::onCredentialsStatusChanged()
+ void ImapClient::logIn()
  {
-     qMailLog(IMAP)  << "Got credential status changed" << _credentials->status();
-@@ -1850,6 +1870,14 @@ void ImapClient::onAccountsUpdated(const QMailAccountIdList &list)
+     emit updateStatus( tr("Logging in" ) );
+@@ -1880,6 +1900,14 @@ void ImapClient::onAccountsUpdated(const QMailAccountIdList &list)
          }
  
          qMailLog(IMAP) << Q_FUNC_INFO << imapCfg1.mailUserName() ;
@@ -128,7 +128,7 @@ index bafef831..e71325f2 100644
          // compare config modified by the User
          const bool& notEqual = (imapCfg1.mailUserName() != imapCfg2.mailUserName()) ||
                                 (imapCfg1.mailPassword() != imapCfg2.mailPassword()) ||
-@@ -1857,13 +1885,16 @@ void ImapClient::onAccountsUpdated(const QMailAccountIdList &list)
+@@ -1887,13 +1915,16 @@ void ImapClient::onAccountsUpdated(const QMailAccountIdList &list)
                                 (imapCfg1.mailPort() != imapCfg2.mailPort()) ||
                                 (imapCfg1.mailEncryption() != imapCfg2.mailEncryption()) ||
                                 (imapCfg1.pushEnabled() != imapCfg2.pushEnabled());
@@ -146,10 +146,10 @@ index bafef831..e71325f2 100644
  }
  
 diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
-index 8362043d..e49f18e1 100644
+index d1cecad5..0bfa035d 100644
 --- a/src/plugins/messageservices/imap/imapclient.h
 +++ b/src/plugins/messageservices/imap/imapclient.h
-@@ -93,6 +94,8 @@ public:
+@@ -94,6 +94,8 @@ public:
      void setPushConnectionsReserved(int reserved) { _pushConnectionsReserved = reserved; }
      int idleRetryDelay() const { return _idleRetryDelay; }
      void setIdleRetryDelay(int delay) { _idleRetryDelay = delay; }
@@ -158,7 +158,7 @@ index 8362043d..e49f18e1 100644
  
  signals:
      void errorOccurred(int, const QString &);
-@@ -184,6 +187,7 @@ private:
+@@ -187,6 +189,7 @@ private:
      QList<QMailMessageBufferFlushCallback*> callbacks;
      QVector<QMailMessage*> _bufferedMessages;
      int _pushConnectionsReserved;

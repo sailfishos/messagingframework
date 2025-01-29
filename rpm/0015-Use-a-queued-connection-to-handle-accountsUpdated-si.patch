@@ -15,10 +15,10 @@ code which caused the database change, otherwise crashes can result
  3 files changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index e71325f2..894feb08 100644
+index 9359f1ad..146f6358 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -452,7 +452,8 @@ ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
+@@ -487,7 +487,8 @@ ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
  
      setupAccount();
  #ifdef USE_ACCOUNTS_QT

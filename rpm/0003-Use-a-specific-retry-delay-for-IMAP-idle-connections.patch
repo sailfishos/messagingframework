@@ -9,7 +9,7 @@ Subject: [PATCH] Use a specific retry delay for IMAP idle connections.
  2 files changed, 23 insertions(+), 11 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index bef0b027..344d2ab5 100644
+index fb75e7c0..a3714806 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -182,11 +182,12 @@ public:
@@ -26,7 +26,7 @@ index bef0b027..344d2ab5 100644
  
  protected slots:
      virtual void idleContinuation(ImapCommand, const QString &);
-@@ -202,6 +203,8 @@ protected:
+@@ -204,6 +205,8 @@ protected:
  private:
      QTimer _idleTimer; // Send a DONE command every 29 minutes
      QTimer _idleRecoveryTimer; // Check command hasn't hung
@@ -35,7 +35,7 @@ index bef0b027..344d2ab5 100644
      QMailCredentialsInterface *_credentials;
  };
  
-@@ -369,9 +372,18 @@ void IdleProtocol::idleErrorRecovery()
+@@ -404,9 +407,18 @@ void IdleProtocol::idleErrorRecovery()
      const int oneHour = 60*60;
      _idleRecoveryTimer.stop();
  
@@ -56,7 +56,7 @@ index bef0b027..344d2ab5 100644
  }
  
  ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
-@@ -1736,20 +1748,20 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
+@@ -1751,20 +1763,20 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
                      this, SIGNAL(idleNewMailNotification(QMailFolderId)));
              connect(protocol, SIGNAL(idleFlagsChangedNotification(QMailFolderId)),
                      this, SIGNAL(idleFlagsChangedNotification(QMailFolderId)));
@@ -85,10 +85,10 @@ index bef0b027..344d2ab5 100644
      }
      _protocol.close();
 diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
-index 64cb362f..64b5fe8f 100644
+index 5e4f88f5..0b22075e 100644
 --- a/src/plugins/messageservices/imap/imapclient.h
 +++ b/src/plugins/messageservices/imap/imapclient.h
-@@ -140,7 +140,7 @@ protected slots:
+@@ -141,7 +141,7 @@ protected slots:
      void checkCommandResponse(const ImapCommand, const OperationStatus);
      void commandTransition(const ImapCommand, const OperationStatus);
      void transportStatus(const QString& status);
