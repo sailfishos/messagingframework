@@ -12,10 +12,10 @@ Subject: [PATCH] Don't save settings during IMAP logging in.
  5 files changed, 41 insertions(+), 12 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 91b27c17..036c4bcd 100644
+index 268a7e22..da0bdbc3 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -1695,6 +1695,15 @@ void ImapClient::updateFolderCountStatus(QMailFolder *folder)
+@@ -1699,6 +1699,15 @@ void ImapClient::updateFolderCountStatus(QMailFolder *folder)
      folder->setStatus(QMailFolder::PartialContent, (count < folder->serverCount()));
  }
  
@@ -31,7 +31,7 @@ index 91b27c17..036c4bcd 100644
  bool ImapClient::idlesEstablished()
  {
      ImapConfiguration imapCfg(_config);
-@@ -1784,7 +1793,7 @@ void ImapClient::idleOpenRequested(IdleProtocol *idleProtocol)
+@@ -1788,7 +1797,7 @@ void ImapClient::idleOpenRequested(IdleProtocol *idleProtocol)
          delete protocol;
      }
      _idlesEstablished = false;
@@ -81,10 +81,10 @@ index 8f014828..70ccbd91 100644
  
      bool delimiterUnknown() const;
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 76c8e2a4..ac9e5033 100644
+index bef6d831..e6ac2bf4 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1564,6 +1564,10 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
+@@ -1558,6 +1558,10 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
      bool isPushEnabled(imapCfg.pushEnabled());
      QStringList pushFolders(imapCfg.pushFolders());
      QString newConnectionSettings(connectionSettings(imapCfg));
@@ -95,7 +95,7 @@ index 76c8e2a4..ac9e5033 100644
      if (!isEnabled) {
          if (_accountWasEnabled) {
              // Account changed from enabled to disabled
-@@ -1574,18 +1578,27 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
+@@ -1568,18 +1572,27 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)
          return;
      }
  

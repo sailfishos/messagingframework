@@ -2120,10 +2120,10 @@ index 9abae1c7..ac8c2902 100644
  HEADERS += plugin.h \
             ssomanager.h
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 26ad7138..64a1613a 100644
+index 13c3184c..29aae0f4 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -1837,4 +1837,20 @@ void ImapClient::onCredentialsStatusChanged()
+@@ -1841,4 +1841,20 @@ void ImapClient::onCredentialsStatusChanged()
      }
  }
  

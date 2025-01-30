@@ -27,7 +27,7 @@ index 4b65fc1e..03c19785 100644
             imapconfiguration.h \
             imapmailboxproperties.h \
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index ac9e5033..e98d498f 100644
+index e6ac2bf4..dd18e697 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -1473,6 +1473,12 @@ ImapService::ImapService(const QMailAccountId &accountId)
@@ -41,9 +41,9 @@ index ac9e5033..e98d498f 100644
 +#endif
 +
      QMailAccount account(accountId);
-     if (!(account.status() & QMailAccount::CanSearchOnServer)) {
-         account.setStatus(QMailAccount::CanSearchOnServer, true);
-@@ -1879,7 +1885,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
+     if (account.status() & QMailAccount::Enabled) {
+         enable();
+@@ -1873,7 +1879,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
          }
      }
      _idling = status;

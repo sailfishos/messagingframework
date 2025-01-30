@@ -9,7 +9,7 @@ Subject: [PATCH] Use a specific retry delay for IMAP idle connections.
  2 files changed, 23 insertions(+), 11 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 64a1613a..91b27c17 100644
+index 29aae0f4..268a7e22 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -182,11 +182,12 @@ public:
@@ -56,7 +56,7 @@ index 64a1613a..91b27c17 100644
  }
  
  ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
-@@ -1748,20 +1760,20 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
+@@ -1752,20 +1764,20 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
                      this, SIGNAL(idleNewMailNotification(QMailFolderId)));
              connect(protocol, SIGNAL(idleFlagsChangedNotification(QMailFolderId)),
                      this, SIGNAL(idleFlagsChangedNotification(QMailFolderId)));

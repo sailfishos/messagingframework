@@ -14,10 +14,10 @@ code which caused the database change, otherwise crashes can result
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 26ba5610..be9bbd32 100644
+index 44788de2..1e9012ec 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1508,7 +1508,7 @@ ImapService::ImapService(const QMailAccountId &accountId)
+@@ -1502,7 +1502,7 @@ ImapService::ImapService(const QMailAccountId &accountId)
      }
      connect(_restartPushEmailTimer, SIGNAL(timeout()), this, SLOT(restartPushEmail()));
      connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
