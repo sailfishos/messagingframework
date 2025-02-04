@@ -343,7 +343,7 @@ index 3c274119..0b18aaa5 100644
          transmissionInProgressIds = idSet;
          transmissionSetInitialized = true;
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 1e9012ec..fef8fbf0 100644
+index e59d9446..ba21d798 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -1240,7 +1240,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
@@ -412,10 +412,10 @@ index a49c6ef9..4165a9bc 100644
          if (foldersToSearch.isEmpty()) {
              ImapRetrieveFolderListStrategy::folderListCompleted(context);
 diff --git a/src/tools/messageserver/messageserver.cpp b/src/tools/messageserver/messageserver.cpp
-index bfcd4625..f51e0563 100644
+index 6512b9e9..99b625dc 100644
 --- a/src/tools/messageserver/messageserver.cpp
 +++ b/src/tools/messageserver/messageserver.cpp
-@@ -183,7 +183,7 @@ void MessageServer::retrievalCompleted(quint64 action)
+@@ -186,7 +186,7 @@ void MessageServer::retrievalCompleted(quint64 action)
          if (!completionAttempted) {
              // Complete the messages that we selected for immediate completion
              completionAttempted = true;
@@ -425,7 +425,7 @@ index bfcd4625..f51e0563 100644
          } else {
              completionList.clear();
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index 5d58ff30..7082d882 100644
+index 1c6da93b..446cc821 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
 @@ -1004,11 +1004,6 @@ QSet<QMailMessageService*> ServiceHandler::sourceServiceSet(const QSet<QMailAcco

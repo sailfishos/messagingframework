@@ -12,10 +12,10 @@ Subject: [PATCH] Don't save settings during IMAP logging in.
  5 files changed, 41 insertions(+), 12 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 268a7e22..da0bdbc3 100644
+index 29aae0f4..eba05b72 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -1699,6 +1699,15 @@ void ImapClient::updateFolderCountStatus(QMailFolder *folder)
+@@ -1687,6 +1687,15 @@ void ImapClient::updateFolderCountStatus(QMailFolder *folder)
      folder->setStatus(QMailFolder::PartialContent, (count < folder->serverCount()));
  }
  
@@ -31,7 +31,7 @@ index 268a7e22..da0bdbc3 100644
  bool ImapClient::idlesEstablished()
  {
      ImapConfiguration imapCfg(_config);
-@@ -1788,7 +1797,7 @@ void ImapClient::idleOpenRequested(IdleProtocol *idleProtocol)
+@@ -1776,7 +1785,7 @@ void ImapClient::idleOpenRequested()
          delete protocol;
      }
      _idlesEstablished = false;
@@ -41,7 +41,7 @@ index 268a7e22..da0bdbc3 100644
      emit restartPushEmail();
  }
 diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
-index 518047a9..9330e033 100644
+index 5d56e977..b327975b 100644
 --- a/src/plugins/messageservices/imap/imapclient.h
 +++ b/src/plugins/messageservices/imap/imapclient.h
 @@ -84,6 +84,7 @@ public:
