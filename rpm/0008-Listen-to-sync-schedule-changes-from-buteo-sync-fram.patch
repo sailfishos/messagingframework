@@ -301,7 +301,7 @@ index dd18e697..7869b82d 100644
  }
  
  void ImapService::setPersistentConnectionStatus(bool status)
-@@ -1896,6 +1955,31 @@ void ImapService::startStopBackgroundActivity()
+@@ -1896,6 +1955,30 @@ void ImapService::startStopBackgroundActivity()
          _backgroundActivity->stop();
      }
  }
@@ -319,7 +319,6 @@ index dd18e697..7869b82d 100644
 +                    disable();
 +                }
 +                enable();
-+                restartPushEmail();
 +            } else {
 +                // When it changes to true, this state is set inside "enable()"
 +                // since a new client is created
