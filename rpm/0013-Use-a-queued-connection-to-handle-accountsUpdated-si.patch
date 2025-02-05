@@ -14,10 +14,10 @@ code which caused the database change, otherwise crashes can result
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index d8c29bfb..e59d9446 100644
+index 96991a77..c7db39b9 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1502,7 +1502,7 @@ ImapService::ImapService(const QMailAccountId &accountId)
+@@ -1498,7 +1498,7 @@ ImapService::ImapService(const QMailAccountId &accountId)
      }
      connect(_restartPushEmailTimer, SIGNAL(timeout()), this, SLOT(restartPushEmail()));
      connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
@@ -25,7 +25,7 @@ index d8c29bfb..e59d9446 100644
 +            this, SLOT(accountsUpdated(const QMailAccountIdList&)), Qt::QueuedConnection);
      connect(_initiatePushEmailTimer, SIGNAL(timeout()), this, SLOT(initiatePushEmail()));
  
- #ifdef USE_KEEPALIVE
+     QDBusConnection::sessionBus().connect("com.meego.msyncd", "/synchronizer",
 diff --git a/src/plugins/messageservices/pop/popservice.cpp b/src/plugins/messageservices/pop/popservice.cpp
 index ef7cbf45..bb1fbc5f 100644
 --- a/src/plugins/messageservices/pop/popservice.cpp

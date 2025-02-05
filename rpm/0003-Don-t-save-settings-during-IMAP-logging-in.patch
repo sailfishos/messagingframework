@@ -12,7 +12,7 @@ Subject: [PATCH] Don't save settings during IMAP logging in.
  5 files changed, 41 insertions(+), 12 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 29aae0f4..eba05b72 100644
+index 13c3184c..c8a89db1 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -1687,6 +1687,15 @@ void ImapClient::updateFolderCountStatus(QMailFolder *folder)
@@ -41,10 +41,10 @@ index 29aae0f4..eba05b72 100644
      emit restartPushEmail();
  }
 diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
-index 5d56e977..b327975b 100644
+index c442f2f8..e2187e73 100644
 --- a/src/plugins/messageservices/imap/imapclient.h
 +++ b/src/plugins/messageservices/imap/imapclient.h
-@@ -84,6 +84,7 @@ public:
+@@ -83,6 +83,7 @@ public:
      QMailMessageKey trashKey(const QMailFolderId &folderId) const;
      QStringList deletedMessages(const QMailFolderId &folderId) const;
  

@@ -87,7 +87,7 @@ index 933cfa0c..9ee1a6ce 100644
      friend class QMailAccountPrivate;
      friend class QMailStore;
 diff --git a/src/plugins/messageservices/imap/imapconfiguration.cpp b/src/plugins/messageservices/imap/imapconfiguration.cpp
-index af37630e..0cf2f524 100644
+index 2483f1ef..9cf6fd3a 100644
 --- a/src/plugins/messageservices/imap/imapconfiguration.cpp
 +++ b/src/plugins/messageservices/imap/imapconfiguration.cpp
 @@ -31,6 +31,8 @@

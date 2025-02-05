@@ -36,7 +36,7 @@ index c1404aab..ac9e9077 100644
  #include <QCoreApplication>
  #include <QList>
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 6244ae40..8dd7541b 100644
+index 84d498d5..c620b962 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -35,7 +35,7 @@

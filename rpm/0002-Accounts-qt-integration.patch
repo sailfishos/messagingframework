@@ -92,13 +92,11 @@ base-qmf-oauth2-plugin/oauth2plugin.cpp
  src/libraries/qmfclient/share/email.service   |   65 +
  src/plugins/credentials/sso/plugin.cpp        |  123 +-
  src/plugins/credentials/sso/sso.pro           |    2 +-
- .../messageservices/imap/imapclient.cpp       |   16 +
- src/plugins/messageservices/imap/imapclient.h |    1 +
  src/plugins/plugins.pro                       |    4 +
  src/tools/messageserver/servicehandler.cpp    |   13 +
  tests/tests.pri                               |    6 +
  tests/tst_qmailstore/tst_qmailstore.cpp       |   93 +-
- 14 files changed, 1614 insertions(+), 67 deletions(-)
+ 12 files changed, 1597 insertions(+), 67 deletions(-)
  create mode 100644 src/libraries/qmfclient/share/email.provider
  create mode 100644 src/libraries/qmfclient/share/email.service
 
@@ -2119,43 +2117,6 @@ index 9abae1c7..ac8c2902 100644
  
  HEADERS += plugin.h \
             ssomanager.h
-diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 13c3184c..29aae0f4 100644
---- a/src/plugins/messageservices/imap/imapclient.cpp
-+++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -1841,4 +1841,20 @@ void ImapClient::onCredentialsStatusChanged()
-     }
- }
- 
-+void ImapClient::closeIdleConnections()
-+{
-+    qMailLog(IMAP) << Q_FUNC_INFO << "Account was modified. Closing connections";
-+
-+    closeConnection();
-+    // closing idle connections
-+    foreach(const QMailFolderId &id, _monitored.keys()) {
-+        IdleProtocol *protocol = _monitored.take(id);
-+        if (protocol->inUse()) {
-+            protocol->close();
-+        }
-+        delete protocol;
-+    }
-+    _idlesEstablished = false;
-+}
-+
- #include "imapclient.moc"
-diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
-index c442f2f8..5d56e977 100644
---- a/src/plugins/messageservices/imap/imapclient.h
-+++ b/src/plugins/messageservices/imap/imapclient.h
-@@ -67,6 +67,7 @@ public:
-     void newConnection();
-     void cancelTransfer(QMailServiceAction::Status::ErrorCode code, const QString &text);
-     void closeConnection();
-+    void closeIdleConnections();
- 
-     ImapStrategyContext *strategyContext();
- 
 diff --git a/src/plugins/plugins.pro b/src/plugins/plugins.pro
 index 6c9464c2..a647ade7 100644
 --- a/src/plugins/plugins.pro
