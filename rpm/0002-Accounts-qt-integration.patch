@@ -92,13 +92,13 @@ base-qmf-oauth2-plugin/oauth2plugin.cpp
  src/libraries/qmfclient/share/email.service   |   65 +
  src/plugins/credentials/sso/plugin.cpp        |  123 +-
  src/plugins/credentials/sso/sso.pro           |    2 +-
- .../messageservices/imap/imapclient.cpp       |   39 +
- src/plugins/messageservices/imap/imapclient.h |    4 +
+ .../messageservices/imap/imapclient.cpp       |   16 +
+ src/plugins/messageservices/imap/imapclient.h |    1 +
  src/plugins/plugins.pro                       |    4 +
  src/tools/messageserver/servicehandler.cpp    |   13 +
  tests/tests.pri                               |    6 +
  tests/tst_qmailstore/tst_qmailstore.cpp       |   93 +-
- 14 files changed, 1640 insertions(+), 67 deletions(-)
+ 14 files changed, 1614 insertions(+), 67 deletions(-)
  create mode 100644 src/libraries/qmfclient/share/email.provider
  create mode 100644 src/libraries/qmfclient/share/email.service
 
@@ -2120,59 +2120,13 @@ index 9abae1c7..ac8c2902 100644
  HEADERS += plugin.h \
             ssomanager.h
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 4aaa48a1..bef0b027 100644
+index 13c3184c..29aae0f4 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -438,6 +438,9 @@ ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
-     connect(QMailMessageBuffer::instance(), SIGNAL(flushed()), this, SLOT(messageBufferFlushed()));
- 
-     setupAccount();
-+#ifdef USE_ACCOUNTS_QT
-+    connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)), this, SLOT(onAccountsUpdated(QMailAccountIdList)));
-+#endif
- }
- 
- ImapClient::~ImapClient()
-@@ -1807,4 +1810,56 @@ void ImapClient::onCredentialsStatusChanged()
+@@ -1841,4 +1841,20 @@ void ImapClient::onCredentialsStatusChanged()
      }
  }
  
-+void ImapClient::onAccountsUpdated(const QMailAccountIdList &list)
-+{
-+    if (list.contains(_config.id()) && !loggingIn()) {
-+        ImapConfiguration imapCfg1(_config);
-+        // copying here as the data is shared
-+        QMailAccountConfiguration config = QMailAccountConfiguration(_config.id());
-+        ImapConfiguration imapCfg2(config);
-+
-+        if (!imapCfg1.isValid()) {
-+            qMailLog(IMAP) << Q_FUNC_INFO << "current config is invalid";
-+            return;
-+        }
-+
-+        if (!imapCfg2.isValid()) {
-+            qMailLog(IMAP) << Q_FUNC_INFO << "invalid config from db";
-+            return;
-+        }
-+
-+        qMailLog(IMAP) << Q_FUNC_INFO << imapCfg1.mailUserName() ;
-+        // compare config modified by the User
-+        const bool& notEqual = (imapCfg1.mailUserName() != imapCfg2.mailUserName()) ||
-+                               (imapCfg1.mailPassword() != imapCfg2.mailPassword()) ||
-+                               (imapCfg1.mailServer() != imapCfg2.mailServer()) ||
-+                               (imapCfg1.mailPort() != imapCfg2.mailPort()) ||
-+                               (imapCfg1.mailEncryption() != imapCfg2.mailEncryption()) ||
-+                               (imapCfg1.pushEnabled() != imapCfg2.pushEnabled());
-+        if (notEqual)
-+            closeIdleConnections();
-+
-+        if (imapCfg1.pushEnabled() != imapCfg2.pushEnabled()) {
-+            if (imapCfg2.pushEnabled())
-+                emit restartPushEmail();
-+        }
-+    }
-+}
-+
 +void ImapClient::closeIdleConnections()
 +{
 +    qMailLog(IMAP) << Q_FUNC_INFO << "Account was modified. Closing connections";
@@ -2191,7 +2145,7 @@ index 4aaa48a1..bef0b027 100644
 +
  #include "imapclient.moc"
 diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
-index dbf5abec..64cb362f 100644
+index c442f2f8..5d56e977 100644
 --- a/src/plugins/messageservices/imap/imapclient.h
 +++ b/src/plugins/messageservices/imap/imapclient.h
 @@ -67,6 +67,7 @@ public:
@@ -2201,17 +2155,6 @@ index dbf5abec..64cb362f 100644
 +    void closeIdleConnections();
  
      ImapStrategyContext *strategyContext();
- 
-@@ -144,6 +144,10 @@ protected slots:
-     void messageBufferFlushed();
-     void onCredentialsStatusChanged();
- 
-+#ifdef USE_ACCOUNTS_QT
-+    void onAccountsUpdated(const QMailAccountIdList& list);
-+#endif
-+
- private:
-     friend class ImapStrategyContextBase;
  
 diff --git a/src/plugins/plugins.pro b/src/plugins/plugins.pro
 index 6c9464c2..a647ade7 100644

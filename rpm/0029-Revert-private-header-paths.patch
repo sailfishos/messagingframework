@@ -36,7 +36,7 @@ index c1404aab..ac9e9077 100644
  #include <QCoreApplication>
  #include <QList>
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 1b7e642e..2b40f962 100644
+index bcc1242b..0a310420 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -35,7 +35,7 @@
@@ -75,7 +75,7 @@ index 4165a9bc..92dfc5e5 100644
  #include <qmaillog.h>
  #include <qmailaccount.h>
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index 32010a8e..5a69db4a 100644
+index 9255045f..78f51fea 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
 @@ -36,7 +36,7 @@

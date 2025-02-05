@@ -172,7 +172,7 @@ index e8563c39..3a41a1c1 100644
  #endif
  
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index c92a5f5d..26ba5610 100644
+index b0bdb066..44788de2 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -235,7 +235,7 @@ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, co

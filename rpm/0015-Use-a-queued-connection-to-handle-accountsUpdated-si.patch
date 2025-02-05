@@ -9,30 +9,15 @@ asynchronously to avoid deleting the socket out from underneath the
 code which caused the database change, otherwise crashes can result
 (specifically, in the ImapProtocol::incomingData method).
 ---
- src/plugins/messageservices/imap/imapclient.cpp  | 3 ++-
  src/plugins/messageservices/imap/imapservice.cpp | 2 +-
  src/plugins/messageservices/pop/popservice.cpp   | 2 +-
- 3 files changed, 4 insertions(+), 3 deletions(-)
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index e71325f2..894feb08 100644
---- a/src/plugins/messageservices/imap/imapclient.cpp
-+++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -452,7 +452,8 @@ ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
- 
-     setupAccount();
- #ifdef USE_ACCOUNTS_QT
--    connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)), this, SLOT(onAccountsUpdated(QMailAccountIdList)));
-+    connect(QMailStore::instance(), SIGNAL(accountsUpdated(QMailAccountIdList)),
-+            this, SLOT(onAccountsUpdated(QMailAccountIdList)), Qt::QueuedConnection);
- #endif
- }
- 
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 26ba5610..be9bbd32 100644
+index 44788de2..1e9012ec 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1508,7 +1508,7 @@ ImapService::ImapService(const QMailAccountId &accountId)
+@@ -1502,7 +1502,7 @@ ImapService::ImapService(const QMailAccountId &accountId)
      }
      connect(_restartPushEmailTimer, SIGNAL(timeout()), this, SLOT(restartPushEmail()));
      connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
