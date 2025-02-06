@@ -42,8 +42,8 @@ Patch8:  0008-Prevent-push-enabled-status-to-go-out-of-sync.patch
 Patch9:  0009-Add-signature-settings-in-account.patch
 Patch10:  0010-Use-EightBit-encoding-instead-of-Base64-for-text-typ.patch
 Patch11:  0011-Retrieve-message-lists-based-on-the-folder-sync-poli.patch
-Patch12:  001-Apply-folder-policy-to-always-on-connection.patch
-Patch13:  00134-Allow-a-service-provided-folder-to-be-set-as-the-sta.patch
+Patch12:  0012-Apply-folder-policy-to-always-on-connection.patch
+Patch13:  0013-Allow-a-service-provided-folder-to-be-set-as-the-sta.patch
 Patch14:  0014-Use-a-queued-connection-to-handle-accountsUpdated-si.patch
 Patch15:  0015-Adjust-for-Qt-5.6.patch
 Patch16:  0016-Revert-Fix-bundled-zlib-detection.patch
