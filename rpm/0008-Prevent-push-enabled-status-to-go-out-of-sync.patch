@@ -4,11 +4,11 @@ Date: Mon, 23 Feb 2015 13:31:30 +0200
 Subject: [PATCH] Prevent push enabled status to go out of sync.
 
 ---
- .../messageservices/imap/imapservice.cpp      | 57 +++++++++++--------
- 1 file changed, 33 insertions(+), 24 deletions(-)
+ .../messageservices/imap/imapservice.cpp      | 55 +++++++++++--------
+ 1 file changed, 32 insertions(+), 23 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 7869b82d..b0bdb066 100644
+index 9aa53472..e4f08297 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -64,7 +64,10 @@ QString connectionSettings(ImapConfiguration &config)
@@ -86,7 +86,7 @@ index 7869b82d..b0bdb066 100644
      _previousPushFolders = imapCfg.pushFolders();
  #endif
      QMailFolderIdList ids(_client->configurationIdleFolderIds());
-@@ -1960,23 +1964,28 @@ void ImapService::pushEnabledStatus(uint accountId, const QString &profileType,
+@@ -1960,22 +1964,27 @@ void ImapService::pushEnabledStatus(uint accountId, const QString &profileType,
  {
      qMailLog(Messaging) << "Received new idleState for account: " << accountId << "state: " << state << "profile type: " << profileType;
      if (accountId == _accountId.toULongLong() && profileType == QLatin1String("syncemail")) {
@@ -108,7 +108,6 @@ index 7869b82d..b0bdb066 100644
 +                        disable();
 +                    }
 +                    enable();
-+                    restartPushEmail();
 +                } else {
 +                    // When it changes to true, this state is set inside "enable()"
 +                    // since a new client is created
@@ -117,7 +116,6 @@ index 7869b82d..b0bdb066 100644
 +                    stopPushEmail();
                  }
 -                enable();
--                restartPushEmail();
 -            } else {
 -                // When it changes to true, this state is set inside "enable()"
 -                // since a new client is created

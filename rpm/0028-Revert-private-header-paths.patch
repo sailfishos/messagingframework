@@ -36,7 +36,7 @@ index c1404aab..ac9e9077 100644
  #include <QCoreApplication>
  #include <QList>
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index bcc1242b..0a310420 100644
+index 6244ae40..8dd7541b 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -35,7 +35,7 @@
@@ -88,7 +88,7 @@ index 9255045f..78f51fea 100644
  #include <qmailmessagebuffer.h>
  #include <qmailtransport.h>
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index 7082d882..3ba85da3 100644
+index 446cc821..9e68d586 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
 @@ -33,7 +33,7 @@
@@ -179,7 +179,7 @@ index 338d7ea6..e206479f 100644
  
  
 diff --git a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
-index 37a1b3de..2248ce0e 100644
+index 0d9a37c1..005db7d1 100644
 --- a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
 +++ b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
 @@ -34,7 +34,7 @@
