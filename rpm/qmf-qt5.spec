@@ -39,7 +39,7 @@ Patch0004: 0004-Start-messageserver-on-system-startup-in-case-there-.patch
 Patch0005: 0005-Add-keepalive-timer-to-IMAP-IDLE-service.patch
 Patch0006: 0006-Use-Qt5-booster-to-save-memory.patch
 Patch0007: 0007-Listen-to-sync-schedule-changes-from-buteo-sync-fram.patch
-Patch0008: 0008-Add-signature-settings-in-account.patch
+Patch0008: 0008-Add-missing-export-in-crypto.patch
 Patch0009: 0009-Use-EightBit-encoding-instead-of-Base64-for-text-typ.patch
 Patch0010: 0010-Retrieve-message-lists-based-on-the-folder-sync-poli.patch
 Patch0011: 0011-Apply-folder-policy-to-always-on-connection.patch
