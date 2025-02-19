@@ -19,7 +19,7 @@ Also captures the sync policy as part of the QMailAccount structure.
  8 files changed, 138 insertions(+), 12 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailaccount.cpp b/src/libraries/qmfclient/qmailaccount.cpp
-index b477e907..5163e370 100644
+index fddbea45..f1df914c 100644
 --- a/src/libraries/qmfclient/qmailaccount.cpp
 +++ b/src/libraries/qmfclient/qmailaccount.cpp
 @@ -89,6 +89,7 @@ public:
@@ -44,10 +44,10 @@ index b477e907..5163e370 100644
 +    d->_folderSyncPolicy = policy;
 +}
 diff --git a/src/libraries/qmfclient/qmailaccount.h b/src/libraries/qmfclient/qmailaccount.h
-index 9306dd9c..933cfa0c 100644
+index b5fd9fc5..23a686dd 100644
 --- a/src/libraries/qmfclient/qmailaccount.h
 +++ b/src/libraries/qmfclient/qmailaccount.h
-@@ -79,6 +79,13 @@ public:
+@@ -80,6 +80,13 @@ public:
      static const quint64 &HasPersistentConnection;
      static const quint64 &UseCryptoSignatureByDefault;
  
@@ -61,7 +61,7 @@ index 9306dd9c..933cfa0c 100644
      QMailAccount();
      explicit QMailAccount(const QMailAccountId& id);
      QMailAccount(const QMailAccount& other);
-@@ -121,6 +128,9 @@ public:
+@@ -122,6 +129,9 @@ public:
  
      const QMap<QMailFolder::StandardFolder, QMailFolderId> &standardFolders() const;
  
@@ -72,10 +72,10 @@ index 9306dd9c..933cfa0c 100644
      void setStatus(quint64 newStatus);
      void setStatus(quint64 mask, bool set);
 diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
-index 8b4ab73c..ed4eff9e 100644
+index b162d760..0284def7 100644
 --- a/src/libraries/qmfclient/qmailstore_p.cpp
 +++ b/src/libraries/qmfclient/qmailstore_p.cpp
-@@ -3718,6 +3718,42 @@ bool QMailStorePrivate::messageExists(const QString &serveruid, const QMailAccou
+@@ -3707,6 +3707,42 @@ bool QMailStorePrivate::messageExists(const QString &serveruid, const QMailAccou
  }
  
  #ifdef USE_ACCOUNTS_QT
@@ -118,7 +118,7 @@ index 8b4ab73c..ed4eff9e 100644
  QMailAccount QMailStorePrivate::extractAccount(const QSharedPointer<Accounts::Account>& ssoAccount)
  {
      Q_ASSERT(ssoAccount);
-@@ -3735,6 +3771,8 @@ QMailAccount QMailStorePrivate::extractAccount(const QSharedPointer<Accounts::Ac
+@@ -3724,6 +3760,8 @@ QMailAccount QMailStorePrivate::extractAccount(const QSharedPointer<Accounts::Ac
  
      ssoAccount->selectService();
      const bool& enabled = ssoAccount->enabled();
@@ -127,7 +127,7 @@ index 8b4ab73c..ed4eff9e 100644
      ssoAccount->selectService(service);
      const bool& isDefault = ssoAccount->valueAsBool(QLatin1String("email/default"));
      const bool& canTransmit = ssoAccount->valueAsBool(QLatin1String("canTransmit"), true);
-@@ -6238,6 +6276,9 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddAccount(QMailAccou
+@@ -6266,6 +6304,9 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddAccount(QMailAccou
      ssoAccount->setDisplayName(account->name());
      ssoAccount->setEnabled(account->status() & QMailAccount::Enabled);
  
@@ -137,7 +137,7 @@ index 8b4ab73c..ed4eff9e 100644
      Accounts::ServiceList services = ssoAccount->services(QLatin1String("e-mail"));
      if (!services.count()) {
          qMailLog(Messaging) << "E-mail Services not found, make sure that *.service and *.provider files are properly installed.";
-@@ -7032,6 +7073,11 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
+@@ -7060,6 +7101,11 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
      if (!ssoAccount)
        return Failure;
  
@@ -149,7 +149,7 @@ index 8b4ab73c..ed4eff9e 100644
      Accounts::ServiceList services = ssoAccount->enabledServices();
      Q_ASSERT (services.count() == 1);
      Accounts::Service service = services.first();
-@@ -7079,6 +7125,7 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
+@@ -7107,6 +7153,7 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
          ssoAccount->setValue(QLatin1String("email/default"), isDefault);
          ssoAccount->setValue(QLatin1String("canTransmit"), canTransmit);
          ssoAccount->setValue(QLatin1String("iconPath"), account->iconPath());
@@ -158,10 +158,10 @@ index 8b4ab73c..ed4eff9e 100644
          QString properties(QLatin1String("type=?, name=?, emailaddress=?, status=?, signature=?, lastsynchronized=?, iconpath=?"));
          QVariantList propertyValues;
 diff --git a/src/libraries/qmfclient/qmailstore_p.h b/src/libraries/qmfclient/qmailstore_p.h
-index e8563c39..3a41a1c1 100644
+index 2b7ef757..abe785b6 100644
 --- a/src/libraries/qmfclient/qmailstore_p.h
 +++ b/src/libraries/qmfclient/qmailstore_p.h
-@@ -289,6 +289,9 @@ public:
+@@ -286,6 +286,9 @@ public:
      enum AttemptResult { Success = 0, Failure, DatabaseFailure };
  
  #ifdef USE_ACCOUNTS_QT
@@ -172,7 +172,7 @@ index e8563c39..3a41a1c1 100644
  #endif
  
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 1d18519f..96991a77 100644
+index 48416719..498698cb 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -230,7 +230,7 @@ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, co
@@ -253,10 +253,10 @@ index 1d18519f..96991a77 100644
      if(!_unavailable)
          return initiateStrategy();
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index 606377a7..a49c6ef9 100644
+index a90d670d..3a2fcd20 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
-@@ -2366,14 +2366,53 @@ void ImapSynchronizeBaseStrategy::previewDiscoveredMessages(ImapStrategyContextB
+@@ -2368,14 +2368,53 @@ void ImapSynchronizeBaseStrategy::previewDiscoveredMessages(ImapStrategyContextB
      }
  }
  
@@ -314,18 +314,18 @@ index 606377a7..a49c6ef9 100644
  
  bool ImapSynchronizeBaseStrategy::nextFolder()
 diff --git a/src/plugins/messageservices/imap/imapstrategy.h b/src/plugins/messageservices/imap/imapstrategy.h
-index 4880b2b1..9a79e4b7 100644
+index 0c896f1e..eea74f34 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.h
 +++ b/src/plugins/messageservices/imap/imapstrategy.h
-@@ -36,6 +36,7 @@
+@@ -42,6 +42,7 @@
+ #include <QList>
+ #include <QMap>
  
- #include "imapprotocol.h"
- #include "integerregion.h"
-+#include "qmailaccount.h"
- #include <qstring.h>
- #include <qstringlist.h>
- #include <qlist.h>
-@@ -456,14 +457,14 @@ private:
++#include <qmailaccount.h>
+ #include <qmailfolder.h>
+ #include <qmailmessagebuffer.h>
+ 
+@@ -458,14 +459,14 @@ private:
  class ImapSynchronizeBaseStrategy : public ImapFolderListStrategy 
  {
  public:
@@ -342,7 +342,7 @@ index 4880b2b1..9a79e4b7 100644
  
  protected:
      void handleLogin(ImapStrategyContextBase *context) override;
-@@ -489,7 +490,7 @@ protected:
+@@ -491,7 +492,7 @@ protected:
      int _outstandingPreviews;
  
  private:

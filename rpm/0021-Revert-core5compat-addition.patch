@@ -10,7 +10,7 @@ Subject: [PATCH] Revert core5compat addition
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmfclient.pro b/src/libraries/qmfclient/qmfclient.pro
-index 62e6415d..d97bdf03 100644
+index 7b9afbca..67dac532 100644
 --- a/src/libraries/qmfclient/qmfclient.pro
 +++ b/src/libraries/qmfclient/qmfclient.pro
 @@ -1,5 +1,5 @@
@@ -21,15 +21,15 @@ index 62e6415d..d97bdf03 100644
  
  # FIXME this will result in prl file having explicit linkage against qt-xml and accounts+signon.
 diff --git a/src/plugins/messageservices/pop/pop.pro b/src/plugins/messageservices/pop/pop.pro
-index edcc1220..56b5d88e 100644
+index 7c87e3df..df556a1c 100644
 --- a/src/plugins/messageservices/pop/pop.pro
 +++ b/src/plugins/messageservices/pop/pop.pro
 @@ -4,7 +4,7 @@ PLUGIN_TYPE = messageservices
  PLUGIN_CLASS_NAME = QmfPopPlugin
  load(qt_plugin)
  
--QT = core core5compat network qmfclient qmfclient-private qmfmessageserver
-+QT = core network qmfclient qmfclient-private qmfmessageserver
+-QT = core core5compat network qmfclient qmfclient-private qmfmessageserver qmfmessageserver-private
++QT = core network qmfclient qmfclient-private qmfmessageserver qmfmessageserver-private
  
  HEADERS += popclient.h \
             popconfiguration.h \

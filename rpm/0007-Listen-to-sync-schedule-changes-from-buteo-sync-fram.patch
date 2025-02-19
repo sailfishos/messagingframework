@@ -16,19 +16,19 @@ and activate/deactivate IMAP IDLE.
  6 files changed, 36 insertions(+), 4 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
-index 03c19785..da1c8a0c 100644
+index 023d6a96..c4ba87c0 100644
 --- a/src/plugins/messageservices/imap/imap.pro
 +++ b/src/plugins/messageservices/imap/imap.pro
 @@ -5,6 +5,7 @@ PLUGIN_CLASS_NAME = QmfImapPlugin
  load(qt_plugin)
  
- QT = core network qmfclient qmfclient-private qmfmessageserver
+ QT = core network qmfclient qmfclient-private qmfmessageserver qmfmessageserver-private
 +QT += dbus
  
  contains(DEFINES, USE_KEEPALIVE) {
      PKGCONFIG += keepalive
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index c8a89db1..84d498d5 100644
+index 3171b916..b2f091c6 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -653,7 +653,7 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
@@ -63,7 +63,7 @@ index af37630e..2483f1ef 100644
  
  void ImapConfigurationEditor::setBaseFolder(const QString &s)
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index dd18e697..1d18519f 100644
+index 7acf9517..48416719 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -46,6 +46,10 @@
@@ -91,7 +91,7 @@ index dd18e697..1d18519f 100644
  }
  
  void ImapService::enable()
-@@ -1898,6 +1909,24 @@ void ImapService::startStopBackgroundActivity()
+@@ -1900,6 +1911,24 @@ void ImapService::startStopBackgroundActivity()
  }
  #endif
  

@@ -13,7 +13,7 @@ setting.
  3 files changed, 73 insertions(+), 1 deletion(-)
 
 diff --git a/src/libraries/qmfclient/qmailaccount.cpp b/src/libraries/qmfclient/qmailaccount.cpp
-index 5163e370..79025c6e 100644
+index f1df914c..c6855bcc 100644
 --- a/src/libraries/qmfclient/qmailaccount.cpp
 +++ b/src/libraries/qmfclient/qmailaccount.cpp
 @@ -790,3 +790,56 @@ void QMailAccount::setFolderSyncPolicy(QMailAccount::FolderSyncPolicy policy)
@@ -74,10 +74,10 @@ index 5163e370..79025c6e 100644
 +    return folders;
 +}
 diff --git a/src/libraries/qmfclient/qmailaccount.h b/src/libraries/qmfclient/qmailaccount.h
-index 933cfa0c..9ee1a6ce 100644
+index 23a686dd..db3d55cb 100644
 --- a/src/libraries/qmfclient/qmailaccount.h
 +++ b/src/libraries/qmfclient/qmailaccount.h
-@@ -145,6 +145,8 @@ public:
+@@ -146,6 +146,8 @@ public:
  
      const QMap<QString, QString> &customFields() const;
  

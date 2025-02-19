@@ -27,10 +27,10 @@ index c7173949..f93f39e1 100644
      int tokenCount = tokens.count();
      if ( tokenCount > 0 ) {
 diff --git a/src/libraries/qmfclient/support/qmailnamespace.cpp b/src/libraries/qmfclient/support/qmailnamespace.cpp
-index ce7e158b..75571145 100644
+index 9e490f4a..5dc69870 100644
 --- a/src/libraries/qmfclient/support/qmailnamespace.cpp
 +++ b/src/libraries/qmfclient/support/qmailnamespace.cpp
-@@ -558,28 +558,28 @@ QMap<QByteArray, QStringList> standardFolderTranslations()
+@@ -560,28 +560,28 @@ QMap<QByteArray, QStringList> standardFolderTranslations()
      QTextStream in(&file);
      while (!in.atEnd()) {
          QString line = in.readLine();
@@ -79,7 +79,7 @@ index 9cf6fd3a..f5c6bf2d 100644
  
  void ImapConfiguration::setCapabilities(const QStringList &s)
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index eb334854..654c78f1 100644
+index 2088ab4c..26481c6f 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -409,10 +409,10 @@ void ImapState::untaggedResponse(ImapContext *c, const QString &line)

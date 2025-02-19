@@ -12,7 +12,7 @@ Subject: [PATCH] Don't save settings during IMAP logging in.
  5 files changed, 41 insertions(+), 12 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 13c3184c..c8a89db1 100644
+index e07d0543..3171b916 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -1687,6 +1687,15 @@ void ImapClient::updateFolderCountStatus(QMailFolder *folder)
@@ -41,10 +41,10 @@ index 13c3184c..c8a89db1 100644
      emit restartPushEmail();
  }
 diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
-index c442f2f8..e2187e73 100644
+index f23dbc05..57d95a44 100644
 --- a/src/plugins/messageservices/imap/imapclient.h
 +++ b/src/plugins/messageservices/imap/imapclient.h
-@@ -83,6 +83,7 @@ public:
+@@ -84,6 +84,7 @@ public:
      QMailMessageKey trashKey(const QMailFolderId &folderId) const;
      QStringList deletedMessages(const QMailFolderId &folderId) const;
  
@@ -53,7 +53,7 @@ index c442f2f8..e2187e73 100644
      void idling(const QMailFolderId &id);
      QMailFolderIdList configurationIdleFolderIds();
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index 073e7b19..eb334854 100644
+index 7063d1fa..2088ab4c 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -3206,6 +3206,11 @@ void ImapProtocol::setReceivedCapabilities(bool received)
@@ -69,10 +69,10 @@ index 073e7b19..eb334854 100644
  {
      return _fsm->state() == &_fsm->logoutState;
 diff --git a/src/plugins/messageservices/imap/imapprotocol.h b/src/plugins/messageservices/imap/imapprotocol.h
-index 8f014828..70ccbd91 100644
+index 3002ffe8..ce520b1d 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.h
 +++ b/src/plugins/messageservices/imap/imapprotocol.h
-@@ -145,6 +145,7 @@ public:
+@@ -146,6 +146,7 @@ public:
      bool connected() const;
      bool encrypted() const;
      bool inUse() const;
@@ -81,7 +81,7 @@ index 8f014828..70ccbd91 100644
  
      bool delimiterUnknown() const;
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index bef6d831..e6ac2bf4 100644
+index e5e55eed..614b863e 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -1558,6 +1558,10 @@ void ImapService::accountsUpdated(const QMailAccountIdList &ids)

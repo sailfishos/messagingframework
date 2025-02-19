@@ -4,7 +4,6 @@ Date: Thu, 21 Nov 2024 15:31:07 +0100
 Subject: [PATCH] Revert private header paths
 
 ---
- src/libraries/qmfmessageserver/qmailmessageservice.cpp          | 2 +-
  src/plugins/messageservices/imap/imapclient.cpp                 | 2 +-
  src/plugins/messageservices/imap/imapprotocol.h                 | 2 +-
  src/plugins/messageservices/imap/imapstrategy.cpp               | 2 +-
@@ -20,23 +19,10 @@ Subject: [PATCH] Revert private header paths
  tests/tst_qmailstore/tst_qmailstore.cpp                         | 2 +-
  tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp                 | 2 +-
  tests/tst_qprivateimplementation/tst_qprivateimplementation.cpp | 2 +-
- 16 files changed, 16 insertions(+), 16 deletions(-)
+ 15 files changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/src/libraries/qmfmessageserver/qmailmessageservice.cpp b/src/libraries/qmfmessageserver/qmailmessageservice.cpp
-index c1404aab..ac9e9077 100644
---- a/src/libraries/qmfmessageserver/qmailmessageservice.cpp
-+++ b/src/libraries/qmfmessageserver/qmailmessageservice.cpp
-@@ -32,7 +32,7 @@
- ****************************************************************************/
- 
- #include "qmailmessageservice.h"
--#include <longstream_p.h>
-+#include <private/longstream_p.h>
- #include <QAbstractSocket>
- #include <QCoreApplication>
- #include <QList>
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 84d498d5..c620b962 100644
+index b2f091c6..e1f6bf84 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -35,7 +35,7 @@
@@ -49,20 +35,20 @@ index 84d498d5..c620b962 100644
  #include <qmailmessagebuffer.h>
  #include <qmailfolder.h>
 diff --git a/src/plugins/messageservices/imap/imapprotocol.h b/src/plugins/messageservices/imap/imapprotocol.h
-index 70ccbd91..0e77a74f 100644
+index ce520b1d..3e4efdb8 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.h
 +++ b/src/plugins/messageservices/imap/imapprotocol.h
-@@ -35,7 +35,7 @@
- #define IMAPPROTOCOL_H
+@@ -41,7 +41,7 @@
+ #include <QStringList>
+ #include <QTimer>
  
- #include "imapmailboxproperties.h"
 -#include <longstream_p.h>
 +#include <private/longstream_p.h>
- #include <qobject.h>
- #include <qstring.h>
- #include <qstringlist.h>
+ #include <qmailserviceaction.h>
+ #include <qmailtransport.h>
+ #include <qmailcredentials.h>
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index 4165a9bc..92dfc5e5 100644
+index d4b48d30..b1aa7c34 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
 @@ -34,7 +34,7 @@
@@ -71,17 +57,17 @@ index 4165a9bc..92dfc5e5 100644
  #include "imapconfiguration.h"
 -#include <longstream_p.h>
 +#include <private/longstream_p.h>
- #include <qobject.h>
+ 
  #include <qmaillog.h>
  #include <qmailaccount.h>
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index 9255045f..78f51fea 100644
+index 6307a4d7..977278cf 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
 @@ -36,7 +36,7 @@
+ #include "popclient.h"
+ #include "popauthenticator.h"
  #include "popconfiguration.h"
- #include <QFileInfo>
- #include <QRegExp>
 -#include <longstream_p.h>
 +#include <private/longstream_p.h>
  #include <qmailstore.h>
@@ -114,18 +100,18 @@ index 8d5364cd..339aeb9c 100644
  #include <ctype.h>
  
 diff --git a/tests/tst_longstream/tst_longstream.cpp b/tests/tst_longstream/tst_longstream.cpp
-index 4184691e..26d042f7 100644
+index 0e37852a..0d29c28f 100644
 --- a/tests/tst_longstream/tst_longstream.cpp
 +++ b/tests/tst_longstream/tst_longstream.cpp
-@@ -33,7 +33,7 @@
+@@ -37,7 +37,7 @@
+ #include <QRegularExpression>
  
- #include <QObject>
- #include <QTest>
+ #include <qmailnamespace.h>
 -#include <longstream_p.h>
 +#include <private/longstream_p.h>
- #include <ctype.h>
- #include <QDir>
- #include <QRegularExpression>
+ 
+ /*
+     This class primarily tests that LongStream class correctly stores messages.
 diff --git a/tests/tst_longstring/tst_longstring.cpp b/tests/tst_longstring/tst_longstring.cpp
 index 76c60f78..e18523b3 100644
 --- a/tests/tst_longstring/tst_longstring.cpp
