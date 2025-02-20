@@ -12,12 +12,12 @@ DEFINES+=USE_KEEPALIVE
  3 files changed, 38 insertions(+)
 
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
-index 4b65fc1e..03c19785 100644
+index 0af76d22..023d6a96 100644
 --- a/src/plugins/messageservices/imap/imap.pro
 +++ b/src/plugins/messageservices/imap/imap.pro
 @@ -6,6 +6,10 @@ load(qt_plugin)
  
- QT = core network qmfclient qmfclient-private qmfmessageserver
+ QT = core network qmfclient qmfclient-private qmfmessageserver qmfmessageserver-private
  
 +contains(DEFINES, USE_KEEPALIVE) {
 +    PKGCONFIG += keepalive
@@ -27,7 +27,7 @@ index 4b65fc1e..03c19785 100644
             imapconfiguration.h \
             imapmailboxproperties.h \
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index e6ac2bf4..dd18e697 100644
+index 614b863e..7acf9517 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -1473,6 +1473,12 @@ ImapService::ImapService(const QMailAccountId &accountId)
@@ -43,7 +43,7 @@ index e6ac2bf4..dd18e697 100644
      QMailAccount account(accountId);
      if (account.status() & QMailAccount::Enabled) {
          enable();
-@@ -1873,7 +1879,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
+@@ -1875,7 +1881,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
          }
      }
      _idling = status;

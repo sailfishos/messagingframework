@@ -50,7 +50,7 @@ index 80e9d53d..257549b5 100644
  QT = core qmfclient
  
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
-index 7e10c2d5..f1b8f439 100644
+index cff8bd3f..27de399d 100644
 --- a/src/plugins/messageservices/imap/imap.pro
 +++ b/src/plugins/messageservices/imap/imap.pro
 @@ -1,7 +1,6 @@
@@ -60,9 +60,9 @@ index 7e10c2d5..f1b8f439 100644
 -PLUGIN_CLASS_NAME = QmfImapPlugin
  load(qt_plugin)
  
- QT = core network qmfclient qmfclient-private qmfmessageserver
+ QT = core network qmfclient qmfclient-private qmfmessageserver qmfmessageserver-private
 diff --git a/src/plugins/messageservices/pop/pop.pro b/src/plugins/messageservices/pop/pop.pro
-index 56b5d88e..837f928f 100644
+index df556a1c..007db6fe 100644
 --- a/src/plugins/messageservices/pop/pop.pro
 +++ b/src/plugins/messageservices/pop/pop.pro
 @@ -1,7 +1,6 @@
@@ -72,7 +72,7 @@ index 56b5d88e..837f928f 100644
 -PLUGIN_CLASS_NAME = QmfPopPlugin
  load(qt_plugin)
  
- QT = core network qmfclient qmfclient-private qmfmessageserver
+ QT = core network qmfclient qmfclient-private qmfmessageserver qmfmessageserver-private
 diff --git a/src/plugins/messageservices/smtp/smtp.pro b/src/plugins/messageservices/smtp/smtp.pro
 index bcae20cd..d3c920fb 100644
 --- a/src/plugins/messageservices/smtp/smtp.pro

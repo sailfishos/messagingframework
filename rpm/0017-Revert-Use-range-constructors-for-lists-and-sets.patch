@@ -343,10 +343,10 @@ index 3c274119..0b18aaa5 100644
          transmissionInProgressIds = idSet;
          transmissionSetInitialized = true;
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index e59d9446..ba21d798 100644
+index f9543176..711bfc96 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1240,7 +1240,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
+@@ -1235,7 +1235,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
          bool external(false);
  
          // Are these messages being resolved for internal or external references?
@@ -356,10 +356,10 @@ index e59d9446..ba21d798 100644
  
          for (const QMailMessageMetaData &metaData : QMailStore::instance()->messagesMetaData(key, props)) {
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index a49c6ef9..4165a9bc 100644
+index 3a2fcd20..d4b48d30 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
-@@ -347,15 +347,13 @@ QSet<QMailFolderId> foldersApplicableTo(QMailMessageKey const& messagekey, QSet<
+@@ -349,15 +349,13 @@ QSet<QMailFolderId> foldersApplicableTo(QMailMessageKey const& messagekey, QSet<
                      if (arg.op == QMailKey::Equal || arg.op == QMailKey::Includes) {
                          Q_ASSERT(arg.valueList.count() == 1);
                          Q_ASSERT(arg.valueList[0].canConvert<QMailFolderId>());
@@ -379,7 +379,7 @@ index a49c6ef9..4165a9bc 100644
                      } else {
                          Q_ASSERT(false);
                      }
-@@ -365,15 +363,13 @@ QSet<QMailFolderId> foldersApplicableTo(QMailMessageKey const& messagekey, QSet<
+@@ -367,15 +365,13 @@ QSet<QMailFolderId> foldersApplicableTo(QMailMessageKey const& messagekey, QSet<
                      if (arg.op == QMailKey::Equal || arg.op == QMailKey::Includes) {
                          Q_ASSERT(arg.valueList.count() == 1);
                          Q_ASSERT(arg.valueList[0].canConvert<QMailAccountId>());
@@ -399,7 +399,7 @@ index a49c6ef9..4165a9bc 100644
                      } else {
                          Q_ASSERT(false);
                      }
-@@ -1958,9 +1954,9 @@ void ImapSearchMessageStrategy::folderListCompleted(ImapStrategyContextBase *con
+@@ -1960,9 +1956,9 @@ void ImapSearchMessageStrategy::folderListCompleted(ImapStrategyContextBase *con
          _limit = -1;
          _count = false;
      } else {
