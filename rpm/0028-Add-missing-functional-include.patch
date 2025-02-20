@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Matti=20Lehtim=C3=A4ki?= <matti.lehtimaki@jolla.com>
+Date: Thu, 20 Feb 2025 16:48:29 +0200
+Subject: [PATCH] Add missing <functional> include
+
+Missing from changes done in "Switch custom bind & cref to std:: implementations"
+---
+ src/libraries/qmfclient/qmailstore_p.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
+index c7923f41b7a3a3ce07c98b95c4c0edb4fac3f7a8..1884b7a4e0ebc6d2c34ebea5d4f2da5664945623 100644
+--- a/src/libraries/qmfclient/qmailstore_p.cpp
++++ b/src/libraries/qmfclient/qmailstore_p.cpp
+@@ -47,6 +47,7 @@
+ #include <QTextCodec>
+ #include <QThread>
+ #include <QRegularExpression>
++#include <functional>
+ 
+ #define Q_USE_SQLITE
+ 

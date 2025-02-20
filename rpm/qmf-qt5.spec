@@ -59,6 +59,7 @@ Patch0024: 0024-Revert-Set-PLUGIN_CLASS_NAME-in-plugin-.pro-files.patch
 Patch0025: 0025-Revert-Bump-version-to-6.0.0-since-we-build-against-.patch
 Patch0026: 0026-Fallback-to-sso-credential-plugin.patch
 Patch0027: 0027-Revert-private-header-paths.patch
+Patch0028: 0028-Add-missing-functional-include.patch
 
 
 %description
