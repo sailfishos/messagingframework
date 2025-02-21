@@ -172,10 +172,10 @@ index 2b7ef757..abe785b6 100644
  #endif
  
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 48416719..498698cb 100644
+index 29152a5c..ef21fc56 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -230,7 +230,7 @@ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, co
+@@ -218,7 +218,7 @@ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, co
      _service->_client->strategyContext()->foldersOnlyStrategy.setBase(folderId);
      _service->_client->strategyContext()->foldersOnlyStrategy.setQuickList(!folderId.isValid());
      _service->_client->strategyContext()->foldersOnlyStrategy.setDescending(descending);
@@ -184,7 +184,7 @@ index 48416719..498698cb 100644
      appendStrategy(&_service->_client->strategyContext()->foldersOnlyStrategy);
      if(!_unavailable)
          return initiateStrategy();
-@@ -259,10 +259,10 @@ bool ImapService::Source::retrieveMessageList(const QMailAccountId &accountId, c
+@@ -247,10 +247,10 @@ bool ImapService::Source::retrieveMessageList(const QMailAccountId &accountId, c
  {
      Q_ASSERT(!_unavailable);
      if (folderId.isValid()) {
@@ -197,7 +197,7 @@ index 48416719..498698cb 100644
  }
  
  bool ImapService::Source::retrieveNewMessages(const QMailAccountId &accountId, const QMailFolderIdList &folderIds)
-@@ -303,6 +303,9 @@ bool ImapService::Source::retrieveMessageLists(const QMailAccountId &accountId,
+@@ -291,6 +291,9 @@ bool ImapService::Source::retrieveMessageLists(const QMailAccountId &accountId,
          qWarning() << "IMAP Search sorting not yet implemented!";
      }
      
@@ -207,7 +207,7 @@ index 48416719..498698cb 100644
      QMailFolderIdList folderIds;
      uint adjustedMinimum = minimum ? minimum : INT_MAX; // zero means retrieve all mail
      _service->_client->strategyContext()->retrieveMessageListStrategy.clearSelection();
-@@ -322,7 +325,7 @@ bool ImapService::Source::retrieveMessageLists(const QMailAccountId &accountId,
+@@ -310,7 +313,7 @@ bool ImapService::Source::retrieveMessageLists(const QMailAccountId &accountId,
  
      _service->_client->strategyContext()->retrieveMessageListStrategy.setOperation(_service->_client->strategyContext(), QMailRetrievalAction::Auto);
      _service->_client->strategyContext()->retrieveMessageListStrategy.selectedFoldersAppend(folderIds);
@@ -216,7 +216,7 @@ index 48416719..498698cb 100644
      appendStrategy(&_service->_client->strategyContext()->retrieveMessageListStrategy);
      if(!_unavailable)
          return initiateStrategy();
-@@ -510,12 +513,15 @@ bool ImapService::Source::retrieveAll(const QMailAccountId &accountId)
+@@ -498,12 +501,15 @@ bool ImapService::Source::retrieveAll(const QMailAccountId &accountId)
          return false;
      }
  
@@ -233,7 +233,7 @@ index 48416719..498698cb 100644
      appendStrategy(&_service->_client->strategyContext()->retrieveAllStrategy);
      if(!_unavailable)
          return initiateStrategy();
-@@ -584,6 +590,9 @@ bool ImapService::Source::synchronize(const QMailAccountId &accountId)
+@@ -572,6 +578,9 @@ bool ImapService::Source::synchronize(const QMailAccountId &accountId)
          return false;
      }
  
@@ -243,7 +243,7 @@ index 48416719..498698cb 100644
      queueDisconnectedOperations(accountId);
  
      _service->_client->strategyContext()->synchronizeAccountStrategy.clearSelection();
-@@ -591,7 +600,7 @@ bool ImapService::Source::synchronize(const QMailAccountId &accountId)
+@@ -579,7 +588,7 @@ bool ImapService::Source::synchronize(const QMailAccountId &accountId)
      _service->_client->strategyContext()->synchronizeAccountStrategy.setQuickList(false);
      _service->_client->strategyContext()->synchronizeAccountStrategy.setDescending(true);
      _service->_client->strategyContext()->synchronizeAccountStrategy.setOperation(_service->_client->strategyContext(), QMailRetrievalAction::Auto);
@@ -253,10 +253,10 @@ index 48416719..498698cb 100644
      if(!_unavailable)
          return initiateStrategy();
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index a90d670d..3a2fcd20 100644
+index 7a41cfde..f6a54592 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
-@@ -2368,14 +2368,53 @@ void ImapSynchronizeBaseStrategy::previewDiscoveredMessages(ImapStrategyContextB
+@@ -2372,14 +2372,53 @@ void ImapSynchronizeBaseStrategy::previewDiscoveredMessages(ImapStrategyContextB
      }
  }
  
@@ -314,7 +314,7 @@ index a90d670d..3a2fcd20 100644
  
  bool ImapSynchronizeBaseStrategy::nextFolder()
 diff --git a/src/plugins/messageservices/imap/imapstrategy.h b/src/plugins/messageservices/imap/imapstrategy.h
-index 0c896f1e..eea74f34 100644
+index 32ec3038..a2d4bf9f 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.h
 +++ b/src/plugins/messageservices/imap/imapstrategy.h
 @@ -42,6 +42,7 @@

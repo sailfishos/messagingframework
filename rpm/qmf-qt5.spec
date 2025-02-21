@@ -34,31 +34,28 @@ Requires:       buteo-syncfw-qt5 >= 0.7.16
 # i=1; for j in 00*patch; do printf "Patch%04d: %s\n" $i $j; i=$((i+1));done
 Patch0001: 0001-fix-tests-installation-path.patch
 Patch0002: 0002-Accounts-qt-integration.patch
-Patch0003: 0003-Don-t-save-settings-during-IMAP-logging-in.patch
-Patch0004: 0004-Start-messageserver-on-system-startup-in-case-there-.patch
-Patch0005: 0005-Add-keepalive-timer-to-IMAP-IDLE-service.patch
-Patch0006: 0006-Use-Qt5-booster-to-save-memory.patch
-Patch0007: 0007-Listen-to-sync-schedule-changes-from-buteo-sync-fram.patch
-Patch0008: 0008-Add-missing-export-in-crypto.patch
-Patch0009: 0009-Use-EightBit-encoding-instead-of-Base64-for-text-typ.patch
-Patch0010: 0010-Retrieve-message-lists-based-on-the-folder-sync-poli.patch
-Patch0011: 0011-Apply-folder-policy-to-always-on-connection.patch
-Patch0012: 0012-Allow-a-service-provided-folder-to-be-set-as-the-sta.patch
-Patch0013: 0013-Use-a-queued-connection-to-handle-accountsUpdated-si.patch
-Patch0014: 0014-Adjust-for-Qt-5.6.patch
-Patch0015: 0015-Revert-Fix-bundled-zlib-detection.patch
-Patch0016: 0016-Revert-Use-QRandomGenerator-instead-of-qrand.patch
-Patch0017: 0017-Revert-Use-range-constructors-for-lists-and-sets.patch
-Patch0018: 0018-Revert-Adjust-to-Qt6-QMetaType-API-changes.patch
-Patch0019: 0019-Revert-Replace-deprecated-QString-SplitBehavior.patch
+Patch0003: 0003-Start-messageserver-on-system-startup-in-case-there-.patch
+Patch0004: 0004-Add-keepalive-timer-to-IMAP-IDLE-service.patch
+Patch0005: 0005-Use-Qt5-booster-to-save-memory.patch
+Patch0006: 0006-Listen-to-sync-schedule-changes-from-buteo-sync-fram.patch
+Patch0007: 0007-Use-EightBit-encoding-instead-of-Base64-for-text-typ.patch
+Patch0008: 0008-Retrieve-message-lists-based-on-the-folder-sync-poli.patch
+Patch0009: 0009-Apply-folder-policy-to-always-on-connection.patch
+Patch0010: 0010-Allow-a-service-provided-folder-to-be-set-as-the-sta.patch
+Patch0011: 0011-Adjust-for-Qt-5.6.patch
+Patch0012: 0012-Revert-Fix-bundled-zlib-detection.patch
+Patch0013: 0013-Revert-Use-QRandomGenerator-instead-of-qrand.patch
+Patch0014: 0014-Revert-Use-range-constructors-for-lists-and-sets.patch
+Patch0015: 0015-Revert-Adjust-to-Qt6-QMetaType-API-changes.patch
+Patch0016: 0016-Revert-Replace-deprecated-QString-SplitBehavior.patch
+Patch0017: 0017-Revert-core5compat-addition.patch
+Patch0018: 0018-Adjust-qmflist-for-missing-bits-in-5.6.patch
+Patch0019: 0019-Revert-loadRelax.patch
 Patch0020: 0020-Revert-Fix-disappearance-of-QDateTime-QDate.patch
-Patch0021: 0021-Revert-core5compat-addition.patch
-Patch0022: 0022-Adjust-qmflist-for-missing-bits-in-5.6.patch
-Patch0023: 0023-Revert-loadRelax.patch
-Patch0024: 0024-Revert-Set-PLUGIN_CLASS_NAME-in-plugin-.pro-files.patch
-Patch0025: 0025-Revert-Bump-version-to-6.0.0-since-we-build-against-.patch
-Patch0026: 0026-Fallback-to-sso-credential-plugin.patch
-Patch0027: 0027-Revert-private-header-paths.patch
+Patch0021: 0021-Revert-Set-PLUGIN_CLASS_NAME-in-plugin-.pro-files.patch
+Patch0022: 0022-Revert-Bump-version-to-6.0.0-since-we-build-against-.patch
+Patch0023: 0023-Fallback-to-sso-credential-plugin.patch
+Patch0024: 0024-Revert-private-header-paths.patch
 
 
 %description

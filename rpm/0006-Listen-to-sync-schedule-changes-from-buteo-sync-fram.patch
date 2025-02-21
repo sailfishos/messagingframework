@@ -8,12 +8,11 @@ react to changes in the account schedule related to always-on mode
 and activate/deactivate IMAP IDLE.
 ---
  src/plugins/messageservices/imap/imap.pro     |  1 +
- .../messageservices/imap/imapclient.cpp       |  2 +-
  .../imap/imapconfiguration.cpp                |  4 +--
  .../messageservices/imap/imapservice.cpp      | 29 +++++++++++++++++++
  .../messageservices/imap/imapservice.h        |  2 ++
  src/tools/systemd/messageserver5.service      |  2 +-
- 6 files changed, 36 insertions(+), 4 deletions(-)
+ 5 files changed, 35 insertions(+), 3 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
 index 023d6a96..c4ba87c0 100644
@@ -27,19 +26,6 @@ index 023d6a96..c4ba87c0 100644
  
  contains(DEFINES, USE_KEEPALIVE) {
      PKGCONFIG += keepalive
-diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 3171b916..b2f091c6 100644
---- a/src/plugins/messageservices/imap/imapclient.cpp
-+++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -653,7 +653,7 @@ void ImapClient::commandTransition(ImapCommand command, OperationStatus status)
-             }
- 
-             // We are now connected
--            ImapConfiguration imapCfg(_config);            
-+            ImapConfiguration imapCfg(_config);
-             _waitingForIdleFolderIds = configurationIdleFolderIds();
- 
-             if (!_idlesEstablished
 diff --git a/src/plugins/messageservices/imap/imapconfiguration.cpp b/src/plugins/messageservices/imap/imapconfiguration.cpp
 index af37630e..2483f1ef 100644
 --- a/src/plugins/messageservices/imap/imapconfiguration.cpp
@@ -63,7 +49,7 @@ index af37630e..2483f1ef 100644
  
  void ImapConfigurationEditor::setBaseFolder(const QString &s)
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 7acf9517..48416719 100644
+index 9e211b2a..29152a5c 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -46,6 +46,10 @@
@@ -77,7 +63,7 @@ index 7acf9517..48416719 100644
  namespace { 
  
  const QString serviceKey("imap4");
-@@ -1487,6 +1491,13 @@ ImapService::ImapService(const QMailAccountId &accountId)
+@@ -1474,6 +1478,13 @@ ImapService::ImapService(const QMailAccountId &accountId)
      connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
              this, SLOT(accountsUpdated(const QMailAccountIdList&)));
      connect(_initiatePushEmailTimer, SIGNAL(timeout()), this, SLOT(initiatePushEmail()));
@@ -91,7 +77,7 @@ index 7acf9517..48416719 100644
  }
  
  void ImapService::enable()
-@@ -1900,6 +1911,24 @@ void ImapService::startStopBackgroundActivity()
+@@ -1869,6 +1880,24 @@ void ImapService::startStopBackgroundActivity()
  }
  #endif
  
@@ -117,10 +103,10 @@ index 7acf9517..48416719 100644
  {
  public:
 diff --git a/src/plugins/messageservices/imap/imapservice.h b/src/plugins/messageservices/imap/imapservice.h
-index 3089401f..eb5de3bb 100644
+index 839debe1..9944e05d 100644
 --- a/src/plugins/messageservices/imap/imapservice.h
 +++ b/src/plugins/messageservices/imap/imapservice.h
-@@ -81,6 +81,8 @@ protected slots:
+@@ -79,6 +79,8 @@ protected slots:
      void openIdleSession();
      void closeIdleSession();
  

@@ -343,10 +343,10 @@ index 3c274119..0b18aaa5 100644
          transmissionInProgressIds = idSet;
          transmissionSetInitialized = true;
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index f9543176..711bfc96 100644
+index ef21fc56..3c0d47db 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1235,7 +1235,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
+@@ -1223,7 +1223,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
          bool external(false);
  
          // Are these messages being resolved for internal or external references?
@@ -356,7 +356,7 @@ index f9543176..711bfc96 100644
  
          for (const QMailMessageMetaData &metaData : QMailStore::instance()->messagesMetaData(key, props)) {
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index 3a2fcd20..d4b48d30 100644
+index f6a54592..b27dc4f6 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
 @@ -349,15 +349,13 @@ QSet<QMailFolderId> foldersApplicableTo(QMailMessageKey const& messagekey, QSet<
@@ -399,7 +399,7 @@ index 3a2fcd20..d4b48d30 100644
                      } else {
                          Q_ASSERT(false);
                      }
-@@ -1960,9 +1956,9 @@ void ImapSearchMessageStrategy::folderListCompleted(ImapStrategyContextBase *con
+@@ -1964,9 +1960,9 @@ void ImapSearchMessageStrategy::folderListCompleted(ImapStrategyContextBase *con
          _limit = -1;
          _count = false;
      } else {

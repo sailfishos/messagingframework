@@ -27,10 +27,10 @@ index 0af76d22..023d6a96 100644
             imapconfiguration.h \
             imapmailboxproperties.h \
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 614b863e..7acf9517 100644
+index 3c7e5ebd..9e211b2a 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1473,6 +1473,12 @@ ImapService::ImapService(const QMailAccountId &accountId)
+@@ -1460,6 +1460,12 @@ ImapService::ImapService(const QMailAccountId &accountId)
        _networkSession(0),
        _networkSessionTimer(new QTimer(this))
  {
@@ -43,7 +43,7 @@ index 614b863e..7acf9517 100644
      QMailAccount account(accountId);
      if (account.status() & QMailAccount::Enabled) {
          enable();
-@@ -1875,7 +1881,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
+@@ -1844,7 +1850,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
          }
      }
      _idling = status;
@@ -69,7 +69,7 @@ index 614b863e..7acf9517 100644
  class ImapConfigurator : public QMailMessageServiceConfigurator
  {
 diff --git a/src/plugins/messageservices/imap/imapservice.h b/src/plugins/messageservices/imap/imapservice.h
-index e3736e1f..3089401f 100644
+index e5c62d15..839debe1 100644
 --- a/src/plugins/messageservices/imap/imapservice.h
 +++ b/src/plugins/messageservices/imap/imapservice.h
 @@ -38,6 +38,10 @@
@@ -83,7 +83,7 @@ index e3736e1f..3089401f 100644
  class ImapService : public QMailMessageService
  {
      Q_OBJECT
-@@ -77,6 +81,10 @@ protected slots:
+@@ -75,6 +79,10 @@ protected slots:
      void openIdleSession();
      void closeIdleSession();
  
@@ -94,7 +94,7 @@ index e3736e1f..3089401f 100644
  private slots:
      void onOnlineStateChanged(bool isOnline);
      void onSessionOpened();
-@@ -107,6 +115,9 @@ private:
+@@ -106,6 +114,9 @@ private:
      QTimer *_initiatePushEmailTimer;
      IdleNetworkSession              *_networkSession;          // IDLE network session
      QTimer                          *_networkSessionTimer;
