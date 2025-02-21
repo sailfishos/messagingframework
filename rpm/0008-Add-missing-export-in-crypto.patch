@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Damien Caliste <dcaliste@free.fr>
+Date: Thu, 20 Feb 2025 15:44:52 +0100
+Subject: [PATCH] Add missing export in crypto
+
+Change-Id: I532ca8cfdb1dff33772529197e11c92469a14696
+---
+ src/libraries/qmfclient/qmailcrypto.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libraries/qmfclient/qmailcrypto.h b/src/libraries/qmfclient/qmailcrypto.h
+index 7defd164..3645d7a3 100644
+--- a/src/libraries/qmfclient/qmailcrypto.h
++++ b/src/libraries/qmfclient/qmailcrypto.h
+@@ -43,7 +43,7 @@
+ 
+ class QMailAccountConfiguration;
+ 
+-class QMailCryptographicServiceConfiguration
++class QMF_EXPORT QMailCryptographicServiceConfiguration
+ {
+ public:
+     QMailCryptographicServiceConfiguration(QMailAccountConfiguration *config);

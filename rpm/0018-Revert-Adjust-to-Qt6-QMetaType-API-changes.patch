@@ -10,10 +10,10 @@ This reverts commit f53c2885bff3408bf6aa8d89a9cb913980f51e9b.
  2 files changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
-index 0284def7..4d5625ce 100644
+index 8ffd4be4..b64d9afe 100644
 --- a/src/libraries/qmfclient/qmailstore_p.cpp
 +++ b/src/libraries/qmfclient/qmailstore_p.cpp
-@@ -3393,7 +3393,7 @@ static QString queryText(const QString &query, const QList<QVariant> &values)
+@@ -3387,7 +3387,7 @@ static QString queryText(const QString &query, const QList<QVariant> &values)
      int index = result.indexOf(marker);
      while ((index != -1) && (it != end)) {
          QString substitute((*it).toString());
@@ -22,7 +22,7 @@ index 0284def7..4d5625ce 100644
              substitute.prepend(quote).append(quote);
  
          result.replace(index, 1, substitute);
-@@ -3408,7 +3408,7 @@ static QString queryText(const QString &query, const QList<QVariant> &values)
+@@ -3402,7 +3402,7 @@ static QString queryText(const QString &query, const QList<QVariant> &values)
  static QString queryText(const QSqlQuery &query)
  {
      // Note: we currently only handle positional parameters
