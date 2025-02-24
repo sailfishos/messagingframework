@@ -22,7 +22,7 @@ Subject: [PATCH] Revert private header paths
  15 files changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index b2f091c6..e1f6bf84 100644
+index e389b31a..3533fbc6 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -35,7 +35,7 @@
@@ -35,7 +35,7 @@ index b2f091c6..e1f6bf84 100644
  #include <qmailmessagebuffer.h>
  #include <qmailfolder.h>
 diff --git a/src/plugins/messageservices/imap/imapprotocol.h b/src/plugins/messageservices/imap/imapprotocol.h
-index ce520b1d..3e4efdb8 100644
+index 3002ffe8..c5c01d1c 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.h
 +++ b/src/plugins/messageservices/imap/imapprotocol.h
 @@ -41,7 +41,7 @@
@@ -48,7 +48,7 @@ index ce520b1d..3e4efdb8 100644
  #include <qmailtransport.h>
  #include <qmailcredentials.h>
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index d4b48d30..b1aa7c34 100644
+index b27dc4f6..9315699b 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
 @@ -34,7 +34,7 @@
