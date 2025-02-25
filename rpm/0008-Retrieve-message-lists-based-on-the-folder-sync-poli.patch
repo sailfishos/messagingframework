@@ -72,10 +72,10 @@ index 9f2bbed6..5caaea26 100644
      void setStatus(quint64 newStatus);
      void setStatus(quint64 mask, bool set);
 diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
-index ba576dcc..8ffd4be4 100644
+index 59b87a2a..24a901f6 100644
 --- a/src/libraries/qmfclient/qmailstore_p.cpp
 +++ b/src/libraries/qmfclient/qmailstore_p.cpp
-@@ -3701,6 +3701,42 @@ bool QMailStorePrivate::messageExists(const QString &serveruid, const QMailAccou
+@@ -3703,6 +3703,42 @@ bool QMailStorePrivate::messageExists(const QString &serveruid, const QMailAccou
  }
  
  #ifdef USE_ACCOUNTS_QT
@@ -118,7 +118,7 @@ index ba576dcc..8ffd4be4 100644
  QMailAccount QMailStorePrivate::extractAccount(const QSharedPointer<Accounts::Account>& ssoAccount)
  {
      Q_ASSERT(ssoAccount);
-@@ -3718,6 +3754,8 @@ QMailAccount QMailStorePrivate::extractAccount(const QSharedPointer<Accounts::Ac
+@@ -3720,6 +3756,8 @@ QMailAccount QMailStorePrivate::extractAccount(const QSharedPointer<Accounts::Ac
  
      ssoAccount->selectService();
      const bool& enabled = ssoAccount->enabled();
@@ -127,7 +127,7 @@ index ba576dcc..8ffd4be4 100644
      ssoAccount->selectService(service);
      const bool& isDefault = ssoAccount->valueAsBool(QLatin1String("email/default"));
      const bool& canTransmit = ssoAccount->valueAsBool(QLatin1String("canTransmit"), true);
-@@ -6256,6 +6294,9 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddAccount(QMailAccou
+@@ -6258,6 +6296,9 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptAddAccount(QMailAccou
      ssoAccount->setDisplayName(account->name());
      ssoAccount->setEnabled(account->status() & QMailAccount::Enabled);
  
@@ -137,7 +137,7 @@ index ba576dcc..8ffd4be4 100644
      Accounts::ServiceList services = ssoAccount->services(QLatin1String("e-mail"));
      if (!services.count()) {
          qMailLog(Messaging) << "E-mail Services not found, make sure that *.service and *.provider files are properly installed.";
-@@ -7052,6 +7093,11 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
+@@ -7054,6 +7095,11 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
      if (!ssoAccount)
        return Failure;
  
@@ -149,7 +149,7 @@ index ba576dcc..8ffd4be4 100644
      Accounts::ServiceList services = ssoAccount->enabledServices();
      Q_ASSERT (services.count() == 1);
      Accounts::Service service = services.first();
-@@ -7095,6 +7141,7 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
+@@ -7097,6 +7143,7 @@ QMailStorePrivate::AttemptResult QMailStorePrivate::attemptUpdateAccount(QMailAc
          ssoAccount->setValue(QLatin1String("email/default"), isDefault);
          ssoAccount->setValue(QLatin1String("canTransmit"), canTransmit);
          ssoAccount->setValue(QLatin1String("iconPath"), account->iconPath());

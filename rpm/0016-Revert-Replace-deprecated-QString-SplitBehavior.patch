@@ -27,10 +27,10 @@ index c7173949..f93f39e1 100644
      int tokenCount = tokens.count();
      if ( tokenCount > 0 ) {
 diff --git a/src/libraries/qmfclient/support/qmailnamespace.cpp b/src/libraries/qmfclient/support/qmailnamespace.cpp
-index 9e490f4a..5dc69870 100644
+index b9a30477..c28dda6e 100644
 --- a/src/libraries/qmfclient/support/qmailnamespace.cpp
 +++ b/src/libraries/qmfclient/support/qmailnamespace.cpp
-@@ -560,28 +560,28 @@ QMap<QByteArray, QStringList> standardFolderTranslations()
+@@ -420,28 +420,28 @@ QMap<QByteArray, QStringList> standardFolderTranslations()
      QTextStream in(&file);
      while (!in.atEnd()) {
          QString line = in.readLine();

@@ -126,12 +126,12 @@ index 76c60f78..e18523b3 100644
  
  
 diff --git a/tests/tst_python_email/tst_python_email.cpp b/tests/tst_python_email/tst_python_email.cpp
-index 224a7895..1eb8e570 100644
+index bf4a26fb..b8f5f48a 100644
 --- a/tests/tst_python_email/tst_python_email.cpp
 +++ b/tests/tst_python_email/tst_python_email.cpp
-@@ -34,7 +34,7 @@
- #include <QObject>
- #include <QTest>
+@@ -36,7 +36,7 @@
+ #include <QMimeDatabase>
+ 
  #include <qmailmessage.h>
 -#include <longstring_p.h>
 +#include <private/longstring_p.h>
