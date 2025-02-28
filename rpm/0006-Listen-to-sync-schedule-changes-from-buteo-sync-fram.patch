@@ -49,7 +49,7 @@ index af37630e..2483f1ef 100644
  
  void ImapConfigurationEditor::setBaseFolder(const QString &s)
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 9e211b2a..29152a5c 100644
+index 2d625a38..7b6108c1 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -46,6 +46,10 @@
@@ -63,10 +63,10 @@ index 9e211b2a..29152a5c 100644
  namespace { 
  
  const QString serviceKey("imap4");
-@@ -1474,6 +1478,13 @@ ImapService::ImapService(const QMailAccountId &accountId)
+@@ -1463,6 +1467,13 @@ ImapService::ImapService(const QMailAccountId &accountId)
+     connect(_restartPushEmailTimer, SIGNAL(timeout()), this, SLOT(restartPushEmail()));
      connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
              this, SLOT(accountsUpdated(const QMailAccountIdList&)));
-     connect(_initiatePushEmailTimer, SIGNAL(timeout()), this, SLOT(initiatePushEmail()));
 +
 +    QDBusConnection::sessionBus().connect("com.meego.msyncd", "/synchronizer",
 +                                          "com.meego.msyncd", "syncedExternallyStatus",
@@ -77,9 +77,9 @@ index 9e211b2a..29152a5c 100644
  }
  
  void ImapService::enable()
-@@ -1869,6 +1880,24 @@ void ImapService::startStopBackgroundActivity()
+@@ -1830,6 +1841,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
+     _idling = status;
  }
- #endif
  
 +void ImapService::onSyncedExternallyChanged(uint accountId, const QString &profileType, bool state)
 +{
@@ -103,18 +103,18 @@ index 9e211b2a..29152a5c 100644
  {
  public:
 diff --git a/src/plugins/messageservices/imap/imapservice.h b/src/plugins/messageservices/imap/imapservice.h
-index 839debe1..9944e05d 100644
+index 7b24794a..4cf549a5 100644
 --- a/src/plugins/messageservices/imap/imapservice.h
 +++ b/src/plugins/messageservices/imap/imapservice.h
-@@ -79,6 +79,8 @@ protected slots:
+@@ -75,6 +75,8 @@ protected slots:
      void openIdleSession();
      void closeIdleSession();
  
 +    void onSyncedExternallyChanged(uint accountId, const QString &profileType, bool state);
 +
- #ifdef USE_KEEPALIVE
-     void startStopBackgroundActivity();
- #endif
+ private slots:
+     void onOnlineStateChanged(bool isOnline);
+     void onSessionOpened();
 diff --git a/src/tools/systemd/messageserver5.service b/src/tools/systemd/messageserver5.service
 index a5aa05a9..9622d701 100644
 --- a/src/tools/systemd/messageserver5.service

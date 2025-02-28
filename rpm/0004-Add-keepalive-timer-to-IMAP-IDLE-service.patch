@@ -6,10 +6,11 @@ Subject: [PATCH] Add keepalive timer to IMAP IDLE service
 This commit introduce a dependency on nemo-keepalive via
 DEFINES+=USE_KEEPALIVE
 ---
- src/plugins/messageservices/imap/imap.pro     |  4 ++++
- .../messageservices/imap/imapservice.cpp      | 23 +++++++++++++++++++
- .../messageservices/imap/imapservice.h        | 11 +++++++++
- 3 files changed, 38 insertions(+)
+ src/plugins/messageservices/imap/imap.pro       |  4 ++++
+ src/plugins/messageservices/imap/imapclient.cpp | 16 ++++++++++++++++
+ src/plugins/messageservices/imap/imapclient.h   |  7 +++++++
+ tests/tst_imap/tst_imap.pro                     |  4 ++++
+ 4 files changed, 31 insertions(+)
 
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
 index 0af76d22..023d6a96 100644
@@ -26,81 +27,93 @@ index 0af76d22..023d6a96 100644
  HEADERS += imapclient.h \
             imapconfiguration.h \
             imapmailboxproperties.h \
-diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 3c7e5ebd..9e211b2a 100644
---- a/src/plugins/messageservices/imap/imapservice.cpp
-+++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1460,6 +1460,12 @@ ImapService::ImapService(const QMailAccountId &accountId)
-       _networkSession(0),
-       _networkSessionTimer(new QTimer(this))
- {
+diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
+index 40398332..9ed4fa1c 100644
+--- a/src/plugins/messageservices/imap/imapclient.cpp
++++ b/src/plugins/messageservices/imap/imapclient.cpp
+@@ -449,9 +449,15 @@ ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
+     connect(&_inactiveTimer, SIGNAL(timeout()),
+             this, SLOT(connectionInactive()));
+ 
 +#ifdef USE_KEEPALIVE
 +    _backgroundActivity = new BackgroundActivity(this);
-+    _backgroundActivity->setWakeupFrequency(BackgroundActivity::ThirtySeconds);
-+    connect(_backgroundActivity, SIGNAL(running()), this, SLOT(startStopBackgroundActivity()));
-+#endif
-+
-     QMailAccount account(accountId);
-     if (account.status() & QMailAccount::Enabled) {
-         enable();
-@@ -1844,7 +1850,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
-         }
-     }
-     _idling = status;
-+#ifdef USE_KEEPALIVE
-+    startStopBackgroundActivity();
-+#endif
-+}
-+
-+#ifdef USE_KEEPALIVE
-+void ImapService::startStopBackgroundActivity()
-+{
-+    // start timer again if still in idle mode
-+    if (_idling) {
-+        qMailLog(Messaging) << Q_FUNC_INFO <<  "Starting keepalive";
-+        _backgroundActivity->wait();
-+    } else if (_backgroundActivity->isRunning()){
-+        qMailLog(Messaging) << Q_FUNC_INFO << "Stopping keepalive";
-+        _backgroundActivity->stop();
-+    }
- }
++    _backgroundActivity->setWakeupFrequency(BackgroundActivity::FifteenMinutes);
++    connect(_backgroundActivity, &BackgroundActivity::running, this, &ImapClient::renewPushEmail);
++#else
+     _idleTimer.setSingleShot(true);
+     _idleTimer.setInterval(28 * 60 * 1000);
+     connect(&_idleTimer, &QTimer::timeout, this, &ImapClient::renewPushEmail);
 +#endif
  
- class ImapConfigurator : public QMailMessageServiceConfigurator
+     connect(QMailMessageBuffer::instance(), SIGNAL(flushed()), this, SLOT(messageBufferFlushed()));
+ 
+@@ -1674,10 +1680,16 @@ bool ImapClient::isPushEmailEstablished()
+ 
+ void ImapClient::setIdlingForFolder(const QMailFolderId &id)
  {
-diff --git a/src/plugins/messageservices/imap/imapservice.h b/src/plugins/messageservices/imap/imapservice.h
-index e5c62d15..839debe1 100644
---- a/src/plugins/messageservices/imap/imapservice.h
-+++ b/src/plugins/messageservices/imap/imapservice.h
-@@ -38,6 +38,10 @@
- #include "idlenetworksession.h"
- #include <qmailmessageservice.h>
++#ifdef USE_KEEPALIVE
++    if (_monitored.value(id)->connected()) {
++        _backgroundActivity->wait();
++    }
++#else
+     if (_monitored.value(id)->connected()
+         && !_idleTimer.isActive()) {
+         _idleTimer.start();
+     }
++#endif
+     if (!_waitingForIdleFolderIds.isEmpty()) {
+         _waitingForIdleFolderIds.removeOne(id);
+         if (_waitingForIdleFolderIds.isEmpty()) {
+@@ -1707,7 +1719,11 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
+     static int count(0);
+ 
+     if (mailboxIds.isEmpty()) {
++#ifdef USE_KEEPALIVE
++        _backgroundActivity->stop();
++#else
+         _idleTimer.stop();
++#endif
+     }
+ 
+     foreach(const QMailFolderId &id, _monitored.keys()) {
+diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
+index 8edc94b9..bb2e1354 100644
+--- a/src/plugins/messageservices/imap/imapclient.h
++++ b/src/plugins/messageservices/imap/imapclient.h
+@@ -47,6 +47,9 @@
+ #include <qmailmessageclassifier.h>
+ #include <qmailmessageserver.h>
  
 +#ifdef USE_KEEPALIVE
 +#include <keepalive/backgroundactivity.h>
 +#endif
-+
- class ImapService : public QMailMessageService
- {
-     Q_OBJECT
-@@ -75,6 +79,10 @@ protected slots:
-     void openIdleSession();
-     void closeIdleSession();
  
-+#ifdef USE_KEEPALIVE
-+    void startStopBackgroundActivity();
-+#endif
-+
- private slots:
-     void onOnlineStateChanged(bool isOnline);
-     void onSessionOpened();
-@@ -106,6 +114,9 @@ private:
-     QTimer *_initiatePushEmailTimer;
-     IdleNetworkSession              *_networkSession;          // IDLE network session
-     QTimer                          *_networkSessionTimer;
+ class ImapStrategy;
+ class ImapStrategyContext;
+@@ -168,7 +171,11 @@ private:
+     bool _qresyncEnabled;
+     bool _requestRapidClose;
+     bool _rapidClosing;
 +#ifdef USE_KEEPALIVE
 +    BackgroundActivity* _backgroundActivity;
++#else
+     QTimer _idleTimer;
 +#endif
- };
  
- class ImapServicePlugin : public QMailMessageServicePlugin
+     QMailMessageClassifier _classifier;
+     ImapStrategyContext *_strategyContext;
+diff --git a/tests/tst_imap/tst_imap.pro b/tests/tst_imap/tst_imap.pro
+index 2e64084e..0be64ba1 100644
+--- a/tests/tst_imap/tst_imap.pro
++++ b/tests/tst_imap/tst_imap.pro
+@@ -2,6 +2,10 @@ TEMPLATE = app
+ CONFIG += qmfclient qmfmessageserver
+ TARGET = tst_imap
+ 
++contains(DEFINES, USE_KEEPALIVE) {
++    PKGCONFIG += keepalive
++}
++
+ SRCDIR = $$PWD/../../src/plugins/messageservices/imap
+ INCLUDEPATH += $$SRCDIR
+ QT += qmfclient qmfmessageserver qmfmessageserver-private
