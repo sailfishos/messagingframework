@@ -72,7 +72,7 @@ index 9f2bbed6..5caaea26 100644
      void setStatus(quint64 newStatus);
      void setStatus(quint64 mask, bool set);
 diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
-index 59b87a2a..24a901f6 100644
+index 7ee59a5a..74b6179f 100644
 --- a/src/libraries/qmfclient/qmailstore_p.cpp
 +++ b/src/libraries/qmfclient/qmailstore_p.cpp
 @@ -3703,6 +3703,42 @@ bool QMailStorePrivate::messageExists(const QString &serveruid, const QMailAccou
@@ -158,7 +158,7 @@ index 59b87a2a..24a901f6 100644
          QString properties(QLatin1String("type=?, name=?, emailaddress=?, status=?, signature=?, lastsynchronized=?, iconpath=?"));
          QVariantList propertyValues;
 diff --git a/src/libraries/qmfclient/qmailstore_p.h b/src/libraries/qmfclient/qmailstore_p.h
-index 2b7ef757..abe785b6 100644
+index 564070aa..d8839433 100644
 --- a/src/libraries/qmfclient/qmailstore_p.h
 +++ b/src/libraries/qmfclient/qmailstore_p.h
 @@ -286,6 +286,9 @@ public:
@@ -172,7 +172,7 @@ index 2b7ef757..abe785b6 100644
  #endif
  
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 7b6108c1..0d7b12a0 100644
+index da9d2ebd..c9e014f2 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -218,7 +218,7 @@ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, co

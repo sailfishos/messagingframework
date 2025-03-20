@@ -10,7 +10,7 @@ This reverts commit 260cb748a7556b1e6a70efa05522c01200dda823.
  src/libraries/qmfclient/qmailmessageset.cpp   | 15 ++++----
  .../qmfclient/qmailmessagethreadedmodel.cpp   | 14 +++-----
  src/libraries/qmfclient/qmailstore.cpp        | 15 +++-----
- .../qmfclient/qmailstoreimplementation_p.cpp  | 29 ++++++++-------
+ .../qmfclient/qmailstorenotifier_p.cpp        | 18 +++++-----
  .../messageservices/imap/imapservice.cpp      |  2 +-
  .../messageservices/imap/imapstrategy.cpp     | 24 ++++++-------
  src/tools/messageserver/messageserver.cpp     |  2 +-
@@ -19,10 +19,10 @@ This reverts commit 260cb748a7556b1e6a70efa05522c01200dda823.
  .../tst_qmaildisconnected.cpp                 |  2 +-
  .../tst_qmailserviceaction.cpp                |  2 +-
  .../tst_qmailstorekeys/tst_qmailstorekeys.cpp | 36 ++++++++-----------
- 14 files changed, 78 insertions(+), 112 deletions(-)
+ 14 files changed, 73 insertions(+), 106 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessagekey.cpp b/src/libraries/qmfclient/qmailmessagekey.cpp
-index 117bca21..4f656b81 100644
+index d0af025c..2735c66a 100644
 --- a/src/libraries/qmfclient/qmailmessagekey.cpp
 +++ b/src/libraries/qmfclient/qmailmessagekey.cpp
 @@ -390,8 +390,7 @@ QMailMessageKey QMailMessageKey::id(const QMailMessageIdList &ids, QMailDataComp
@@ -170,7 +170,7 @@ index dd8c5f16..5ad2a57e 100644
  
      return true;
 diff --git a/src/libraries/qmfclient/qmailstore.cpp b/src/libraries/qmfclient/qmailstore.cpp
-index 9522c05a..bbde2106 100644
+index 28a77663..aae4ffab 100644
 --- a/src/libraries/qmfclient/qmailstore.cpp
 +++ b/src/libraries/qmfclient/qmailstore.cpp
 @@ -1236,8 +1236,7 @@ void QMailStore::emitAccountNotification(ChangeType type, const QMailAccountIdLi
@@ -223,46 +223,12 @@ index 9522c05a..bbde2106 100644
  
          d->notifyMessageRemovalRecordsChange(type, idList);
  
-diff --git a/src/libraries/qmfclient/qmailstoreimplementation_p.cpp b/src/libraries/qmfclient/qmailstoreimplementation_p.cpp
-index 3c274119..0b18aaa5 100644
---- a/src/libraries/qmfclient/qmailstoreimplementation_p.cpp
-+++ b/src/libraries/qmfclient/qmailstoreimplementation_p.cpp
-@@ -116,11 +116,11 @@ void emitIpcUpdates(MailstoreAdaptor &adaptor, const QMailMessageIdList& ids,  q
-     emit adaptor.updated(sig, payload);
- }
- 
--template<typename IDType>
--void dispatchNotifications(MailstoreAdaptor &adaptor, QSet<IDType> &ids, const QString &sig)
-+template<typename IDSetType>
-+void dispatchNotifications(MailstoreAdaptor &adaptor, IDSetType &ids, const QString &sig)
- {
-     if (!ids.isEmpty()) {
--        emitIpcUpdates(adaptor, ids.values(), sig);
-+        emitIpcUpdates(adaptor, ids.toList(), sig);
-         ids.clear();
-     }
- } 
-@@ -140,7 +140,7 @@ void dispatchNotifications(MailstoreAdaptor &adaptor, MessagesPropertiesBuffer&
- {
-     if (!data.isEmpty()) {
-         foreach (const MessagesProperties& props, data) {
--            emitIpcUpdates(adaptor, props.second.values(), props.first.first, props.first.second, sig);
-+            emitIpcUpdates(adaptor, props.second.toList(), props.first.first, props.first.second, sig);
-         }
-         data.clear();
-     }
-@@ -153,8 +153,7 @@ void dispatchNotifications(MailstoreAdaptor &adaptor, MessagesStatusBuffer& data
- {
-     if (!data.isEmpty()) {
-         foreach (const MessagesStatus& status, data.keys()) {
--            const QSet<QMailMessageId> ids = data[status];
--            emitIpcUpdates(adaptor,ids.values(), status.first, status.second, sig);
-+            emitIpcUpdates(adaptor, data[status].toList(), status.first, status.second, sig);
-         }
-         data.clear();
-     }
-@@ -315,7 +314,7 @@ void QMailStoreImplementationBase::notifyAccountsChange(QMailStore::ChangeType c
-             flushTimer.start(flushTimeout);
+diff --git a/src/libraries/qmfclient/qmailstorenotifier_p.cpp b/src/libraries/qmfclient/qmailstorenotifier_p.cpp
+index 2600292d..b7e6b986 100644
+--- a/src/libraries/qmfclient/qmailstorenotifier_p.cpp
++++ b/src/libraries/qmfclient/qmailstorenotifier_p.cpp
+@@ -202,7 +202,7 @@ void QMailStoreNotifier::notifyAccountsChange(QMailStore::ChangeType changeType,
+             flushTimer.start();
          }
  
 -        QSet<QMailAccountId> idsSet = QSet<QMailAccountId>(ids.constBegin(), ids.constEnd());
@@ -270,8 +236,8 @@ index 3c274119..0b18aaa5 100644
          switch (changeType)
          {
          case QMailStore::Added:
-@@ -352,7 +351,7 @@ void QMailStoreImplementationBase::notifyMessagesChange(QMailStore::ChangeType c
-             flushTimer.start(flushTimeout);
+@@ -237,7 +237,7 @@ void QMailStoreNotifier::notifyMessagesChange(QMailStore::ChangeType changeType,
+             flushTimer.start();
          }
  
 -        QSet<QMailMessageId> idsSet = QSet<QMailMessageId>(ids.constBegin(), ids.constEnd());
@@ -279,26 +245,26 @@ index 3c274119..0b18aaa5 100644
          switch (changeType)
          {
          case QMailStore::Added:
-@@ -418,7 +417,7 @@ void QMailStoreImplementationBase::notifyMessagesDataChange(const QMailMessageId
-             flushTimer.start(flushTimeout);
+@@ -311,7 +311,7 @@ void QMailStoreNotifier::notifyMessagesDataChange(const QMailMessageIdList& ids,
+             flushTimer.start();
          }
  
 -        MessagesProperties props(QPair<QMailMessageKey::Properties, QMailMessageMetaData>(properties, data), QSet<QMailMessageId>(ids.constBegin(), ids.constEnd()));
-+        MessagesProperties props(QPair<QMailMessageKey::Properties, QMailMessageMetaData>(properties, data), ids.toSet());
-         messagesPropertiesBuffer.append(props);;
++        MessagesProperties props(QPair<QMailMessageKey::Properties, QMailMessageMetaData>(properties, data), QSet<QMailMessageId>::fromList(ids));
+         messagesPropertiesBuffer.append(props);
  
      } else {
-@@ -438,7 +437,7 @@ void QMailStoreImplementationBase::notifyMessagesDataChange(const QMailMessageId
+@@ -331,7 +331,7 @@ void QMailStoreNotifier::notifyMessagesDataChange(const QMailMessageIdList& ids,
          }
  
          MessagesStatus messageStatus(status, set);
 -        messagesStatusBuffer[messageStatus] += QSet<QMailMessageId>(ids.constBegin(), ids.constEnd());
-+        messagesStatusBuffer[messageStatus] += ids.toSet();
++        messagesStatusBuffer[messageStatus] += QSet<QMailMessageId>::fromList(ids);
  
      } else {
-         emitIpcUpdates(*ipcAdaptor, ids, status, set, messageStatusUpdatedSig());
-@@ -458,7 +457,7 @@ void QMailStoreImplementationBase::notifyThreadsChange(QMailStore::ChangeType ch
-             flushTimer.start(flushTimeout);
+         emit ipcAdaptor->messageStatusChanged(ids, status, set);
+@@ -349,7 +349,7 @@ void QMailStoreNotifier::notifyThreadsChange(QMailStore::ChangeType changeType,
+             flushTimer.start();
          }
  
 -        QSet<QMailThreadId> idsSet = QSet<QMailThreadId>(ids.constBegin(), ids.constEnd());
@@ -306,8 +272,8 @@ index 3c274119..0b18aaa5 100644
          switch (changeType)
          {
          case QMailStore::Added:
-@@ -496,7 +495,7 @@ void QMailStoreImplementationBase::notifyFoldersChange(QMailStore::ChangeType ch
-             flushTimer.start(flushTimeout);
+@@ -385,7 +385,7 @@ void QMailStoreNotifier::notifyFoldersChange(QMailStore::ChangeType changeType,
+             flushTimer.start();
          }
  
 -        QSet<QMailFolderId> idsSet = QSet<QMailFolderId>(ids.constBegin(), ids.constEnd());
@@ -315,8 +281,8 @@ index 3c274119..0b18aaa5 100644
          switch (changeType)
          {
          case QMailStore::Added:
-@@ -533,7 +532,7 @@ void QMailStoreImplementationBase::notifyMessageRemovalRecordsChange(QMailStore:
-             flushTimer.start(flushTimeout);
+@@ -420,7 +420,7 @@ void QMailStoreNotifier::notifyMessageRemovalRecordsChange(QMailStore::ChangeTyp
+             flushTimer.start();
          }
  
 -        QSet<QMailAccountId> idsSet = QSet<QMailAccountId>(ids.constBegin(), ids.constEnd());
@@ -324,18 +290,18 @@ index 3c274119..0b18aaa5 100644
          switch (changeType)
          {
          case QMailStore::Added:
-@@ -571,7 +570,7 @@ void QMailStoreImplementationBase::notifyTransmissionInProgress(const QMailAccou
+@@ -458,7 +458,7 @@ void QMailStoreNotifier::notifyTransmissionInProgress(const QMailAccountIdList&
  
- bool QMailStoreImplementationBase::setRetrievalInProgress(const QMailAccountIdList& ids)
+ bool QMailStoreNotifier::setRetrievalInProgress(const QMailAccountIdList& ids)
  {
 -    QSet<QMailAccountId> idSet(ids.constBegin(), ids.constEnd());
 +    QSet<QMailAccountId> idSet(ids.toSet());
      if ((idSet != retrievalInProgressIds) || !retrievalSetInitialized) {
          retrievalInProgressIds = idSet;
          retrievalSetInitialized = true;
-@@ -583,7 +582,7 @@ bool QMailStoreImplementationBase::setRetrievalInProgress(const QMailAccountIdLi
+@@ -470,7 +470,7 @@ bool QMailStoreNotifier::setRetrievalInProgress(const QMailAccountIdList& ids)
  
- bool QMailStoreImplementationBase::setTransmissionInProgress(const QMailAccountIdList& ids)
+ bool QMailStoreNotifier::setTransmissionInProgress(const QMailAccountIdList& ids)
  {
 -    QSet<QMailAccountId> idSet(ids.constBegin(), ids.constEnd());
 +    QSet<QMailAccountId> idSet(ids.toSet());
@@ -343,7 +309,7 @@ index 3c274119..0b18aaa5 100644
          transmissionInProgressIds = idSet;
          transmissionSetInitialized = true;
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 0d7b12a0..bd22ed07 100644
+index c9e014f2..ddd5480b 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -1223,7 +1223,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
