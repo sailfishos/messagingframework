@@ -9,8 +9,8 @@ DEFINES+=USE_KEEPALIVE
  src/plugins/messageservices/imap/imap.pro       |  4 ++++
  src/plugins/messageservices/imap/imapclient.cpp | 16 ++++++++++++++++
  src/plugins/messageservices/imap/imapclient.h   |  7 +++++++
- tests/tst_imap/tst_imap.pro                     |  4 ++++
- 4 files changed, 31 insertions(+)
+ tests/tst_imap/tst_imap.pro                     |  5 +++++
+ 4 files changed, 32 insertions(+)
 
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
 index 0af76d22..023d6a96 100644
@@ -28,7 +28,7 @@ index 0af76d22..023d6a96 100644
             imapconfiguration.h \
             imapmailboxproperties.h \
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 40398332..9ed4fa1c 100644
+index 416c6e72..4eaff89a 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -449,9 +449,15 @@ ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
@@ -103,14 +103,15 @@ index 8edc94b9..bb2e1354 100644
      QMailMessageClassifier _classifier;
      ImapStrategyContext *_strategyContext;
 diff --git a/tests/tst_imap/tst_imap.pro b/tests/tst_imap/tst_imap.pro
-index 2e64084e..0be64ba1 100644
+index 2e64084e..cac5a6d1 100644
 --- a/tests/tst_imap/tst_imap.pro
 +++ b/tests/tst_imap/tst_imap.pro
-@@ -2,6 +2,10 @@ TEMPLATE = app
+@@ -2,6 +2,11 @@ TEMPLATE = app
  CONFIG += qmfclient qmfmessageserver
  TARGET = tst_imap
  
 +contains(DEFINES, USE_KEEPALIVE) {
++    CONFIG += link_pkgconfig
 +    PKGCONFIG += keepalive
 +}
 +

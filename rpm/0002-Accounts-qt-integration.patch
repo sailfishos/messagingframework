@@ -96,14 +96,13 @@ base-qmf-oauth2-plugin/oauth2plugin.cpp
  src/plugins/credentials/sso/sso.pro           |    2 +-
  src/plugins/plugins.pro                       |    4 +
  src/tools/messageserver/servicehandler.cpp    |   13 +
- tests/tests.pri                               |    6 +
- tests/tst_qmailstore/tst_qmailstore.cpp       |   93 +-
- 14 files changed, 1645 insertions(+), 64 deletions(-)
+ tests/tst_qmailstore/tst_qmailstore.cpp       |    4 +-
+ 13 files changed, 1552 insertions(+), 62 deletions(-)
  create mode 100644 src/libraries/qmfclient/share/email.provider
  create mode 100644 src/libraries/qmfclient/share/email.service
 
 diff --git a/src/libraries/qmfclient/qmailaccountconfiguration.cpp b/src/libraries/qmfclient/qmailaccountconfiguration.cpp
-index c1a790ae..e3ce0ec5 100644
+index 751df727..da33d696 100644
 --- a/src/libraries/qmfclient/qmailaccountconfiguration.cpp
 +++ b/src/libraries/qmfclient/qmailaccountconfiguration.cpp
 @@ -202,14 +202,26 @@ QString QMailAccountConfiguration::ServiceConfiguration::value(const QString &na
@@ -234,7 +233,7 @@ index 28f566cb..63d98c53 100644
  }
  
 diff --git a/src/libraries/qmfclient/qmailstore_p.cpp b/src/libraries/qmfclient/qmailstore_p.cpp
-index 89d8b7f3..59b87a2a 100644
+index 35ef10b0..7ee59a5a 100644
 --- a/src/libraries/qmfclient/qmailstore_p.cpp
 +++ b/src/libraries/qmfclient/qmailstore_p.cpp
 @@ -1824,7 +1824,15 @@ QString whereClauseItem<QMailAccountKey>(const QMailAccountKey &, const QMailAcc
@@ -785,7 +784,7 @@ index 89d8b7f3..59b87a2a 100644
  QMailStorePrivate::QMailStorePrivate(QMailStore* parent)
      : QMailStoreImplementation(parent),
        q_ptr(parent),
-@@ -2526,7 +3004,43 @@ QMailStorePrivate::QMailStorePrivate(QMailStore* parent)
+@@ -2526,8 +3004,44 @@ QMailStorePrivate::QMailStorePrivate(QMailStore* parent)
          contentMutex = new ProcessMutex(databaseIdentifier(), 3);
      }
      connect(&databaseUnloadTimer, SIGNAL(timeout()), this, SLOT(unloadDatabase()));
@@ -803,8 +802,8 @@ index 89d8b7f3..59b87a2a 100644
 +    connect(manager.data(), &Accounts::Manager::accountUpdated,
 +            this, &QMailStorePrivate::accountUpdated);
 +#endif
-+}
-+
+ }
+ 
 +#ifdef USE_ACCOUNTS_QT
 +QSharedPointer<Accounts::Account> QMailStorePrivate::getEmailAccount(const Accounts::AccountId id)
 +{
@@ -824,11 +823,12 @@ index 89d8b7f3..59b87a2a 100644
 +    }
 +
 +    return ssoAccount;
- }
++}
 +#endif
- 
++
  QMailStorePrivate::~QMailStorePrivate()
  {
+     delete mutex;
 @@ -2805,6 +3319,25 @@ void QMailStorePrivate::clearContent()
  
      Transaction t(this);
@@ -1620,10 +1620,10 @@ index 89d8b7f3..59b87a2a 100644
 +            ssoAccount->endGroup();
 +        }
 +    }
-+
+ 
 +    result->setId(id);
 +    result->setModified(false);
- 
++
 +    return Success;
 +}
 +#else
@@ -1696,9 +1696,9 @@ index 89d8b7f3..59b87a2a 100644
 +    {
 +        // Remove accounts from SSO
 +        foreach (const QMailAccountId& accountID, deletedAccountIds) {
- 
-+            QSharedPointer<Accounts::Account> ssoAccount(Accounts::Account::fromId(manager.data(), accountID.toULongLong(), this));
 +
++            QSharedPointer<Accounts::Account> ssoAccount(Accounts::Account::fromId(manager.data(), accountID.toULongLong(), this));
+ 
 +            if (ssoAccount) {
 +                ssoAccount->remove();
 +                if (!ssoAccount->syncAndBlock()) {
@@ -1722,7 +1722,7 @@ index 89d8b7f3..59b87a2a 100644
      // Do not report any deleted entities as updated
      for (QMailMessageIdList::iterator mit = updatedMessageIds.begin(); mit != updatedMessageIds.end(); ) {
          if (deletedMessageIds.contains(*mit)) {
-@@ -9851,3 +10975,109 @@ void QMailStorePrivate::reconnectIpc()
+@@ -9960,3 +11084,109 @@ void QMailStorePrivate::reconnectIpc()
          ipcLastDbUpdated = lastDbUpdated;
      }
  }
@@ -1833,7 +1833,7 @@ index 89d8b7f3..59b87a2a 100644
 +}
 +#endif
 diff --git a/src/libraries/qmfclient/qmailstore_p.h b/src/libraries/qmfclient/qmailstore_p.h
-index 370483f3..2b7ef757 100644
+index 98be4452..564070aa 100644
 --- a/src/libraries/qmfclient/qmailstore_p.h
 +++ b/src/libraries/qmfclient/qmailstore_p.h
 @@ -51,6 +51,12 @@
@@ -1899,7 +1899,7 @@ index 370483f3..2b7ef757 100644
      QMailThread extractThread(const QSqlRecord &r);
      QMailFolder extractFolder(const QSqlRecord& r);
      QMailMessageMetaData extractMessageMetaData(const QSqlRecord& r, QMailMessageKey::Properties recordProperties, const QMailMessageKey::Properties& properties = allMessageProperties());
-@@ -789,10 +813,26 @@ private:
+@@ -795,10 +819,26 @@ private:
  
      static void extractMessageMetaData(const QSqlRecord& r, QMailMessageKey::Properties recordProperties, const QMailMessageKey::Properties& properties, QMailMessageMetaData* metaData);
  
@@ -1927,7 +1927,7 @@ index 370483f3..2b7ef757 100644
      class Cache
      {
 diff --git a/src/libraries/qmfclient/qmfclient.pro b/src/libraries/qmfclient/qmfclient.pro
-index 86768ead..cdd634dc 100644
+index a94780a3..b1630aaa 100644
 --- a/src/libraries/qmfclient/qmfclient.pro
 +++ b/src/libraries/qmfclient/qmfclient.pro
 @@ -2,6 +2,24 @@ TARGET     = QmfClient
@@ -2255,74 +2255,11 @@ index 89cfe5de..1c6da93b 100644
  }
  
  void ServiceHandler::accountsRemoved(const QMailAccountIdList &ids)
-diff --git a/tests/tests.pri b/tests/tests.pri
-index 872fa50b..e81f4e07 100644
---- a/tests/tests.pri
-+++ b/tests/tests.pri
-@@ -5,4 +5,10 @@ CONFIG += testcase
- QT += qmfclient qmfclient-private
- target.path += /opt/tests/qmf-qt5
- 
-+contains(DEFINES, USE_ACCOUNTS_QT) {
-+    CONFIG += link_pkgconfig
-+    QT += xml
-+    PKGCONFIG += accounts-qt5
-+}
-+
- INSTALLS += target
 diff --git a/tests/tst_qmailstore/tst_qmailstore.cpp b/tests/tst_qmailstore/tst_qmailstore.cpp
-index c1c43c09..24d24a83 100644
+index c3e294e4..6a39450e 100644
 --- a/tests/tst_qmailstore/tst_qmailstore.cpp
 +++ b/tests/tst_qmailstore/tst_qmailstore.cpp
-@@ -48,6 +48,9 @@
-     This class tests that QMailStore correctly handles addition, updates, removal, counting and
-     querying of QMailMessages and QMailFolders.
- */
-+
-+Q_DECLARE_METATYPE(QMailMessageKey::Properties)
-+
- class tst_QMailStore : public QObject
- {
-     Q_OBJECT
-@@ -78,8 +81,19 @@ private slots:
-     void removeMessageWithInResponse();
-     void message();
-     void implementationbase();
-+
-+#ifdef USE_ACCOUNTS_QT
-+private:
-+    static const QSet<QString> defaultMailServices;
-+#endif
- };
- 
-+#ifdef USE_ACCOUNTS_QT
-+// Keep in sync with src/libraries/qmfclient/share/email.service
-+const QSet<QString> tst_QMailStore::defaultMailServices =
-+    QSet<QString>() << "auth" << "crypto";
-+#endif
-+
- QTEST_MAIN(tst_QMailStore)
- 
- #include "tst_qmailstore.moc"
-@@ -97,6 +111,7 @@ tst_QMailStore::~tst_QMailStore()
- void tst_QMailStore::initTestCase()
- {
-     QMailStore::instance()->clearContent();
-+    qRegisterMetaType<QMailMessageKey::Properties>("QMailMessageKeyProperties");
- }
- 
- void tst_QMailStore::cleanup()
-@@ -110,6 +125,9 @@ void tst_QMailStore::cleanupTestCase()
- 
- void tst_QMailStore::addAccount()
- {
-+
-+    QSignalSpy spyAccountAdded(QMailStore::instance(), SIGNAL(accountsAdded(QMailAccountIdList)));
-+
-     QMailAccount account1;
-     account1.setName("Account 1");
-     account1.setFromAddress(QMailAddress("Account 1", "account1@example.org"));
-@@ -132,9 +150,9 @@ void tst_QMailStore::addAccount()
+@@ -134,9 +134,9 @@ void tst_QMailStore::addAccount()
          svcCfg->setValue("username", "account1");
      }
  
@@ -2334,150 +2271,3 @@ index c1c43c09..24d24a83 100644
      QVERIFY(!accountX.id().isValid());
      
      // Verify that addition is successful
-@@ -147,6 +165,9 @@ void tst_QMailStore::addAccount()
-     QCOMPARE(QMailStore::instance()->countAccounts(), 1);
-     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
- 
-+    // Verify that the addAccount signal is emitted only once
-+    QCOMPARE(spyAccountAdded.count(), 1);
-+
-     // Verify that retrieval yields matching result
-     QMailAccount account2(account1.id());
-     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
-@@ -162,12 +183,22 @@ void tst_QMailStore::addAccount()
- 
-     QMailAccountConfiguration config2(account1.id());
-     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
-+
-+#ifdef USE_ACCOUNTS_QT
-+    QCOMPARE(config2.services().toSet() - defaultMailServices, config1.services().toSet());
-+    foreach (const QString &service, config2.services().toSet() - defaultMailServices) {
-+        if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
-+            QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
-+        } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
-+    }
-+#else
-     QCOMPARE(config2.services(), config1.services());
-     foreach (const QString &service, config2.services()) {
-         if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
-             QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
-         } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
-     }
-+#endif
- 
-     QCOMPARE(QMailStore::instance()->countAccounts(QMailAccountKey::id(account1.id())), 1);
-     QCOMPARE(QMailStore::instance()->countAccounts(QMailAccountKey::id(account1.id(), QMailDataComparator::NotEqual)), 0);
-@@ -707,12 +738,21 @@ void tst_QMailStore::updateAccount()
- 
-     QMailAccountConfiguration config2(account1.id());
-     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
-+#ifdef USE_ACCOUNTS_QT
-+    QCOMPARE(config2.services().toSet() - defaultMailServices, config1.services().toSet());
-+    foreach (const QString &service, config2.services().toSet() - defaultMailServices) {
-+        if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
-+            QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
-+        } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
-+    }
-+#else
-     QCOMPARE(config2.services(), config1.services());
-     foreach (const QString &service, config2.services()) {
-         if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
-             QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
-         } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
-     }
-+#endif
- }
- 
- void tst_QMailStore::updateFolder()
-@@ -1222,8 +1262,12 @@ void tst_QMailStore::updateMessage()
- 
- void tst_QMailStore::updateMessages()
- {
-+    QSignalSpy spyMessagesAdded(QMailStore::instance(), SIGNAL(messagesAdded(QMailMessageIdList)));
-     QSignalSpy spyMessagesUpdated(QMailStore::instance(), SIGNAL(messagesUpdated(QMailMessageIdList)));
-     QSignalSpy spyMessagesDataUpdated(QMailStore::instance(), SIGNAL(messageDataUpdated(QMailMessageMetaDataList)));
-+    QSignalSpy spyMessagePropertyUpdated(QMailStore::instance(), SIGNAL(messagePropertyUpdated(QMailMessageIdList, QMailMessageKeyProperties, QMailMessageMetaData)));
-+    QSignalSpy spyMessageStatusUpdated(QMailStore::instance(), SIGNAL(messageStatusUpdated(QMailMessageIdList, quint64, bool)));
-+
- 
-     QMailAccount account;
-     account.setName("Account");
-@@ -1299,12 +1343,41 @@ void tst_QMailStore::updateMessages()
-     }
- 
-     //Verify that the signals are only emitted once
-+    QCOMPARE(spyMessagesAdded.count(), 1);
-     QCOMPARE(spyMessagesUpdated.count(), 1);
-     QCOMPARE(spyMessagesDataUpdated.count(), 1);
-+    // Verify that was not emitted since we didn't modify message metadata directly
-+    QCOMPARE(spyMessagePropertyUpdated.count(),0);
-+    QCOMPARE(spyMessageStatusUpdated.count(), 0);
-+
-+    QMailMessageMetaData data;
-+    data.setCustomField("answer", "Fido");
-+    data.setCustomField("bicycle", "fish");
-+
-+    QVERIFY(QMailStore::instance()->updateMessagesMetaData(QMailMessageKey(), QMailMessageKey::Custom, data));
-+    QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
-+
-+    // Message was update
-+    QCOMPARE(spyMessagesUpdated.count(), 2);
-+    // Properties were updated
-+    QCOMPARE(spyMessagePropertyUpdated.count(),1);
-+    // Status was not updated
-+    QCOMPARE(spyMessageStatusUpdated.count(), 0);
-+
-+    QVERIFY(QMailStore::instance()->updateMessagesMetaData(QMailMessageKey(), QMailMessage::Read, false));
-+    QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
-+    // Message was update
-+    QCOMPARE(spyMessagesUpdated.count(), 3);
-+    // Properties were not updated
-+    QCOMPARE(spyMessagePropertyUpdated.count(),1);
-+    // Status was updated
-+    QCOMPARE(spyMessageStatusUpdated.count(), 1);
- }
- 
- void tst_QMailStore::removeAccount()
- {
-+    QSignalSpy spyAccountRemoved(QMailStore::instance(), SIGNAL(accountsRemoved(QMailAccountIdList)));
-+
-     QMailAccount account1;
-     account1.setName("Account 1");
-     account1.setFromAddress(QMailAddress("Account 1", "account1@example.org"));
-@@ -1347,12 +1420,21 @@ void tst_QMailStore::removeAccount()
- 
-     QMailAccountConfiguration config2(account2.id());
-     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
-+#ifdef USE_ACCOUNTS_QT
-+    QCOMPARE(config2.services().toSet() - defaultMailServices, config1.services().toSet());
-+    foreach (const QString &service, config2.services().toSet() - defaultMailServices) {
-+        if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
-+            QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
-+        } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
-+    }
-+#else
-     QCOMPARE(config2.services(), config1.services());
-     foreach (const QString &service, config2.services()) {
-         if (QMailAccountConfiguration::ServiceConfiguration *svcCfg = &config2.serviceConfiguration(service)) {
-             QCOMPARE(svcCfg->values(), config1.serviceConfiguration(service).values());
-         } else QFAIL(qPrintable(QString("no config for %1!").arg(service)));
-     }
-+#endif
- 
-     // Verify that removal is successful 
-     QVERIFY(QMailStore::instance()->removeAccount(account1.id()));
-@@ -1360,9 +1442,12 @@ void tst_QMailStore::removeAccount()
-     QCOMPARE(QMailStore::instance()->countAccounts(), 0);
-     QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
- 
--    // Verify that retrieval yields invalid result
-+    // Verify that the removeAccount signal is emitted only once
-+    QCOMPARE(spyAccountRemoved.count(), 1);
-+
-+    // Verify that retrieval yields no error and an invalid result
-     QMailAccount account3(account1.id());
--    QCOMPARE(QMailStore::instance()->lastError(), QMailStore::InvalidId);
-+    QCOMPARE(QMailStore::instance()->lastError(), QMailStore::NoError);
-     QVERIFY(!account3.id().isValid());
- 
-     QMailAccountConfiguration config3(account1.id());

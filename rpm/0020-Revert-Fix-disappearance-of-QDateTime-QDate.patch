@@ -372,10 +372,10 @@ index 1ff42e03..0d9a37c1 100644
      message.setStatus(QMailMessage::New, false);
      message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailstore/tst_qmailstore.cpp b/tests/tst_qmailstore/tst_qmailstore.cpp
-index 24d24a83..b568eccb 100644
+index 6a39450e..7501c35d 100644
 --- a/tests/tst_qmailstore/tst_qmailstore.cpp
 +++ b/tests/tst_qmailstore/tst_qmailstore.cpp
-@@ -1822,8 +1822,8 @@ void tst_QMailStore::message()
+@@ -1778,8 +1778,8 @@ void tst_QMailStore::message()
      msg2.setParentAccountId(account2.id());
      msg2.setParentFolderId(QMailFolder::LocalStorageFolderId);
      msg2.setSubject("email message test");
