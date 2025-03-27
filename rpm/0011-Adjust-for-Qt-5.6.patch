@@ -5,8 +5,9 @@ Subject: [PATCH] Adjust for Qt 5.6
 
 ---
  .../qmfmessageserver/qmailtransport.cpp        |  4 ++--
+ src/plugins/mailaccountmanagers/sso/plugin.cpp |  4 ++--
  tests/tst_smtp/tst_smtp.cpp                    | 18 +++++++++---------
- 2 files changed, 11 insertions(+), 11 deletions(-)
+ 3 files changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/src/libraries/qmfmessageserver/qmailtransport.cpp b/src/libraries/qmfmessageserver/qmailtransport.cpp
 index 6f603653..481a1f4d 100644
@@ -30,6 +31,28 @@ index 6f603653..481a1f4d 100644
      connect(mSocket, &QAbstractSocket::readyRead, this, &QMailTransport::readyRead);
      connect(mSocket, &QAbstractSocket::bytesWritten, this, &QMailTransport::bytesWritten);
  
+diff --git a/src/plugins/mailaccountmanagers/sso/plugin.cpp b/src/plugins/mailaccountmanagers/sso/plugin.cpp
+index 17cf9271..8efc5602 100644
+--- a/src/plugins/mailaccountmanagers/sso/plugin.cpp
++++ b/src/plugins/mailaccountmanagers/sso/plugin.cpp
+@@ -633,7 +633,7 @@ QMailAccount SSOAccountManager::account(const QMailAccountId &id) const
+     if ((static_cast<uint>(ssoAccount->valueAsUInt64(QLatin1String("lastSynchronized")))) == 0) {
+         result.setLastSynchronized(QMailTimeStamp());
+     } else {
+-        result.setLastSynchronized(QMailTimeStamp(QDateTime::fromSecsSinceEpoch(static_cast<uint>(ssoAccount->valueAsUInt64(QLatin1String("lastSynchronized"))))));
++        result.setLastSynchronized(QMailTimeStamp(QDateTime::fromTime_t(static_cast<uint>(ssoAccount->valueAsUInt64(QLatin1String("lastSynchronized"))))));
+     }
+ 
+     result.setIconPath(ssoAccount->valueAsString(QLatin1String("iconPath")));
+@@ -984,7 +984,7 @@ bool SSOAccountManager::updateAccountToSSO(QMailAccount *account,
+         ssoAccount->setValue(QLatin1String("emailaddress"), account->fromAddress().address());
+         ssoAccount->setValue(QLatin1String("fullName"), account->fromAddress().name());
+         if (account->lastSynchronized().isValid()) {
+-            ssoAccount->setValue(QLatin1String("lastSynchronized"), static_cast<quint64>(account->lastSynchronized().toLocalTime().toSecsSinceEpoch()));
++            ssoAccount->setValue(QLatin1String("lastSynchronized"), static_cast<quint64>(account->lastSynchronized().toLocalTime().toTime_t()));
+         } else {
+             ssoAccount->setValue(QLatin1String("lastSynchronized"), quint64(0));
+         }
 diff --git a/tests/tst_smtp/tst_smtp.cpp b/tests/tst_smtp/tst_smtp.cpp
 index 8dcfbe3a..7defc685 100644
 --- a/tests/tst_smtp/tst_smtp.cpp
