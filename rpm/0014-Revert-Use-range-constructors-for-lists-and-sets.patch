@@ -170,10 +170,10 @@ index dd8c5f16..5ad2a57e 100644
  
      return true;
 diff --git a/src/libraries/qmfclient/qmailstore.cpp b/src/libraries/qmfclient/qmailstore.cpp
-index 28a77663..aae4ffab 100644
+index 739cfb6d..dbb3485a 100644
 --- a/src/libraries/qmfclient/qmailstore.cpp
 +++ b/src/libraries/qmfclient/qmailstore.cpp
-@@ -1236,8 +1236,7 @@ void QMailStore::emitAccountNotification(ChangeType type, const QMailAccountIdLi
+@@ -1237,8 +1237,7 @@ void QMailStore::emitAccountNotification(ChangeType type, const QMailAccountIdLi
      Q_ASSERT(!ids.contains(QMailAccountId()));
      if (!ids.isEmpty()) {
          // Ensure there are no duplicates in the list
@@ -183,7 +183,7 @@ index 28a77663..aae4ffab 100644
  
          d->notifyAccountsChange(type, idList);
  
-@@ -1267,8 +1266,7 @@ void QMailStore::emitFolderNotification(ChangeType type, const QMailFolderIdList
+@@ -1268,8 +1267,7 @@ void QMailStore::emitFolderNotification(ChangeType type, const QMailFolderIdList
      Q_ASSERT(!ids.contains(QMailFolderId()));
      if (!ids.isEmpty()) {
          // Ensure there are no duplicates in the list
@@ -193,7 +193,7 @@ index 28a77663..aae4ffab 100644
  
          d->notifyFoldersChange(type, idList);
  
-@@ -1298,8 +1296,7 @@ void QMailStore::emitThreadNotification(ChangeType type, const QMailThreadIdList
+@@ -1299,8 +1297,7 @@ void QMailStore::emitThreadNotification(ChangeType type, const QMailThreadIdList
      Q_ASSERT(!ids.contains(QMailThreadId()));
      if (!ids.isEmpty()) {
          // Ensure there are no duplicates in the list
@@ -203,7 +203,7 @@ index 28a77663..aae4ffab 100644
  
          d->notifyThreadsChange(type, idList);
  
-@@ -1329,8 +1326,7 @@ void QMailStore::emitMessageNotification(ChangeType type, const QMailMessageIdLi
+@@ -1330,8 +1327,7 @@ void QMailStore::emitMessageNotification(ChangeType type, const QMailMessageIdLi
      Q_ASSERT(!ids.contains(QMailMessageId()));
      if (!ids.isEmpty()) {
          // Ensure there are no duplicates in the list
@@ -213,7 +213,7 @@ index 28a77663..aae4ffab 100644
  
          d->notifyMessagesChange(type, idList);
  
-@@ -1401,8 +1397,7 @@ void QMailStore::emitRemovalRecordNotification(ChangeType type, const QMailAccou
+@@ -1402,8 +1398,7 @@ void QMailStore::emitRemovalRecordNotification(ChangeType type, const QMailAccou
  {
      if (!ids.isEmpty()) {
          // Ensure there are no duplicates in the list
@@ -224,7 +224,7 @@ index 28a77663..aae4ffab 100644
          d->notifyMessageRemovalRecordsChange(type, idList);
  
 diff --git a/src/libraries/qmfclient/qmailstorenotifier_p.cpp b/src/libraries/qmfclient/qmailstorenotifier_p.cpp
-index 2600292d..b7e6b986 100644
+index 2600292d..ed7babb6 100644
 --- a/src/libraries/qmfclient/qmailstorenotifier_p.cpp
 +++ b/src/libraries/qmfclient/qmailstorenotifier_p.cpp
 @@ -202,7 +202,7 @@ void QMailStoreNotifier::notifyAccountsChange(QMailStore::ChangeType changeType,
@@ -250,7 +250,7 @@ index 2600292d..b7e6b986 100644
          }
  
 -        MessagesProperties props(QPair<QMailMessageKey::Properties, QMailMessageMetaData>(properties, data), QSet<QMailMessageId>(ids.constBegin(), ids.constEnd()));
-+        MessagesProperties props(QPair<QMailMessageKey::Properties, QMailMessageMetaData>(properties, data), QSet<QMailMessageId>::fromList(ids));
++        MessagesProperties props(QPair<QMailMessageKey::Properties, QMailMessageMetaData>(properties, data), ids.toSet());
          messagesPropertiesBuffer.append(props);
  
      } else {
@@ -259,7 +259,7 @@ index 2600292d..b7e6b986 100644
  
          MessagesStatus messageStatus(status, set);
 -        messagesStatusBuffer[messageStatus] += QSet<QMailMessageId>(ids.constBegin(), ids.constEnd());
-+        messagesStatusBuffer[messageStatus] += QSet<QMailMessageId>::fromList(ids);
++        messagesStatusBuffer[messageStatus] += ids.toSet();
  
      } else {
          emit ipcAdaptor->messageStatusChanged(ids, status, set);

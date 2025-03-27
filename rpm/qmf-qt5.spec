@@ -237,6 +237,7 @@ install -m 644 -p %{SOURCE2} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 %license LICENSE.LGPLv* LGPL_EXCEPTION.txt
 %{_libdir}/libQmfClient.so.*
 %{_libdir}/qt5/plugins/contentmanagers
+%{_libdir}/qt5/plugins/mailaccountmanagers
 
 %files -n libqmfclient1-qt5-cryptoplugins
 %{_libdir}/qt5/plugins/crypto

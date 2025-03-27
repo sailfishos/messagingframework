@@ -178,7 +178,7 @@ index 0d9a37c1..005db7d1 100644
  #include <qmaildisconnected.h>
  #include <qmailnamespace.h>
 diff --git a/tests/tst_qmailstore/tst_qmailstore.cpp b/tests/tst_qmailstore/tst_qmailstore.cpp
-index 7501c35d..ce937e71 100644
+index 17aceb26..a1e6534a 100644
 --- a/tests/tst_qmailstore/tst_qmailstore.cpp
 +++ b/tests/tst_qmailstore/tst_qmailstore.cpp
 @@ -38,7 +38,7 @@
