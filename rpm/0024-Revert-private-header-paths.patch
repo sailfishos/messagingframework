@@ -74,7 +74,7 @@ index 6307a4d7..977278cf 100644
  #include <qmailmessagebuffer.h>
  #include <qmailtransport.h>
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index 446cc821..9e68d586 100644
+index 8a8792c6..f62c38a1 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
 @@ -33,7 +33,7 @@
@@ -165,7 +165,7 @@ index 338d7ea6..e206479f 100644
  
  
 diff --git a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
-index 0d9a37c1..005db7d1 100644
+index f167c314..46d402ad 100644
 --- a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
 +++ b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
 @@ -34,7 +34,7 @@
@@ -178,7 +178,7 @@ index 0d9a37c1..005db7d1 100644
  #include <qmaildisconnected.h>
  #include <qmailnamespace.h>
 diff --git a/tests/tst_qmailstore/tst_qmailstore.cpp b/tests/tst_qmailstore/tst_qmailstore.cpp
-index 7501c35d..ce937e71 100644
+index 9f065d36..9c28be89 100644
 --- a/tests/tst_qmailstore/tst_qmailstore.cpp
 +++ b/tests/tst_qmailstore/tst_qmailstore.cpp
 @@ -38,7 +38,7 @@
