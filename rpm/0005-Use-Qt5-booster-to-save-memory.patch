@@ -84,11 +84,11 @@ index 0d583d15..a5aa05a9 100644
  RestartSec=1
  
 diff --git a/src/tools/tools.pro b/src/tools/tools.pro
-index 689ad320..15aa630e 100644
+index fcecd342..00fb25a7 100644
 --- a/src/tools/tools.pro
 +++ b/src/tools/tools.pro
 @@ -4,3 +4,5 @@ SUBDIRS = messageserver
- contains(DEFINES,USE_ACCOUNTS_QT) {
+ packagesExist(accounts-qt5) {
      SUBDIRS += accountscheck
  }
 +
