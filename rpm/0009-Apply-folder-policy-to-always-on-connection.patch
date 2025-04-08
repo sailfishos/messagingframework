@@ -74,7 +74,7 @@ index 10417858..cca6ea08 100644
 +    return folders;
 +}
 diff --git a/src/libraries/qmfclient/qmailaccount.h b/src/libraries/qmfclient/qmailaccount.h
-index 5caaea26..2a9dd234 100644
+index 15883b8d..e3b258d6 100644
 --- a/src/libraries/qmfclient/qmailaccount.h
 +++ b/src/libraries/qmfclient/qmailaccount.h
 @@ -140,6 +140,8 @@ public:
