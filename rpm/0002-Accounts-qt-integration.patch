@@ -2228,7 +2228,7 @@ index 6c9464c2..a647ade7 100644
 +}
 +}
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index 89cfe5de..1c6da93b 100644
+index 474e4a73..73295774 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
 @@ -801,10 +801,23 @@ void ServiceHandler::accountsAdded(const QMailAccountIdList &ids)
@@ -2256,7 +2256,7 @@ index 89cfe5de..1c6da93b 100644
  
  void ServiceHandler::accountsRemoved(const QMailAccountIdList &ids)
 diff --git a/tests/tst_qmailstore/tst_qmailstore.cpp b/tests/tst_qmailstore/tst_qmailstore.cpp
-index c3e294e4..6a39450e 100644
+index fd370395..423abf00 100644
 --- a/tests/tst_qmailstore/tst_qmailstore.cpp
 +++ b/tests/tst_qmailstore/tst_qmailstore.cpp
 @@ -134,9 +134,9 @@ void tst_QMailStore::addAccount()

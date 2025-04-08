@@ -169,7 +169,6 @@ touch .git
 %qmake5 \
     QT_BUILD_PARTS+=tests \
     QMF_INSTALL_ROOT=%{_prefix} \
-    DEFINES+=QMF_ENABLE_LOGGING \
     DEFINES+=MESSAGESERVER_PLUGINS \
     DEFINES+=QMF_NO_MESSAGE_SERVICE_EDITOR \
     DEFINES+=QMF_NO_WIDGETS \
@@ -178,10 +177,9 @@ touch .git
     DEFINES+=USE_HTML_PARSER \
     CONFIG+=syslog
 
-make %{?_smp_mflags}
+%make_build
 
 %install
-rm -rf %{buildroot}
 %qmake5_install
 UNIT_DIR=%{buildroot}%{_userunitdir}/user-session.target.wants
 mkdir -p "$UNIT_DIR"
@@ -203,7 +201,6 @@ install -m 644 -p %{SOURCE2} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 %postun -n libqmfclient1-qt5 -p /sbin/ldconfig
 
 %files devel
-%defattr(-,root,root,-)
 %{_includedir}/qt5/QmfClient
 %{_includedir}/qt5/QmfMessageServer
 %exclude %{_libdir}/cmake/Qt5QmfClient/Qt5QmfClient_.cmake
@@ -222,7 +219,6 @@ install -m 644 -p %{SOURCE2} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 %{_datadir}/qt5/mkspecs/modules/qt_lib_qmfmessageserver_private.pri
 
 %files -n libqmfmessageserver1-qt5
-%defattr(-,root,root,-)
 %{_bindir}/messageserver5
 %{_bindir}/qmf-accountscheck
 %{_datadir}/mapplauncherd/privileges.d/*
@@ -233,7 +229,6 @@ install -m 644 -p %{SOURCE2} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 %{_userunitdir}/user-session.target.wants/*.service
 
 %files -n libqmfclient1-qt5
-%defattr(-,root,root,-)
 %license LICENSE.LGPLv* LGPL_EXCEPTION.txt
 %{_libdir}/libQmfClient.so.*
 %{_libdir}/qt5/plugins/contentmanagers
@@ -243,7 +238,6 @@ install -m 644 -p %{SOURCE2} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 
 %if 0
 %files tests
-%defattr(-,root,root,-)
 %{_datadir}/accounts/*
 /opt/tests/qmf-qt5
 %else
