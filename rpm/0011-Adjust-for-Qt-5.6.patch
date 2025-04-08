@@ -4,10 +4,33 @@ Date: Tue, 21 Nov 2023 09:51:51 +0100
 Subject: [PATCH] Adjust for Qt 5.6
 
 ---
+ src/libraries/qmfclient/libaccounts_p.cpp      |  4 ++--
  .../qmfmessageserver/qmailtransport.cpp        |  4 ++--
  tests/tst_smtp/tst_smtp.cpp                    | 18 +++++++++---------
- 2 files changed, 11 insertions(+), 11 deletions(-)
+ 3 files changed, 13 insertions(+), 13 deletions(-)
 
+diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
+index 9ed8256a..9c723962 100644
+--- a/src/libraries/qmfclient/libaccounts_p.cpp
++++ b/src/libraries/qmfclient/libaccounts_p.cpp
+@@ -551,7 +551,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
+     if ((static_cast<uint>(account->valueAsUInt64(QLatin1String("lastSynchronized")))) == 0) {
+         result.setLastSynchronized(QMailTimeStamp());
+     } else {
+-        result.setLastSynchronized(QMailTimeStamp(QDateTime::fromSecsSinceEpoch(static_cast<uint>(account->valueAsUInt64(QLatin1String("lastSynchronized"))))));
++        result.setLastSynchronized(QMailTimeStamp(QDateTime::fromTime_t(static_cast<uint>(account->valueAsUInt64(QLatin1String("lastSynchronized"))))));
+     }
+ 
+     result.setIconPath(account->valueAsString(QLatin1String("iconPath")));
+@@ -904,7 +904,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
+         sharedAccount->setValue(QLatin1String("emailaddress"), account->fromAddress().address());
+         sharedAccount->setValue(QLatin1String("fullName"), account->fromAddress().name());
+         if (account->lastSynchronized().isValid()) {
+-            sharedAccount->setValue(QLatin1String("lastSynchronized"), static_cast<quint64>(account->lastSynchronized().toLocalTime().toSecsSinceEpoch()));
++            sharedAccount->setValue(QLatin1String("lastSynchronized"), static_cast<quint64>(account->lastSynchronized().toLocalTime().toTime_t()));
+         } else {
+             sharedAccount->setValue(QLatin1String("lastSynchronized"), quint64(0));
+         }
 diff --git a/src/libraries/qmfmessageserver/qmailtransport.cpp b/src/libraries/qmfmessageserver/qmailtransport.cpp
 index 6f603653..481a1f4d 100644
 --- a/src/libraries/qmfmessageserver/qmailtransport.cpp

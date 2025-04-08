@@ -10,7 +10,7 @@ Subject: [PATCH] Revert core5compat addition
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmfclient.pro b/src/libraries/qmfclient/qmfclient.pro
-index b1630aaa..6949cd0a 100644
+index eb9f312f..e1d9dd60 100644
 --- a/src/libraries/qmfclient/qmfclient.pro
 +++ b/src/libraries/qmfclient/qmfclient.pro
 @@ -1,5 +1,5 @@
@@ -19,7 +19,7 @@ index b1630aaa..6949cd0a 100644
 +QT         = core dbus sql network
  CONFIG    += warn_on
  
- # FIXME this will result in prl file having explicit linkage against qt-xml and accounts+signon.
+ MODULE_PLUGIN_TYPES = \
 diff --git a/src/plugins/messageservices/pop/pop.pro b/src/plugins/messageservices/pop/pop.pro
 index 7c87e3df..df556a1c 100644
 --- a/src/plugins/messageservices/pop/pop.pro
