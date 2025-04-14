@@ -173,6 +173,7 @@ touch .git
     DEFINES+=QMF_NO_MESSAGE_SERVICE_EDITOR \
     DEFINES+=QMF_NO_WIDGETS \
     DEFINES+=USE_ACCOUNTS_QT \
+    DEFINES+=QMF_ACCOUNT_PLUGIN='\\\"libaccounts\\\"' \
     DEFINES+=USE_KEEPALIVE \
     DEFINES+=USE_HTML_PARSER \
     CONFIG+=syslog
@@ -232,6 +233,7 @@ install -m 644 -p %{SOURCE2} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 %license LICENSE.LGPLv* LGPL_EXCEPTION.txt
 %{_libdir}/libQmfClient.so.*
 %{_libdir}/qt5/plugins/contentmanagers
+%{_libdir}/qt5/plugins/mailaccountmanagers
 
 %files -n libqmfclient1-qt5-cryptoplugins
 %{_libdir}/qt5/plugins/crypto

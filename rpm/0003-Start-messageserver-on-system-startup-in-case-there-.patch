@@ -161,13 +161,13 @@ index 00000000..0d583d15
 +[Install]
 +WantedBy=user-session.target
 diff --git a/src/tools/tools.pro b/src/tools/tools.pro
-index d05c3377..689ad320 100644
+index d05c3377..fcecd342 100644
 --- a/src/tools/tools.pro
 +++ b/src/tools/tools.pro
 @@ -1,2 +1,6 @@
  TEMPLATE = subdirs
  SUBDIRS = messageserver
 +
-+contains(DEFINES,USE_ACCOUNTS_QT) {
++packagesExist(accounts-qt5) {
 +    SUBDIRS += accountscheck
 +}
