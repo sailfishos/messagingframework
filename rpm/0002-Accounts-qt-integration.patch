@@ -7,77 +7,13 @@ Adjust sso credential plugin to use invalidation at the account
 level. Also add Sailfish OS specific client id for OAuth2 method.
 
 Change how service are reloaded when account changes.
-
-Avoid adding non existing account in model.
 ---
- .../qmfclient/qmailaccountlistmodel.cpp       |  44 ++++---
  src/plugins/credentials/sso/plugin.cpp        | 123 ++++++++++++++----
  src/plugins/credentials/sso/sso.pro           |   2 +-
  src/plugins/plugins.pro                       |   4 +
  src/tools/messageserver/servicehandler.cpp    |  13 ++
  5 files changed, 144 insertions(+), 42 deletions(-)
 
-diff --git a/src/libraries/qmfclient/qmailaccountlistmodel.cpp b/src/libraries/qmfclient/qmailaccountlistmodel.cpp
-index 28f566cb..63d98c53 100644
---- a/src/libraries/qmfclient/qmailaccountlistmodel.cpp
-+++ b/src/libraries/qmfclient/qmailaccountlistmodel.cpp
-@@ -341,31 +341,37 @@ void QMailAccountListModel::accountsAdded(const QMailAccountIdList& ids)
-     { 
-         foreach(const QMailAccountId &id,results)
-         {
--            LessThanFunctorA lessThan(d->sortKey);
-+            if (!d->idList.contains(id)) {
-+                LessThanFunctorA lessThan(d->sortKey);
- 
--            //if sorting the list fails, then resort to a complete refresh
--            if(lessThan.invalidatedList())
--                fullRefresh();
--            else
--            {
--                QMailAccountIdList::iterator itr = d->lowerBound(id, lessThan);
--                int newIndex = (itr - d->idList.begin());
-+                //if sorting the list fails, then resort to a complete refresh
-+                if (lessThan.invalidatedList())
-+                    fullRefresh();
-+                else
-+                {
-+                    QMailAccountIdList::iterator itr = d->lowerBound(id, lessThan);
-+                    int newIndex = (itr - d->idList.begin());
- 
--                beginInsertRows(QModelIndex(),newIndex,newIndex);
--                d->idList.insert(itr, id);
-+                    beginInsertRows(QModelIndex(),newIndex,newIndex);
-+                    d->idList.insert(itr, id);
-+                    endInsertRows();
-+                }
-+            } else {
-+                qWarning() << "QMailAccountListModel: Account with the same id already present in the model";
-+            }
-+        }
-+    } else {
-+        foreach (const QMailAccountId &id,results) {
-+            if (!d->idList.contains(id)) {
-+                int index = d->idList.count();
-+                beginInsertRows(QModelIndex(),index,(index + results.count() - 1));
-+                d->idList.append(id);
-                 endInsertRows();
-+            } else {
-+                qWarning() << "QMailAccountListModel: Account with the same id already present in the model";
-             }
-         }
-     }
--    else
--    {
--        int index = d->idList.count();
--
--        beginInsertRows(QModelIndex(),index,(index + results.count() - 1));
--        foreach(const QMailAccountId &id,results)
--            d->idList.append(id);
--        endInsertRows();
--    }
-     d->needSynchronize = false;
- }
- 
 diff --git a/src/plugins/credentials/sso/plugin.cpp b/src/plugins/credentials/sso/plugin.cpp
 index 3dc4491f..5d7b8609 100644
 --- a/src/plugins/credentials/sso/plugin.cpp
