@@ -8,11 +8,11 @@ level. Also add Sailfish OS specific client id for OAuth2 method.
 
 Change how service are reloaded when account changes.
 ---
- src/plugins/credentials/sso/plugin.cpp        | 123 ++++++++++++++----
- src/plugins/credentials/sso/sso.pro           |   2 +-
- src/plugins/plugins.pro                       |   4 +
- src/tools/messageserver/servicehandler.cpp    |  13 ++
- 5 files changed, 144 insertions(+), 42 deletions(-)
+ src/plugins/credentials/sso/plugin.cpp     | 123 +++++++++++++++++----
+ src/plugins/credentials/sso/sso.pro        |   2 +-
+ src/plugins/plugins.pro                    |   4 +
+ src/tools/messageserver/servicehandler.cpp |  13 +++
+ 4 files changed, 119 insertions(+), 23 deletions(-)
 
 diff --git a/src/plugins/credentials/sso/plugin.cpp b/src/plugins/credentials/sso/plugin.cpp
 index 3dc4491f..5d7b8609 100644
@@ -198,7 +198,7 @@ index 6c9464c2..a647ade7 100644
 +}
 +}
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index 474e4a73..73295774 100644
+index a8314d76..6756ee55 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
 @@ -801,10 +801,23 @@ void ServiceHandler::accountsAdded(const QMailAccountIdList &ids)

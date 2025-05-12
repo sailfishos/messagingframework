@@ -49,7 +49,7 @@ index af37630e..2483f1ef 100644
  
  void ImapConfigurationEditor::setBaseFolder(const QString &s)
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 34ddd0f0..da9d2ebd 100644
+index 2904b23b..db176e66 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -46,6 +46,10 @@
@@ -60,12 +60,12 @@ index 34ddd0f0..da9d2ebd 100644
 +#include <QDBusInterface>
 +#include <QDBusPendingCall>
 +
- namespace { 
+ namespace {
  
  const QString serviceKey("imap4");
 @@ -1463,6 +1467,13 @@ ImapService::ImapService(const QMailAccountId &accountId)
      connect(_restartPushEmailTimer, SIGNAL(timeout()), this, SLOT(restartPushEmail()));
-     connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
+     connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)),
              this, SLOT(accountsUpdated(const QMailAccountIdList&)));
 +
 +    QDBusConnection::sessionBus().connect("com.meego.msyncd", "/synchronizer",

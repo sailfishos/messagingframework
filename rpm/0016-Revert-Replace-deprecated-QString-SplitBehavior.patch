@@ -14,7 +14,7 @@ This reverts commit faf30f7544c7a1f5ec07ac68d1f0b4fbf4ed855d.
  6 files changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailtimestamp.cpp b/src/libraries/qmfclient/qmailtimestamp.cpp
-index c7173949..f93f39e1 100644
+index 214834f7..d022007e 100644
 --- a/src/libraries/qmfclient/qmailtimestamp.cpp
 +++ b/src/libraries/qmfclient/qmailtimestamp.cpp
 @@ -120,7 +120,7 @@ QMailTimeStampPrivate::QMailTimeStampPrivate(const QString& timeText)
@@ -27,7 +27,7 @@ index c7173949..f93f39e1 100644
      int tokenCount = tokens.count();
      if ( tokenCount > 0 ) {
 diff --git a/src/libraries/qmfclient/support/qmailnamespace.cpp b/src/libraries/qmfclient/support/qmailnamespace.cpp
-index b9a30477..c28dda6e 100644
+index 41bb534c..558e7348 100644
 --- a/src/libraries/qmfclient/support/qmailnamespace.cpp
 +++ b/src/libraries/qmfclient/support/qmailnamespace.cpp
 @@ -420,28 +420,28 @@ QMap<QByteArray, QStringList> standardFolderTranslations()
@@ -79,7 +79,7 @@ index 9cf6fd3a..f5c6bf2d 100644
  
  void ImapConfiguration::setCapabilities(const QStringList &s)
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index 6aa40fc9..d4e5f4d9 100644
+index e5903493..c28e771f 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -409,10 +409,10 @@ void ImapState::untaggedResponse(ImapContext *c, const QString &line)
@@ -123,7 +123,7 @@ index 6aa40fc9..d4e5f4d9 100644
          quint32 exists = c->exists();
          if (exists > 0) {
 diff --git a/src/plugins/messageservices/imap/integerregion.cpp b/src/plugins/messageservices/imap/integerregion.cpp
-index 346dd7d3..7ef0989f 100644
+index de3c978c..bf52104f 100644
 --- a/src/plugins/messageservices/imap/integerregion.cpp
 +++ b/src/plugins/messageservices/imap/integerregion.cpp
 @@ -87,7 +87,7 @@ IntegerRegion::IntegerRegion(const QString &uidString)
@@ -136,7 +136,7 @@ index 346dd7d3..7ef0989f 100644
          bool ok = false;
          int index = s.indexOf(":");
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 7203858c..406c3d5a 100644
+index d5d1f22e..886b058f 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -533,7 +533,7 @@ void SmtpClient::nextAction(const QString &response)

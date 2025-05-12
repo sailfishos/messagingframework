@@ -28,7 +28,7 @@ index 0af76d22..023d6a96 100644
             imapconfiguration.h \
             imapmailboxproperties.h \
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 416c6e72..4eaff89a 100644
+index c5efc46d..c9c9ce38 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -449,9 +449,15 @@ ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)

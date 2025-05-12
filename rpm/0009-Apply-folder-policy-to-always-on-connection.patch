@@ -13,7 +13,7 @@ setting.
  3 files changed, 73 insertions(+), 1 deletion(-)
 
 diff --git a/src/libraries/qmfclient/qmailaccount.cpp b/src/libraries/qmfclient/qmailaccount.cpp
-index 10417858..cca6ea08 100644
+index c3a44961..36b1695a 100644
 --- a/src/libraries/qmfclient/qmailaccount.cpp
 +++ b/src/libraries/qmfclient/qmailaccount.cpp
 @@ -742,3 +742,56 @@ void QMailAccount::setFolderSyncPolicy(QMailAccount::FolderSyncPolicy policy)

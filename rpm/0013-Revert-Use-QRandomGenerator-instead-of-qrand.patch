@@ -11,7 +11,7 @@ This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
  3 files changed, 31 insertions(+), 6 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index a11c1e74..77cd2c12 100644
+index d2d00141..7b9e9c28 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
 @@ -50,7 +50,6 @@
@@ -58,7 +58,7 @@ index a11c1e74..77cd2c12 100644
  
  template <typename F>
 diff --git a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
-index 60def58c..d5043ea5 100644
+index 79bbbd42..53355458 100644
 --- a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
 +++ b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
 @@ -42,7 +42,6 @@
@@ -79,7 +79,7 @@ index 60def58c..d5043ea5 100644
          if (r>57) r+=7;
          if (r>90) r+=6;
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 2ec306b9..7203858c 100644
+index c00fcfc3..d5d1f22e 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -43,7 +43,6 @@

@@ -22,7 +22,7 @@ This reverts commit 260cb748a7556b1e6a70efa05522c01200dda823.
  14 files changed, 73 insertions(+), 106 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessagekey.cpp b/src/libraries/qmfclient/qmailmessagekey.cpp
-index d0af025c..2735c66a 100644
+index 52428022..8ff85293 100644
 --- a/src/libraries/qmfclient/qmailmessagekey.cpp
 +++ b/src/libraries/qmfclient/qmailmessagekey.cpp
 @@ -390,8 +390,7 @@ QMailMessageKey QMailMessageKey::id(const QMailMessageIdList &ids, QMailDataComp
@@ -56,7 +56,7 @@ index d0af025c..2735c66a 100644
  #endif
  
 diff --git a/src/libraries/qmfclient/qmailmessagelistmodel.cpp b/src/libraries/qmfclient/qmailmessagelistmodel.cpp
-index fb7bd6d4..059b543b 100644
+index 78db01f8..6936cfc4 100644
 --- a/src/libraries/qmfclient/qmailmessagelistmodel.cpp
 +++ b/src/libraries/qmfclient/qmailmessagelistmodel.cpp
 @@ -402,9 +402,7 @@ bool QMailMessageListModelPrivate::updateMessages(const QMailMessageIdList &ids)
@@ -71,7 +71,7 @@ index fb7bd6d4..059b543b 100644
      QMap<QMailMessageId, int> newPositions;
  
 diff --git a/src/libraries/qmfclient/qmailmessageset.cpp b/src/libraries/qmfclient/qmailmessageset.cpp
-index 298abff7..db4a01e9 100644
+index 05b366fa..09f276de 100644
 --- a/src/libraries/qmfclient/qmailmessageset.cpp
 +++ b/src/libraries/qmfclient/qmailmessageset.cpp
 @@ -958,7 +958,7 @@ void QMailFilterMessageSet::messagesAdded(const QMailMessageIdList &ids)
@@ -128,7 +128,7 @@ index 298abff7..db4a01e9 100644
          connect(model(), SIGNAL(messagesAdded(QMailMessageIdList)), this, SLOT(messagesAdded(QMailMessageIdList)));
          connect(model(), SIGNAL(messagesRemoved(QMailMessageIdList)), this, SLOT(messagesRemoved(QMailMessageIdList)));
 diff --git a/src/libraries/qmfclient/qmailmessagethreadedmodel.cpp b/src/libraries/qmfclient/qmailmessagethreadedmodel.cpp
-index dd8c5f16..5ad2a57e 100644
+index e27ed09d..b510a2f8 100644
 --- a/src/libraries/qmfclient/qmailmessagethreadedmodel.cpp
 +++ b/src/libraries/qmfclient/qmailmessagethreadedmodel.cpp
 @@ -530,13 +530,12 @@ bool QMailMessageThreadedModelPrivate::processMessagesUpdated(const QMailMessage
@@ -162,7 +162,7 @@ index dd8c5f16..5ad2a57e 100644
  }
 @@ -711,7 +707,7 @@ bool QMailMessageThreadedModelPrivate::removeMessages(const QMailMessageIdList &
      }
-     
+ 
      if (readditions) {
 -        *readditions = childIds.values();
 +        *readditions = childIds.toList();
@@ -170,7 +170,7 @@ index dd8c5f16..5ad2a57e 100644
  
      return true;
 diff --git a/src/libraries/qmfclient/qmailstore.cpp b/src/libraries/qmfclient/qmailstore.cpp
-index 58cd4131..d6199698 100644
+index 26716ce6..1ba2bf14 100644
 --- a/src/libraries/qmfclient/qmailstore.cpp
 +++ b/src/libraries/qmfclient/qmailstore.cpp
 @@ -1236,8 +1236,7 @@ void QMailStore::emitAccountNotification(ChangeType type, const QMailAccountIdLi
@@ -309,7 +309,7 @@ index 2600292d..ed7babb6 100644
          transmissionInProgressIds = idSet;
          transmissionSetInitialized = true;
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index c9e014f2..ddd5480b 100644
+index 01177b45..f2c24c31 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -1223,7 +1223,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
@@ -322,7 +322,7 @@ index c9e014f2..ddd5480b 100644
  
          for (const QMailMessageMetaData &metaData : QMailStore::instance()->messagesMetaData(key, props)) {
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index f6a54592..b27dc4f6 100644
+index 97fcf776..0ec8bae3 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
 @@ -349,15 +349,13 @@ QSet<QMailFolderId> foldersApplicableTo(QMailMessageKey const& messagekey, QSet<
@@ -378,7 +378,7 @@ index f6a54592..b27dc4f6 100644
          if (foldersToSearch.isEmpty()) {
              ImapRetrieveFolderListStrategy::folderListCompleted(context);
 diff --git a/src/tools/messageserver/messageserver.cpp b/src/tools/messageserver/messageserver.cpp
-index 9eefa1ac..c37415f0 100644
+index 28164f96..20cb225d 100644
 --- a/src/tools/messageserver/messageserver.cpp
 +++ b/src/tools/messageserver/messageserver.cpp
 @@ -190,7 +190,7 @@ void MessageServer::retrievalCompleted(quint64 action)
@@ -391,7 +391,7 @@ index 9eefa1ac..c37415f0 100644
          } else {
              completionList.clear();
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index 73295774..8a8792c6 100644
+index 6756ee55..89c53db0 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
 @@ -1004,11 +1004,6 @@ QSet<QMailMessageService*> ServiceHandler::sourceServiceSet(const QSet<QMailAcco
@@ -532,7 +532,7 @@ index 73295774..8a8792c6 100644
  }
  
 diff --git a/src/tools/messageserver/servicehandler.h b/src/tools/messageserver/servicehandler.h
-index 90d95da2..53f85be2 100644
+index db553933..e95a1e6a 100644
 --- a/src/tools/messageserver/servicehandler.h
 +++ b/src/tools/messageserver/servicehandler.h
 @@ -243,7 +243,6 @@ private:
@@ -570,7 +570,7 @@ index a0ae627b..bf598269 100644
  
      action.exportUpdates(accountId1);
 diff --git a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
-index e7adfb07..36efc83d 100644
+index af11b9f8..9120a4d2 100644
 --- a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
 +++ b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
 @@ -97,8 +97,7 @@ private:
@@ -582,7 +582,7 @@ index e7adfb07..36efc83d 100644
 +        return QMailStore::instance()->queryAccounts(key).toSet();
      }
  
-     QSet<QMailAccountId> accountSet() const 
+     QSet<QMailAccountId> accountSet() const
 @@ -108,8 +107,7 @@ private:
  
      const QSet<QMailFolderId> folderSet(const QMailFolderKey &key) const
@@ -592,7 +592,7 @@ index e7adfb07..36efc83d 100644
 +        return QMailStore::instance()->queryFolders(key).toSet();
      }
  
-     QSet<QMailFolderId> folderSet() const 
+     QSet<QMailFolderId> folderSet() const
 @@ -119,8 +117,7 @@ private:
  
      const QSet<QMailMessageId> messageSet(const QMailMessageKey &key) const
@@ -602,7 +602,7 @@ index e7adfb07..36efc83d 100644
 +        return QMailStore::instance()->queryMessages(key).toSet();
      }
  
-     QSet<QMailMessageId> messageSet() const 
+     QSet<QMailMessageId> messageSet() const
 @@ -573,9 +570,8 @@ void tst_QMailStoreKeys::accountId()
      QCOMPARE(accountSet(~QMailAccountKey::id(QMailAccountId(), NotEqual)), noAccounts);
  

@@ -9,7 +9,7 @@ Subject: [PATCH] Allow a service provided folder to be set as the standard
  1 file changed, 4 insertions(+), 8 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailaccount.cpp b/src/libraries/qmfclient/qmailaccount.cpp
-index cca6ea08..af6a2f3c 100644
+index 36b1695a..07853ffd 100644
 --- a/src/libraries/qmfclient/qmailaccount.cpp
 +++ b/src/libraries/qmfclient/qmailaccount.cpp
 @@ -572,15 +572,11 @@ QMailFolderId QMailAccount::standardFolder(QMailFolder::StandardFolder folder) c
