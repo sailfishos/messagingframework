@@ -10,7 +10,7 @@ Subject: [PATCH] Adjust for Qt 5.6
  3 files changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
-index 9ed8256a..9c723962 100644
+index 4179e264..5963f67d 100644
 --- a/src/libraries/qmfclient/libaccounts_p.cpp
 +++ b/src/libraries/qmfclient/libaccounts_p.cpp
 @@ -551,7 +551,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
@@ -32,7 +32,7 @@ index 9ed8256a..9c723962 100644
              sharedAccount->setValue(QLatin1String("lastSynchronized"), quint64(0));
          }
 diff --git a/src/libraries/qmfmessageserver/qmailtransport.cpp b/src/libraries/qmfmessageserver/qmailtransport.cpp
-index 6f603653..481a1f4d 100644
+index 1c08fb94..4ef74954 100644
 --- a/src/libraries/qmfmessageserver/qmailtransport.cpp
 +++ b/src/libraries/qmfmessageserver/qmailtransport.cpp
 @@ -213,7 +213,7 @@ void QMailTransport::createSocket(EncryptType encryptType)

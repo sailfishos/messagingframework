@@ -280,7 +280,7 @@ index bf598269..338d7ea6 100644
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
-index 1afd7817..f167c314 100644
+index 513eddce..d6517662 100644
 --- a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
 +++ b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
 @@ -342,8 +342,8 @@ void tst_QMailStorageAction::initTestCase()
@@ -372,7 +372,7 @@ index 1afd7817..f167c314 100644
      message.setStatus(QMailMessage::New, false);
      message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailstore/tst_qmailstore.cpp b/tests/tst_qmailstore/tst_qmailstore.cpp
-index 7baf9895..3362bafa 100644
+index 279fc1bd..40fd3932 100644
 --- a/tests/tst_qmailstore/tst_qmailstore.cpp
 +++ b/tests/tst_qmailstore/tst_qmailstore.cpp
 @@ -1779,8 +1779,8 @@ void tst_QMailStore::message()
@@ -387,7 +387,7 @@ index 7baf9895..3362bafa 100644
      msg2.setStatus(QMailMessage::New, true);
      msg2.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
-index 36efc83d..338979b4 100644
+index 9120a4d2..e881df8a 100644
 --- a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
 +++ b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
 @@ -343,8 +343,8 @@ void tst_QMailStoreKeys::initTestCase()
@@ -464,7 +464,7 @@ index 36efc83d..338979b4 100644
      yesterday = yesterday.toUTC();
      lastWeek = lastWeek.toUTC();
 diff --git a/tests/tst_qmailthread/tst_qmailthread.cpp b/tests/tst_qmailthread/tst_qmailthread.cpp
-index 830912d4..e5fc657a 100644
+index 936f9c85..f98ce44c 100644
 --- a/tests/tst_qmailthread/tst_qmailthread.cpp
 +++ b/tests/tst_qmailthread/tst_qmailthread.cpp
 @@ -289,8 +289,8 @@ void tst_qmailthread::initTestCase()

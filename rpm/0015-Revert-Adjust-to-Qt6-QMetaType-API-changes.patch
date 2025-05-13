@@ -10,7 +10,7 @@ This reverts commit f53c2885bff3408bf6aa8d89a9cb913980f51e9b.
  2 files changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailstoresql_p.cpp b/src/libraries/qmfclient/qmailstoresql_p.cpp
-index 92ef5aaa..4401a1b3 100644
+index e7707736..646db9c7 100644
 --- a/src/libraries/qmfclient/qmailstoresql_p.cpp
 +++ b/src/libraries/qmfclient/qmailstoresql_p.cpp
 @@ -2925,7 +2925,7 @@ static QString queryText(const QString &query, const QList<QVariant> &values)
