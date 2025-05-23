@@ -22,18 +22,18 @@ Subject: [PATCH] Revert private header paths
  15 files changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index c9c9ce38..b6b9e251 100644
+index 9153b253..7899f872 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -35,7 +35,7 @@
- #include "imapauthenticator.h"
+@@ -36,7 +36,7 @@
  #include "imapconfiguration.h"
  #include "imapstrategy.h"
+ #include "imaplog.h"
 -#include <longstream_p.h>
 +#include <private/longstream_p.h>
- #include <qmaillog.h>
  #include <qmailmessagebuffer.h>
  #include <qmailfolder.h>
+ #include <qmailnamespace.h>
 diff --git a/src/plugins/messageservices/imap/imapprotocol.h b/src/plugins/messageservices/imap/imapprotocol.h
 index 3002ffe8..c5c01d1c 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.h
@@ -48,33 +48,33 @@ index 3002ffe8..c5c01d1c 100644
  #include <qmailtransport.h>
  #include <qmailcredentials.h>
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index 0ec8bae3..8c2a9d62 100644
+index ccf83689..e42635b6 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
-@@ -34,7 +34,7 @@
- #include "imapstrategy.h"
+@@ -35,7 +35,7 @@
  #include "imapclient.h"
  #include "imapconfiguration.h"
+ #include "imaplog.h"
 -#include <longstream_p.h>
 +#include <private/longstream_p.h>
  
- #include <qmaillog.h>
  #include <qmailaccount.h>
+ #include <qmailcrypto.h>
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index fa257087..f70eab7e 100644
+index a31c5938..5b91855c 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
-@@ -36,7 +36,7 @@
- #include "popclient.h"
+@@ -37,7 +37,7 @@
  #include "popauthenticator.h"
  #include "popconfiguration.h"
+ #include "poplog.h"
 -#include <longstream_p.h>
 +#include <private/longstream_p.h>
  #include <qmailstore.h>
  #include <qmailmessagebuffer.h>
  #include <qmailtransport.h>
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index 89c53db0..f4b6f068 100644
+index 101ce93e..a91f98ac 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
 @@ -33,7 +33,7 @@

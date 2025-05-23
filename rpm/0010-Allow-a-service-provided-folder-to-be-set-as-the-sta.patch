@@ -9,7 +9,7 @@ Subject: [PATCH] Allow a service provided folder to be set as the standard
  1 file changed, 4 insertions(+), 8 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailaccount.cpp b/src/libraries/qmfclient/qmailaccount.cpp
-index 36b1695a..07853ffd 100644
+index 69167f5e..07853ffd 100644
 --- a/src/libraries/qmfclient/qmailaccount.cpp
 +++ b/src/libraries/qmfclient/qmailaccount.cpp
 @@ -572,15 +572,11 @@ QMailFolderId QMailAccount::standardFolder(QMailFolder::StandardFolder folder) c
@@ -17,7 +17,7 @@ index 36b1695a..07853ffd 100644
  void QMailAccount::setStandardFolder(QMailFolder::StandardFolder folder, const QMailFolderId &folderId)
  {
 -    if (folder == QMailFolder::OutboxFolder) {
--        qWarning() << "Cannot configure Outbox for account!";
+-        qCWarning(lcMessaging) << "Cannot configure Outbox for account!";
 +    if (folderId == QMailFolderId()) {
 +        // Resetting to default
 +        d->_standardFolders.remove(folder);
