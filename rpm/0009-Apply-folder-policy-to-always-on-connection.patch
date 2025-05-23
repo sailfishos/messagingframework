@@ -13,7 +13,7 @@ setting.
  3 files changed, 73 insertions(+), 1 deletion(-)
 
 diff --git a/src/libraries/qmfclient/qmailaccount.cpp b/src/libraries/qmfclient/qmailaccount.cpp
-index c3a44961..36b1695a 100644
+index 7792198d..69167f5e 100644
 --- a/src/libraries/qmfclient/qmailaccount.cpp
 +++ b/src/libraries/qmfclient/qmailaccount.cpp
 @@ -742,3 +742,56 @@ void QMailAccount::setFolderSyncPolicy(QMailAccount::FolderSyncPolicy policy)
@@ -87,7 +87,7 @@ index 15883b8d..e3b258d6 100644
      friend class QMailAccountPrivate;
      friend class QMailStore;
 diff --git a/src/plugins/messageservices/imap/imapconfiguration.cpp b/src/plugins/messageservices/imap/imapconfiguration.cpp
-index 2483f1ef..9cf6fd3a 100644
+index 7b516d4a..9e0b9ca0 100644
 --- a/src/plugins/messageservices/imap/imapconfiguration.cpp
 +++ b/src/plugins/messageservices/imap/imapconfiguration.cpp
 @@ -31,6 +31,8 @@
@@ -97,9 +97,9 @@ index 2483f1ef..9cf6fd3a 100644
 +#include "qmailaccount.h"
 +
  #include "imapconfiguration.h"
+ #include "imaplog.h"
  #include <QStringList>
- 
-@@ -112,7 +114,22 @@ QString ImapConfiguration::baseFolder() const
+@@ -113,7 +115,22 @@ QString ImapConfiguration::baseFolder() const
  
  QStringList ImapConfiguration::pushFolders() const
  {

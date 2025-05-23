@@ -13,7 +13,7 @@ DEFINES+=USE_KEEPALIVE
  4 files changed, 32 insertions(+)
 
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
-index 0af76d22..023d6a96 100644
+index 9e92fe13..282358d3 100644
 --- a/src/plugins/messageservices/imap/imap.pro
 +++ b/src/plugins/messageservices/imap/imap.pro
 @@ -6,6 +6,10 @@ load(qt_plugin)
@@ -26,9 +26,9 @@ index 0af76d22..023d6a96 100644
 +
  HEADERS += imapclient.h \
             imapconfiguration.h \
-            imapmailboxproperties.h \
+            imaplog.h \
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index c5efc46d..c9c9ce38 100644
+index d25ff467..9153b253 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -449,9 +449,15 @@ ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
@@ -103,7 +103,7 @@ index 8edc94b9..bb2e1354 100644
      QMailMessageClassifier _classifier;
      ImapStrategyContext *_strategyContext;
 diff --git a/tests/tst_imap/tst_imap.pro b/tests/tst_imap/tst_imap.pro
-index 2e64084e..cac5a6d1 100644
+index fe4c8bdc..c510bca3 100644
 --- a/tests/tst_imap/tst_imap.pro
 +++ b/tests/tst_imap/tst_imap.pro
 @@ -2,6 +2,11 @@ TEMPLATE = app
