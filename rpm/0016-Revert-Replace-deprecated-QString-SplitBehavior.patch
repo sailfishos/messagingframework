@@ -27,7 +27,7 @@ index 214834f7..d022007e 100644
      int tokenCount = tokens.count();
      if ( tokenCount > 0 ) {
 diff --git a/src/libraries/qmfclient/support/qmailnamespace.cpp b/src/libraries/qmfclient/support/qmailnamespace.cpp
-index 41bb534c..558e7348 100644
+index 4b392a2f..1f13ee34 100644
 --- a/src/libraries/qmfclient/support/qmailnamespace.cpp
 +++ b/src/libraries/qmfclient/support/qmailnamespace.cpp
 @@ -420,28 +420,28 @@ QMap<QByteArray, QStringList> standardFolderTranslations()
@@ -66,10 +66,10 @@ index 41bb534c..558e7348 100644
          }
      }
 diff --git a/src/plugins/messageservices/imap/imapconfiguration.cpp b/src/plugins/messageservices/imap/imapconfiguration.cpp
-index 9cf6fd3a..f5c6bf2d 100644
+index 9e0b9ca0..3a292e2e 100644
 --- a/src/plugins/messageservices/imap/imapconfiguration.cpp
 +++ b/src/plugins/messageservices/imap/imapconfiguration.cpp
-@@ -144,7 +144,7 @@ bool ImapConfiguration::intervalCheckRoamingEnabled() const
+@@ -145,7 +145,7 @@ bool ImapConfiguration::intervalCheckRoamingEnabled() const
  
  QStringList ImapConfiguration::capabilities() const
  {
@@ -79,7 +79,7 @@ index 9cf6fd3a..f5c6bf2d 100644
  
  void ImapConfiguration::setCapabilities(const QStringList &s)
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index e5903493..c28e771f 100644
+index 4435aa3d..3d2574be 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -409,10 +409,10 @@ void ImapState::untaggedResponse(ImapContext *c, const QString &line)
@@ -123,7 +123,7 @@ index e5903493..c28e771f 100644
          quint32 exists = c->exists();
          if (exists > 0) {
 diff --git a/src/plugins/messageservices/imap/integerregion.cpp b/src/plugins/messageservices/imap/integerregion.cpp
-index de3c978c..bf52104f 100644
+index 763150b9..dbc0c54e 100644
 --- a/src/plugins/messageservices/imap/integerregion.cpp
 +++ b/src/plugins/messageservices/imap/integerregion.cpp
 @@ -87,7 +87,7 @@ IntegerRegion::IntegerRegion(const QString &uidString)
@@ -136,10 +136,10 @@ index de3c978c..bf52104f 100644
          bool ok = false;
          int index = s.indexOf(":");
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index d5d1f22e..886b058f 100644
+index 7296b765..60e00542 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
-@@ -533,7 +533,7 @@ void SmtpClient::nextAction(const QString &response)
+@@ -534,7 +534,7 @@ void SmtpClient::nextAction(const QString &response)
                      QStringList authCaps;
                      foreach (QString const& capability, capabilities) {
                          if (capability.startsWith("AUTH", Qt::CaseInsensitive)) {

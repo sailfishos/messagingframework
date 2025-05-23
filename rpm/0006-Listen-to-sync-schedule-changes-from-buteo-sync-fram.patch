@@ -15,7 +15,7 @@ and activate/deactivate IMAP IDLE.
  5 files changed, 35 insertions(+), 3 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
-index 023d6a96..c4ba87c0 100644
+index 282358d3..a479ebba 100644
 --- a/src/plugins/messageservices/imap/imap.pro
 +++ b/src/plugins/messageservices/imap/imap.pro
 @@ -5,6 +5,7 @@ PLUGIN_CLASS_NAME = QmfImapPlugin
@@ -27,10 +27,10 @@ index 023d6a96..c4ba87c0 100644
  contains(DEFINES, USE_KEEPALIVE) {
      PKGCONFIG += keepalive
 diff --git a/src/plugins/messageservices/imap/imapconfiguration.cpp b/src/plugins/messageservices/imap/imapconfiguration.cpp
-index af37630e..2483f1ef 100644
+index 3d839c69..7b516d4a 100644
 --- a/src/plugins/messageservices/imap/imapconfiguration.cpp
 +++ b/src/plugins/messageservices/imap/imapconfiguration.cpp
-@@ -102,7 +102,7 @@ QString ImapConfiguration::preferredTextSubtype() const
+@@ -103,7 +103,7 @@ QString ImapConfiguration::preferredTextSubtype() const
  
  bool ImapConfiguration::pushEnabled() const
  {
@@ -39,7 +39,7 @@ index af37630e..2483f1ef 100644
  }
  
  QString ImapConfiguration::baseFolder() const
-@@ -270,7 +270,7 @@ void ImapConfigurationEditor::setPreferredTextSubtype(const QString &str)
+@@ -271,7 +271,7 @@ void ImapConfigurationEditor::setPreferredTextSubtype(const QString &str)
  
  void ImapConfigurationEditor::setPushEnabled(bool b)
  {
@@ -49,7 +49,7 @@ index af37630e..2483f1ef 100644
  
  void ImapConfigurationEditor::setBaseFolder(const QString &s)
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 2904b23b..db176e66 100644
+index d7b7d1dd..d56e29b0 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -46,6 +46,10 @@
@@ -77,13 +77,13 @@ index 2904b23b..db176e66 100644
  }
  
  void ImapService::enable()
-@@ -1833,6 +1844,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
+@@ -1835,6 +1846,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
      _idling = status;
  }
  
 +void ImapService::onSyncedExternallyChanged(uint accountId, const QString &profileType, bool state)
 +{
-+    qMailLog(Messaging) << "Received new idleState for account: " << accountId << "state: " << state << "profile type: " << profileType;
++    qCDebug(lcIMAP) << "Received new idleState for account: " << accountId << "state: " << state << "profile type: " << profileType;
 +    if (accountId == _accountId.toULongLong()
 +        && profileType == QLatin1String("syncemail")) {
 +        QMailAccountConfiguration config(_accountId);
@@ -93,7 +93,7 @@ index 2904b23b..db176e66 100644
 +            ImapConfigurationEditor editCfg(&config);
 +            editCfg.setPushEnabled(state);
 +            if (!QMailStore::instance()->updateAccountConfiguration(&config)) {
-+                qWarning() << "Unable to update account" << _accountId;
++                qCWarning(lcMailStore) << "Unable to update account" << _accountId;
 +            }
 +        }
 +    }

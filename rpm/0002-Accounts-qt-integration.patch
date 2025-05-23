@@ -15,7 +15,7 @@ Change how service are reloaded when account changes.
  4 files changed, 119 insertions(+), 23 deletions(-)
 
 diff --git a/src/plugins/credentials/sso/plugin.cpp b/src/plugins/credentials/sso/plugin.cpp
-index 3dc4491f..5d7b8609 100644
+index de7f66b8..5cac25f9 100644
 --- a/src/plugins/credentials/sso/plugin.cpp
 +++ b/src/plugins/credentials/sso/plugin.cpp
 @@ -42,6 +42,12 @@
@@ -95,12 +95,12 @@ index 3dc4491f..5d7b8609 100644
 -        }
 +    Accounts::Account *account = Accounts::Account::fromId(&m_manager, id().toULongLong(), this);
 +    if (!account) {
-+        qWarning() << "cannot retrieve Account from id:" << id();
++        qCWarning(lcMessaging) << "cannot retrieve Account from id:" << id();
 +        return false;
 +    }
 +    const Accounts::ServiceList services = account->services(QStringLiteral("e-mail"));
 +    if (!services.count()) {
-+        qWarning() << "no e-mail service for account " << id();
++        qCWarning(lcMessaging) << "no e-mail service for account " << id();
 +        return false;
      }
 +    const Accounts::Service srv = services.first();
@@ -113,10 +113,10 @@ index 3dc4491f..5d7b8609 100644
 +        parameters.insert("ClientSecret", loadKey(srv.provider(), srv.name(), "client_secret"));
 +    }
  
-     qMailLog(Messaging) << "Creating SSO identity for the service" << service()
--                        << "from account" << id() << "with creds id" << credentialsId;
+     qCDebug(lcMessaging) << "Creating SSO identity for the service" << service()
+-                         << "from account" << id() << "with creds id" << credentialsId;
 -    return SSOManager::init(credentialsId, method, mechanism, parameters);
-+                        << "from account" << id() << "with creds id" << auth.credentialsId();
++                         << "from account" << id() << "with creds id" << auth.credentialsId();
 +    return SSOManager::init(auth.credentialsId(), auth.method(),
 +                            auth.mechanism(), parameters);
 +}
@@ -146,18 +146,18 @@ index 3dc4491f..5d7b8609 100644
 +{
 +    Accounts::Account *account = Accounts::Account::fromId(&m_manager, id().toULongLong(), this);
 +    if (!account) {
-+        qWarning() << "cannot retrieve Account from id:" << id();
++        qCWarning(lcMessaging) << "cannot retrieve Account from id:" << id();
 +        return;
 +    }
 +    const Accounts::ServiceList services = account->services(QStringLiteral("e-mail"));
 +    if (!services.count()) {
-+        qWarning() << "no e-mail service for account " << id();
++        qCWarning(lcMessaging) << "no e-mail service for account " << id();
 +        return;
 +    }
 +    const Accounts::Service srv = services.first();
 +    if (srv.isValid()) {
-+        qMailLog(Messaging) << "Invalidate credentials" << service()
-+                            << " from account" << id();
++        qCDebug(lcMessaging) << "Invalidate credentials" << service()
++                             << " from account" << id();
 +        account->selectService(srv);
 +        account->setValue("CredentialsNeedUpdate", QVariant::fromValue<bool>(true));
 +        if (!source.isEmpty()) {
@@ -198,12 +198,12 @@ index 6c9464c2..a647ade7 100644
 +}
 +}
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index a8314d76..6756ee55 100644
+index 38e35ca0..f83e3e01 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
-@@ -801,10 +801,23 @@ void ServiceHandler::accountsAdded(const QMailAccountIdList &ids)
+@@ -804,10 +804,23 @@ void ServiceHandler::onAccountsAdded(const QMailAccountIdList &ids)
  
- void ServiceHandler::accountsUpdated(const QMailAccountIdList &ids)
+ void ServiceHandler::onAccountsUpdated(const QMailAccountIdList &ids)
  {
 +#ifdef USE_ACCOUNTS_QT
 +    QMailAccountIdList idList;
@@ -224,4 +224,4 @@ index a8314d76..6756ee55 100644
 +#endif
  }
  
- void ServiceHandler::accountsRemoved(const QMailAccountIdList &ids)
+ void ServiceHandler::onAccountsRemoved(const QMailAccountIdList &ids)
