@@ -12,10 +12,10 @@ Subject: [PATCH] Use Qt5 booster to save memory.
  5 files changed, 16 insertions(+), 5 deletions(-)
 
 diff --git a/src/tools/messageserver/main.cpp b/src/tools/messageserver/main.cpp
-index 80136679..01411122 100644
+index 9f58c094..7da26def 100644
 --- a/src/tools/messageserver/main.cpp
 +++ b/src/tools/messageserver/main.cpp
-@@ -41,7 +41,7 @@
+@@ -40,7 +40,7 @@
  #include <QtGui>
  #endif
  
