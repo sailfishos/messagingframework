@@ -50,7 +50,7 @@ index 80e9d53d..257549b5 100644
  QT = core qmfclient
  
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
-index cff8bd3f..27de399d 100644
+index d3d826d8..a747b107 100644
 --- a/src/plugins/messageservices/imap/imap.pro
 +++ b/src/plugins/messageservices/imap/imap.pro
 @@ -1,7 +1,6 @@
@@ -62,7 +62,7 @@ index cff8bd3f..27de399d 100644
  
  QT = core network qmfclient qmfclient-private qmfmessageserver qmfmessageserver-private
 diff --git a/src/plugins/messageservices/pop/pop.pro b/src/plugins/messageservices/pop/pop.pro
-index df556a1c..007db6fe 100644
+index 388330ce..8b2047ca 100644
 --- a/src/plugins/messageservices/pop/pop.pro
 +++ b/src/plugins/messageservices/pop/pop.pro
 @@ -1,7 +1,6 @@

@@ -10,7 +10,7 @@ Subject: [PATCH] Revert core5compat addition
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmfclient.pro b/src/libraries/qmfclient/qmfclient.pro
-index eb9f312f..e1d9dd60 100644
+index d67085e1..e6b3548a 100644
 --- a/src/libraries/qmfclient/qmfclient.pro
 +++ b/src/libraries/qmfclient/qmfclient.pro
 @@ -1,5 +1,5 @@
@@ -21,7 +21,7 @@ index eb9f312f..e1d9dd60 100644
  
  MODULE_PLUGIN_TYPES = \
 diff --git a/src/plugins/messageservices/pop/pop.pro b/src/plugins/messageservices/pop/pop.pro
-index 7c87e3df..df556a1c 100644
+index 788859fb..388330ce 100644
 --- a/src/plugins/messageservices/pop/pop.pro
 +++ b/src/plugins/messageservices/pop/pop.pro
 @@ -4,7 +4,7 @@ PLUGIN_TYPE = messageservices
