@@ -1,6 +1,6 @@
 Name: qmf-qt5
 Summary:    Qt Messaging Framework (QMF) Qt5
-Version:    4.0.4+git146
+Version:    4.0.4+git165
 Release:    1
 License:    (LGPLv2 or LGPLv3) with exception or Qt Commercial
 URL:        https://github.com/sailfishos/messagingframework
@@ -174,8 +174,7 @@ touch .git
     DEFINES+=QMF_NO_WIDGETS \
     DEFINES+=USE_ACCOUNTS_QT \
     DEFINES+=USE_KEEPALIVE \
-    DEFINES+=USE_HTML_PARSER \
-    CONFIG+=syslog
+    DEFINES+=USE_HTML_PARSER
 
 %make_build
 
