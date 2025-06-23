@@ -378,10 +378,10 @@ index 3e1df7c8..ccf83689 100644
          if (foldersToSearch.isEmpty()) {
              ImapRetrieveFolderListStrategy::folderListCompleted(context);
 diff --git a/src/tools/messageserver/messageserver.cpp b/src/tools/messageserver/messageserver.cpp
-index ec0a3948..770d6e75 100644
+index 06a335ae..066b6413 100644
 --- a/src/tools/messageserver/messageserver.cpp
 +++ b/src/tools/messageserver/messageserver.cpp
-@@ -190,7 +190,7 @@ void MessageServer::retrievalCompleted(quint64 action)
+@@ -198,7 +198,7 @@ void MessageServer::retrievalCompleted(quint64 action)
          if (!completionAttempted) {
              // Complete the messages that we selected for immediate completion
              completionAttempted = true;
