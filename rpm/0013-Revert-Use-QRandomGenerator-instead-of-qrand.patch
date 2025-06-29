@@ -11,7 +11,7 @@ This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
  3 files changed, 31 insertions(+), 6 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index c5d28051..c5467b96 100644
+index 78ab1196..99a15b25 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
 @@ -50,7 +50,6 @@
@@ -22,7 +22,7 @@ index c5d28051..c5467b96 100644
  #include <QDataStream>
  #include <QTextStream>
  #include <QTextCodec>
-@@ -7947,6 +7946,25 @@ uint QMailMessagePrivate::indicativeSize() const
+@@ -7951,6 +7950,25 @@ uint QMailMessagePrivate::indicativeSize() const
      return (size + 1);
  }
  
@@ -48,7 +48,7 @@ index c5d28051..c5467b96 100644
  static QByteArray gBoundaryString;
  
  void QMF_EXPORT setQMailMessageBoundaryString(const QByteArray &boundary)
-@@ -7963,7 +7981,7 @@ static QByteArray boundaryString(const QByteArray &hash)
+@@ -7967,7 +7985,7 @@ static QByteArray boundaryString(const QByteArray &hash)
          return gBoundaryString;
  
      // Formulate a boundary that is very unlikely to clash with the content
