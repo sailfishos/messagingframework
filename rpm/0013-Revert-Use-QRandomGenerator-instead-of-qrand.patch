@@ -11,7 +11,7 @@ This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
  3 files changed, 31 insertions(+), 6 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index 78ab1196..99a15b25 100644
+index 3bb37f3d..0cdbd847 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
 @@ -50,7 +50,6 @@
@@ -79,7 +79,7 @@ index 055c55bd..e75a1223 100644
          if (r>57) r+=7;
          if (r>90) r+=6;
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 122fc3b9..7296b765 100644
+index 9c913432..d234e949 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -43,7 +43,6 @@

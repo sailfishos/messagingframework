@@ -79,7 +79,7 @@ index 9e0b9ca0..3a292e2e 100644
  
  void ImapConfiguration::setCapabilities(const QStringList &s)
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index 4435aa3d..3d2574be 100644
+index 86fd69f2..e572a5a3 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -409,10 +409,10 @@ void ImapState::untaggedResponse(ImapContext *c, const QString &line)
@@ -136,7 +136,7 @@ index 763150b9..dbc0c54e 100644
          bool ok = false;
          int index = s.indexOf(":");
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 7296b765..60e00542 100644
+index d234e949..f250d0f2 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -534,7 +534,7 @@ void SmtpClient::nextAction(const QString &response)
