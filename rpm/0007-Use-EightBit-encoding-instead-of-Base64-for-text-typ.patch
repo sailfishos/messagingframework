@@ -16,14 +16,14 @@ Signed-off-by: Tomi Leppänen <tomi.leppanen@jolla.com>
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index 29d1ac1c..3bb37f3d 100644
+index a8191669..8a8bde3d 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
-@@ -1604,7 +1604,11 @@ namespace attachments
+@@ -1555,7 +1555,11 @@ namespace attachments
                  disposition.setParameter("filename*", QMailMessageContentDisposition::encodeParameter(input, "UTF-8"));
              }
  
--            container->appendPart(QMailMessagePart::fromFile(filePath, disposition,attach_type, QMailMessageBody::Base64,
+-            container->appendPart(QMailMessagePart::fromFile(filePath, disposition, attach_type, QMailMessageBody::Base64,
 +            QMailMessageBody::TransferEncoding te(QMailMessageBody::Base64);
 +            if (attach_type.matches("text") || attach_type.matches("message", "rfc822"))
 +                te = QMailMessageBody::EightBit;

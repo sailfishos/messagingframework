@@ -22,7 +22,7 @@ Subject: [PATCH] Revert private header paths
  15 files changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index a8f691c1..5c807374 100644
+index 53d25ecd..47a7e3d2 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -36,7 +36,7 @@
@@ -48,7 +48,7 @@ index 3002ffe8..c5c01d1c 100644
  #include <qmailtransport.h>
  #include <qmailcredentials.h>
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index ccf83689..e42635b6 100644
+index 30626a1a..4421d0a7 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
 @@ -35,7 +35,7 @@
@@ -61,7 +61,7 @@ index ccf83689..e42635b6 100644
  #include <qmailaccount.h>
  #include <qmailcrypto.h>
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index 3b6947de..4ea5c2dc 100644
+index 444965bd..3f3cd540 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
 @@ -37,7 +37,7 @@
@@ -74,7 +74,7 @@ index 3b6947de..4ea5c2dc 100644
  #include <qmailmessagebuffer.h>
  #include <qmailtransport.h>
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index 101ce93e..a91f98ac 100644
+index a268e3c9..a5249900 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
 @@ -33,7 +33,7 @@
@@ -87,7 +87,7 @@ index 101ce93e..a91f98ac 100644
  #include <qmailmessageserver.h>
  #include <qmailserviceconfiguration.h>
 diff --git a/tests/tst_locks/tst_locks.cpp b/tests/tst_locks/tst_locks.cpp
-index 76430bfa..dc1b7902 100644
+index 423b4657..61cca92c 100644
 --- a/tests/tst_locks/tst_locks.cpp
 +++ b/tests/tst_locks/tst_locks.cpp
 @@ -34,7 +34,7 @@
@@ -113,7 +113,7 @@ index 0e37852a..0d29c28f 100644
  /*
      This class primarily tests that LongStream class correctly stores messages.
 diff --git a/tests/tst_longstring/tst_longstring.cpp b/tests/tst_longstring/tst_longstring.cpp
-index ba05242e..282172c3 100644
+index 76be3b77..1f2e65cf 100644
 --- a/tests/tst_longstring/tst_longstring.cpp
 +++ b/tests/tst_longstring/tst_longstring.cpp
 @@ -34,7 +34,7 @@
@@ -126,7 +126,7 @@ index ba05242e..282172c3 100644
  
  
 diff --git a/tests/tst_python_email/tst_python_email.cpp b/tests/tst_python_email/tst_python_email.cpp
-index 619fd7d6..becaac81 100644
+index b539983f..fe34af80 100644
 --- a/tests/tst_python_email/tst_python_email.cpp
 +++ b/tests/tst_python_email/tst_python_email.cpp
 @@ -36,7 +36,7 @@
@@ -139,7 +139,7 @@ index 619fd7d6..becaac81 100644
  #include <ctype.h>
  
 diff --git a/tests/tst_qmailmessageset/tst_qmailmessageset.cpp b/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
-index 7fc7083d..168fb891 100644
+index 01d10c52..331207c9 100644
 --- a/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
 +++ b/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
 @@ -35,7 +35,7 @@
@@ -152,7 +152,7 @@ index 7fc7083d..168fb891 100644
  
  /*
 diff --git a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
-index 338d7ea6..e206479f 100644
+index 0a0d2ceb..9831f71a 100644
 --- a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
 +++ b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
 @@ -36,7 +36,7 @@
@@ -165,7 +165,7 @@ index 338d7ea6..e206479f 100644
  
  
 diff --git a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
-index d6517662..e41e6e33 100644
+index 6f690e83..d46fcae2 100644
 --- a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
 +++ b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
 @@ -34,7 +34,7 @@
@@ -178,7 +178,7 @@ index d6517662..e41e6e33 100644
  #include <qmaildisconnected.h>
  #include <qmailnamespace.h>
 diff --git a/tests/tst_qmailstore/tst_qmailstore.cpp b/tests/tst_qmailstore/tst_qmailstore.cpp
-index 40fd3932..72ff657d 100644
+index deec061a..1d0c80d9 100644
 --- a/tests/tst_qmailstore/tst_qmailstore.cpp
 +++ b/tests/tst_qmailstore/tst_qmailstore.cpp
 @@ -38,7 +38,7 @@
@@ -191,7 +191,7 @@ index 40fd3932..72ff657d 100644
  //TESTED_CLASS=QMailStore
  //TESTED_FILES=src/libraries/qtopiamail/qmailstore.cpp
 diff --git a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
-index e881df8a..9af662de 100644
+index 6648d2e5..e603d9a4 100644
 --- a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
 +++ b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
 @@ -38,7 +38,7 @@
@@ -204,7 +204,7 @@ index e881df8a..9af662de 100644
  class tst_QMailStoreKeys : public QObject
  {
 diff --git a/tests/tst_qprivateimplementation/tst_qprivateimplementation.cpp b/tests/tst_qprivateimplementation/tst_qprivateimplementation.cpp
-index 4a96d78f..abb3d23f 100644
+index 5d48cd22..54b8db36 100644
 --- a/tests/tst_qprivateimplementation/tst_qprivateimplementation.cpp
 +++ b/tests/tst_qprivateimplementation/tst_qprivateimplementation.cpp
 @@ -33,7 +33,7 @@

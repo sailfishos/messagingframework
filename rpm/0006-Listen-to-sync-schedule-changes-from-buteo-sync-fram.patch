@@ -27,7 +27,7 @@ index 282358d3..a479ebba 100644
  contains(DEFINES, USE_KEEPALIVE) {
      PKGCONFIG += keepalive
 diff --git a/src/plugins/messageservices/imap/imapconfiguration.cpp b/src/plugins/messageservices/imap/imapconfiguration.cpp
-index 3d839c69..7b516d4a 100644
+index 4192d1f0..b484b737 100644
 --- a/src/plugins/messageservices/imap/imapconfiguration.cpp
 +++ b/src/plugins/messageservices/imap/imapconfiguration.cpp
 @@ -103,7 +103,7 @@ QString ImapConfiguration::preferredTextSubtype() const
@@ -39,7 +39,7 @@ index 3d839c69..7b516d4a 100644
  }
  
  QString ImapConfiguration::baseFolder() const
-@@ -271,7 +271,7 @@ void ImapConfigurationEditor::setPreferredTextSubtype(const QString &str)
+@@ -267,7 +267,7 @@ void ImapConfigurationEditor::setPreferredTextSubtype(const QString &str)
  
  void ImapConfigurationEditor::setPushEnabled(bool b)
  {
@@ -49,7 +49,7 @@ index 3d839c69..7b516d4a 100644
  
  void ImapConfigurationEditor::setBaseFolder(const QString &s)
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index d7b7d1dd..d56e29b0 100644
+index d626e60e..a4859d7a 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -46,6 +46,10 @@
@@ -103,7 +103,7 @@ index d7b7d1dd..d56e29b0 100644
  {
  public:
 diff --git a/src/plugins/messageservices/imap/imapservice.h b/src/plugins/messageservices/imap/imapservice.h
-index 7b24794a..4cf549a5 100644
+index 5adb68a5..7795ed50 100644
 --- a/src/plugins/messageservices/imap/imapservice.h
 +++ b/src/plugins/messageservices/imap/imapservice.h
 @@ -75,6 +75,8 @@ protected slots:

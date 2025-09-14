@@ -14,7 +14,7 @@ This reverts commit faf30f7544c7a1f5ec07ac68d1f0b4fbf4ed855d.
  6 files changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailtimestamp.cpp b/src/libraries/qmfclient/qmailtimestamp.cpp
-index 214834f7..d022007e 100644
+index 2390cc8c..711ac4f4 100644
 --- a/src/libraries/qmfclient/qmailtimestamp.cpp
 +++ b/src/libraries/qmfclient/qmailtimestamp.cpp
 @@ -120,7 +120,7 @@ QMailTimeStampPrivate::QMailTimeStampPrivate(const QString& timeText)
@@ -27,7 +27,7 @@ index 214834f7..d022007e 100644
      int tokenCount = tokens.count();
      if ( tokenCount > 0 ) {
 diff --git a/src/libraries/qmfclient/support/qmailnamespace.cpp b/src/libraries/qmfclient/support/qmailnamespace.cpp
-index 4b392a2f..1f13ee34 100644
+index 5f0129c8..dd5482d9 100644
 --- a/src/libraries/qmfclient/support/qmailnamespace.cpp
 +++ b/src/libraries/qmfclient/support/qmailnamespace.cpp
 @@ -420,28 +420,28 @@ QMap<QByteArray, QStringList> standardFolderTranslations()
@@ -66,7 +66,7 @@ index 4b392a2f..1f13ee34 100644
          }
      }
 diff --git a/src/plugins/messageservices/imap/imapconfiguration.cpp b/src/plugins/messageservices/imap/imapconfiguration.cpp
-index 9e0b9ca0..3a292e2e 100644
+index 810bfe75..99b4fbeb 100644
 --- a/src/plugins/messageservices/imap/imapconfiguration.cpp
 +++ b/src/plugins/messageservices/imap/imapconfiguration.cpp
 @@ -145,7 +145,7 @@ bool ImapConfiguration::intervalCheckRoamingEnabled() const
@@ -79,10 +79,10 @@ index 9e0b9ca0..3a292e2e 100644
  
  void ImapConfiguration::setCapabilities(const QStringList &s)
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index 86fd69f2..e572a5a3 100644
+index d9cc74cd..cb932b3d 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
-@@ -409,10 +409,10 @@ void ImapState::untaggedResponse(ImapContext *c, const QString &line)
+@@ -405,10 +405,10 @@ void ImapState::untaggedResponse(ImapContext *c, const QString &line)
      } else if (line.indexOf("[CAPABILITY", 0) != -1) {
          int start = 0;
          QString temp = token(line, '[', ']', &start);
@@ -95,7 +95,7 @@ index 86fd69f2..e572a5a3 100644
          c->protocol()->setCapabilities(capabilities);
      }
  
-@@ -518,7 +518,7 @@ void CapabilityState::untaggedResponse(ImapContext *c, const QString &line)
+@@ -514,7 +514,7 @@ void CapabilityState::untaggedResponse(ImapContext *c, const QString &line)
  {
      QStringList capabilities;
      if (line.startsWith(QLatin1String("* CAPABILITY"))) {
@@ -104,7 +104,7 @@ index 86fd69f2..e572a5a3 100644
          c->protocol()->setCapabilities(capabilities);
      } else {
          ImapState::untaggedResponse(c, line);
-@@ -648,7 +648,7 @@ void LoginState::taggedResponse(ImapContext *c, const QString &line)
+@@ -640,7 +640,7 @@ void LoginState::taggedResponse(ImapContext *c, const QString &line)
      if (line.indexOf("[CAPABILITY", Qt::CaseInsensitive) != -1) {
          int start = 0;
          QString temp = token(line, '[', ']', &start);
@@ -113,7 +113,7 @@ index 86fd69f2..e572a5a3 100644
          c->protocol()->setCapabilities(capabilities);
      }
  
-@@ -1441,7 +1441,7 @@ void SelectedState::untaggedResponse(ImapContext *c, const QString &line)
+@@ -1432,7 +1432,7 @@ void SelectedState::untaggedResponse(ImapContext *c, const QString &line)
      } else if (line.indexOf("PERMANENTFLAGS", 0, Qt::CaseInsensitive) != -1) {
          int start = 0;
          QString temp = token(line, '(', ')', &start);
@@ -123,7 +123,7 @@ index 86fd69f2..e572a5a3 100644
          quint32 exists = c->exists();
          if (exists > 0) {
 diff --git a/src/plugins/messageservices/imap/integerregion.cpp b/src/plugins/messageservices/imap/integerregion.cpp
-index 763150b9..dbc0c54e 100644
+index 3daa98a4..fde4d0e8 100644
 --- a/src/plugins/messageservices/imap/integerregion.cpp
 +++ b/src/plugins/messageservices/imap/integerregion.cpp
 @@ -87,7 +87,7 @@ IntegerRegion::IntegerRegion(const QString &uidString)
@@ -132,14 +132,14 @@ index 763150b9..dbc0c54e 100644
      // TODO: sort uids in uidString if they are not already sorted
 -    QStringList rangeList = uidString.split(",", Qt::SkipEmptyParts);
 +    QStringList rangeList = uidString.split(",", QString::SkipEmptyParts);
-     foreach(const QString &s, rangeList) {
+     foreach (const QString &s, rangeList) {
          bool ok = false;
          int index = s.indexOf(":");
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index d234e949..f250d0f2 100644
+index 599a4e84..55378d36 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
-@@ -534,7 +534,7 @@ void SmtpClient::nextAction(const QString &response)
+@@ -529,7 +529,7 @@ void SmtpClient::nextAction(const QString &response)
                      QStringList authCaps;
                      foreach (QString const& capability, capabilities) {
                          if (capability.startsWith("AUTH", Qt::CaseInsensitive)) {
