@@ -8,7 +8,7 @@ Subject: [PATCH] Adjust qmflist for missing bits in 5.6
  1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/src/libraries/qmfclient/qmflist.h b/src/libraries/qmfclient/qmflist.h
-index e35b983e..6942f35e 100644
+index 17b5b7d9..00e53a93 100644
 --- a/src/libraries/qmfclient/qmflist.h
 +++ b/src/libraries/qmfclient/qmflist.h
 @@ -50,6 +50,8 @@

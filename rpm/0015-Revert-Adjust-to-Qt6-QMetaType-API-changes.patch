@@ -10,10 +10,10 @@ This reverts commit f53c2885bff3408bf6aa8d89a9cb913980f51e9b.
  2 files changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailstoresql_p.cpp b/src/libraries/qmfclient/qmailstoresql_p.cpp
-index 9e0c2291..d09c18bb 100644
+index d32b7bab..41b05b37 100644
 --- a/src/libraries/qmfclient/qmailstoresql_p.cpp
 +++ b/src/libraries/qmfclient/qmailstoresql_p.cpp
-@@ -2925,7 +2925,7 @@ static QString queryText(const QString &query, const QList<QVariant> &values)
+@@ -2915,7 +2915,7 @@ static QString queryText(const QString &query, const QList<QVariant> &values)
      int index = result.indexOf(marker);
      while ((index != -1) && (it != end)) {
          QString substitute((*it).toString());
@@ -22,7 +22,7 @@ index 9e0c2291..d09c18bb 100644
              substitute.prepend(quote).append(quote);
  
          result.replace(index, 1, substitute);
-@@ -2940,7 +2940,7 @@ static QString queryText(const QString &query, const QList<QVariant> &values)
+@@ -2930,7 +2930,7 @@ static QString queryText(const QString &query, const QList<QVariant> &values)
  static QString queryText(const QSqlQuery &query)
  {
      // Note: we currently only handle positional parameters
@@ -32,7 +32,7 @@ index 9e0c2291..d09c18bb 100644
  
  QSqlQuery QMailStoreSql::prepare(const QString& sql)
 diff --git a/src/libraries/qmfclient/support/qmailipc.h b/src/libraries/qmfclient/support/qmailipc.h
-index 3445263a..6713f6b4 100644
+index 58c5ccc4..925fdfbd 100644
 --- a/src/libraries/qmfclient/support/qmailipc.h
 +++ b/src/libraries/qmfclient/support/qmailipc.h
 @@ -58,9 +58,12 @@ struct QMetaTypeRegister

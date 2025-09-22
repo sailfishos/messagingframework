@@ -32,19 +32,17 @@ index 6a41c128..a5fceeda 100644
              sharedAccount->setValue(QLatin1String("lastSynchronized"), quint64(0));
          }
 diff --git a/src/libraries/qmfmessageserver/qmailtransport.cpp b/src/libraries/qmfmessageserver/qmailtransport.cpp
-index aeb4645b..14812cd7 100644
+index 746fe48d..a2682105 100644
 --- a/src/libraries/qmfmessageserver/qmailtransport.cpp
 +++ b/src/libraries/qmfmessageserver/qmailtransport.cpp
-@@ -213,7 +213,7 @@ void QMailTransport::createSocket(EncryptType encryptType)
- #ifndef QT_NO_SSL
+@@ -189,13 +189,13 @@ void QMailTransport::createSocket(EncryptType encryptType)
+     mSocket = new Socket(this);
      encryption = encryptType;
      connect(mSocket, &QSslSocket::encrypted, this, &QMailTransport::encryptionEstablished);
 -    connect(mSocket, &QSslSocket::sslErrors, this, &QMailTransport::connectionFailed);
 +    connect(mSocket, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(connectionFailed(QList<QSslError>)));
- #else
-     Q_UNUSED(encryptType);
- #endif
-@@ -222,7 +222,7 @@ void QMailTransport::createSocket(EncryptType encryptType)
+ 
+     const int bufferLimit = 101*1024; // Limit memory used when downloading
      mSocket->setReadBufferSize( bufferLimit );
      mSocket->setObjectName(QString::fromUtf8(mName) + QString::fromLatin1("-socket"));
      connect(mSocket, &QAbstractSocket::connected, this, &QMailTransport::connectionEstablished);
@@ -54,10 +52,10 @@ index aeb4645b..14812cd7 100644
      connect(mSocket, &QAbstractSocket::bytesWritten, this, &QMailTransport::bytesWritten);
  
 diff --git a/tests/tst_smtp/tst_smtp.cpp b/tests/tst_smtp/tst_smtp.cpp
-index 8dcfbe3a..7defc685 100644
+index 99d534af..104393fa 100644
 --- a/tests/tst_smtp/tst_smtp.cpp
 +++ b/tests/tst_smtp/tst_smtp.cpp
-@@ -98,9 +98,9 @@ void tst_SmtpClient::test_connection()
+@@ -94,9 +94,9 @@ void tst_SmtpClient::test_connection()
      QVERIFY(completed.wait());
  
      QCOMPARE(updateStatus.count(), 3);
@@ -70,7 +68,7 @@ index 8dcfbe3a..7defc685 100644
  }
  
  void tst_SmtpClient::test_auth()
-@@ -119,9 +119,9 @@ void tst_SmtpClient::test_auth()
+@@ -115,9 +115,9 @@ void tst_SmtpClient::test_auth()
      QVERIFY(!completed.wait(250)); // Fails with wrong credentials
  
      QCOMPARE(updateStatus.count(), 3);
@@ -83,7 +81,7 @@ index 8dcfbe3a..7defc685 100644
  
      smtp.setSmtpAuthentication(QMail::PlainMechanism);
      QVERIFY(QMailStore::instance()->updateAccountConfiguration(&config));
-@@ -130,7 +130,7 @@ void tst_SmtpClient::test_auth()
+@@ -126,9 +126,9 @@ void tst_SmtpClient::test_auth()
      QVERIFY(!completed.wait(250)); // Fails with wrong credentials
  
      QCOMPARE(updateStatus.count(), 3);
@@ -94,3 +92,5 @@ index 8dcfbe3a..7defc685 100644
 +    QCOMPARE(updateStatus.takeFirst().first().toString(), QString::fromLatin1("Connected"));
 +    QCOMPARE(updateStatus.takeFirst().first().toString(), QString::fromLatin1("Connected"));
  }
+ 
+ QTEST_MAIN(tst_SmtpClient)

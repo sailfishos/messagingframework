@@ -8,7 +8,7 @@ Subject: [PATCH] Revert loadRelax()
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/libraries/qmfclient/qprivateimplementation.h b/src/libraries/qmfclient/qprivateimplementation.h
-index 3f5e1daf..21c76d1b 100644
+index 076db456..504385f7 100644
 --- a/src/libraries/qmfclient/qprivateimplementation.h
 +++ b/src/libraries/qmfclient/qprivateimplementation.h
 @@ -99,7 +99,7 @@ public:

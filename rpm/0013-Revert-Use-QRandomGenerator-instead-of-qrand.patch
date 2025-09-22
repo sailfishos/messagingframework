@@ -11,7 +11,7 @@ This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
  3 files changed, 31 insertions(+), 6 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index 3bb37f3d..0cdbd847 100644
+index 8a8bde3d..a5877cd9 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
 @@ -50,7 +50,6 @@
@@ -22,7 +22,7 @@ index 3bb37f3d..0cdbd847 100644
  #include <QDataStream>
  #include <QTextStream>
  #include <QTextCodec>
-@@ -7951,6 +7950,25 @@ uint QMailMessagePrivate::indicativeSize() const
+@@ -7833,6 +7832,25 @@ uint QMailMessagePrivate::indicativeSize() const
      return (size + 1);
  }
  
@@ -48,7 +48,7 @@ index 3bb37f3d..0cdbd847 100644
  static QByteArray gBoundaryString;
  
  void QMF_EXPORT setQMailMessageBoundaryString(const QByteArray &boundary)
-@@ -7967,7 +7985,7 @@ static QByteArray boundaryString(const QByteArray &hash)
+@@ -7849,7 +7867,7 @@ static QByteArray boundaryString(const QByteArray &hash)
          return gBoundaryString;
  
      // Formulate a boundary that is very unlikely to clash with the content
@@ -58,7 +58,7 @@ index 3bb37f3d..0cdbd847 100644
  
  template <typename F>
 diff --git a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
-index 055c55bd..e75a1223 100644
+index ab03d41b..b6b240dc 100644
 --- a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
 +++ b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
 @@ -42,7 +42,6 @@
@@ -79,7 +79,7 @@ index 055c55bd..e75a1223 100644
          if (r>57) r+=7;
          if (r>90) r+=6;
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 9c913432..d234e949 100644
+index 545ba6a1..599a4e84 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -43,7 +43,6 @@
@@ -88,9 +88,9 @@ index 9c913432..d234e949 100644
  #include <QNetworkInterface>
 -#include <QRandomGenerator>
  #include <QRegExp>
- #ifndef QT_NO_SSL
  #include <QSslSocket>
-@@ -60,9 +59,18 @@ Q_LOGGING_CATEGORY(lcSMTP, "org.qt.messageserver.smtp", QtWarningMsg)
+ 
+@@ -59,9 +58,18 @@ Q_LOGGING_CATEGORY(lcSMTP, "org.qt.messageserver.smtp", QtWarningMsg)
  // Only this many bytes is queued to be sent at a time.
  #define SENDING_BUFFER_SIZE 5000
  
