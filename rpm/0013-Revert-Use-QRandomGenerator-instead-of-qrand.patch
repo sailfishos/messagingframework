@@ -11,7 +11,7 @@ This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
  3 files changed, 31 insertions(+), 6 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index 8a8bde3d..a5877cd9 100644
+index 2251f706..e0bf771a 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
 @@ -50,7 +50,6 @@
@@ -22,7 +22,7 @@ index 8a8bde3d..a5877cd9 100644
  #include <QDataStream>
  #include <QTextStream>
  #include <QTextCodec>
-@@ -7833,6 +7832,25 @@ uint QMailMessagePrivate::indicativeSize() const
+@@ -7914,6 +7913,25 @@ uint QMailMessagePrivate::indicativeSize() const
      return (size + 1);
  }
  
@@ -48,7 +48,7 @@ index 8a8bde3d..a5877cd9 100644
  static QByteArray gBoundaryString;
  
  void QMF_EXPORT setQMailMessageBoundaryString(const QByteArray &boundary)
-@@ -7849,7 +7867,7 @@ static QByteArray boundaryString(const QByteArray &hash)
+@@ -7930,7 +7948,7 @@ static QByteArray boundaryString(const QByteArray &hash)
          return gBoundaryString;
  
      // Formulate a boundary that is very unlikely to clash with the content
@@ -58,7 +58,7 @@ index 8a8bde3d..a5877cd9 100644
  
  template <typename F>
 diff --git a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
-index ab03d41b..b6b240dc 100644
+index f42a916e..e3075622 100644
 --- a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
 +++ b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
 @@ -42,7 +42,6 @@
@@ -73,13 +73,13 @@ index ab03d41b..b6b240dc 100644
  
      int i = 0;
      while (length--) {
--        int r=QRandomGenerator::global()->generate() % 62;
-+        int r=qrand() % 62;
-         r+=48;
+-        int r = QRandomGenerator::global()->generate() % 62;
++        int r = qrand() % 62;
+         r += 48;
          if (r>57) r+=7;
          if (r>90) r+=6;
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 545ba6a1..599a4e84 100644
+index 9309052c..0315e01e 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -43,7 +43,6 @@

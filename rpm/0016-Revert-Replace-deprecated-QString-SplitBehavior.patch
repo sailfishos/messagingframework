@@ -27,10 +27,10 @@ index 2390cc8c..711ac4f4 100644
      int tokenCount = tokens.count();
      if ( tokenCount > 0 ) {
 diff --git a/src/libraries/qmfclient/support/qmailnamespace.cpp b/src/libraries/qmfclient/support/qmailnamespace.cpp
-index 5f0129c8..dd5482d9 100644
+index c954cdb9..9177615e 100644
 --- a/src/libraries/qmfclient/support/qmailnamespace.cpp
 +++ b/src/libraries/qmfclient/support/qmailnamespace.cpp
-@@ -420,28 +420,28 @@ QMap<QByteArray, QStringList> standardFolderTranslations()
+@@ -421,28 +421,28 @@ QMap<QByteArray, QStringList> standardFolderTranslations()
      QTextStream in(&file);
      while (!in.atEnd()) {
          QString line = in.readLine();
@@ -79,7 +79,7 @@ index 810bfe75..99b4fbeb 100644
  
  void ImapConfiguration::setCapabilities(const QStringList &s)
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index d9cc74cd..cb932b3d 100644
+index ec72217c..e72d2cba 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -405,10 +405,10 @@ void ImapState::untaggedResponse(ImapContext *c, const QString &line)
@@ -113,7 +113,7 @@ index d9cc74cd..cb932b3d 100644
          c->protocol()->setCapabilities(capabilities);
      }
  
-@@ -1432,7 +1432,7 @@ void SelectedState::untaggedResponse(ImapContext *c, const QString &line)
+@@ -1433,7 +1433,7 @@ void SelectedState::untaggedResponse(ImapContext *c, const QString &line)
      } else if (line.indexOf("PERMANENTFLAGS", 0, Qt::CaseInsensitive) != -1) {
          int start = 0;
          QString temp = token(line, '(', ')', &start);
@@ -136,10 +136,10 @@ index 3daa98a4..fde4d0e8 100644
          bool ok = false;
          int index = s.indexOf(":");
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 599a4e84..55378d36 100644
+index 0315e01e..15073bfa 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
-@@ -529,7 +529,7 @@ void SmtpClient::nextAction(const QString &response)
+@@ -527,7 +527,7 @@ void SmtpClient::nextAction(const QString &response)
                      QStringList authCaps;
                      foreach (QString const& capability, capabilities) {
                          if (capability.startsWith("AUTH", Qt::CaseInsensitive)) {

@@ -10,7 +10,7 @@ Subject: [PATCH] Adjust for Qt 5.6
  3 files changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
-index 6a41c128..a5fceeda 100644
+index 25225988..546e3418 100644
 --- a/src/libraries/qmfclient/libaccounts_p.cpp
 +++ b/src/libraries/qmfclient/libaccounts_p.cpp
 @@ -551,7 +551,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const

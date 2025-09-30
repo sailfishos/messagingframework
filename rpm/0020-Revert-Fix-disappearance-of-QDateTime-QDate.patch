@@ -18,7 +18,7 @@ This reverts commit a8db671f00ebf5aa56e57d1bdf1511d9af22c809.
  10 files changed, 92 insertions(+), 92 deletions(-)
 
 diff --git a/tests/tst_qmail_listmodels/tst_qmail_listmodels.cpp b/tests/tst_qmail_listmodels/tst_qmail_listmodels.cpp
-index aaa4e1d0..75322222 100644
+index 46493406..bde7c4bb 100644
 --- a/tests/tst_qmail_listmodels/tst_qmail_listmodels.cpp
 +++ b/tests/tst_qmail_listmodels/tst_qmail_listmodels.cpp
 @@ -139,8 +139,8 @@ void tst_QMail_ListModels::initTestCase()
@@ -44,7 +44,7 @@ index aaa4e1d0..75322222 100644
      msg2.setStatus(QMailMessage::New, true);
      msg2.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmail_sortkeys/tst_qmail_sortkeys.cpp b/tests/tst_qmail_sortkeys/tst_qmail_sortkeys.cpp
-index 7dd59785..42208d58 100644
+index d5cedd4e..1a7a47f6 100644
 --- a/tests/tst_qmail_sortkeys/tst_qmail_sortkeys.cpp
 +++ b/tests/tst_qmail_sortkeys/tst_qmail_sortkeys.cpp
 @@ -261,8 +261,8 @@ void tst_QMail_SortKeys::initTestCase()
@@ -103,7 +103,7 @@ index 7dd59785..42208d58 100644
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmaildisconnected/tst_qmaildisconnected.cpp b/tests/tst_qmaildisconnected/tst_qmaildisconnected.cpp
-index f3467d6d..28688772 100644
+index 4dc4f38d..a9bfb6c5 100644
 --- a/tests/tst_qmaildisconnected/tst_qmaildisconnected.cpp
 +++ b/tests/tst_qmaildisconnected/tst_qmaildisconnected.cpp
 @@ -260,8 +260,8 @@ void tst_QMailDisconnected::initTestCase()
@@ -162,7 +162,7 @@ index f3467d6d..28688772 100644
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailmessageset/tst_qmailmessageset.cpp b/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
-index ff0e029d..01d10c52 100644
+index 999f1d4f..46061608 100644
 --- a/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
 +++ b/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
 @@ -267,8 +267,8 @@ void tst_QMailMessageSet::initTestCase()
@@ -221,7 +221,7 @@ index ff0e029d..01d10c52 100644
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
-index c9b73126..0a0d2ceb 100644
+index d45eb156..9c338eb2 100644
 --- a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
 +++ b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
 @@ -265,8 +265,8 @@ void tst_QMailServiceAction::initTestCase()
@@ -280,10 +280,10 @@ index c9b73126..0a0d2ceb 100644
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
-index e90402e2..6f690e83 100644
+index a605027a..b854a74d 100644
 --- a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
 +++ b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
-@@ -338,8 +338,8 @@ void tst_QMailStorageAction::initTestCase()
+@@ -341,8 +341,8 @@ void tst_QMailStorageAction::initTestCase()
          message.setFrom(QMailAddress("0404404040"));
          message.setTo(QMailAddress("0404040404"));
          message.setSubject("Where are you?");
@@ -294,7 +294,7 @@ index e90402e2..6f690e83 100644
          message.setStatus(QMailMessage::Incoming, true);
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, true);
-@@ -362,8 +362,8 @@ void tst_QMailStorageAction::initTestCase()
+@@ -365,8 +365,8 @@ void tst_QMailStorageAction::initTestCase()
          message.setFrom(QMailAddress("account2@example.org"));
          message.setTo(QMailAddress("account1@example.org"));
          message.setSubject("inboxMessage1");
@@ -305,7 +305,7 @@ index e90402e2..6f690e83 100644
          message.setStatus(QMailMessage::Incoming, true);
          message.setStatus(QMailMessage::New, true);
          message.setStatus(QMailMessage::Read, false);
-@@ -386,8 +386,8 @@ void tst_QMailStorageAction::initTestCase()
+@@ -389,8 +389,8 @@ void tst_QMailStorageAction::initTestCase()
          message.setFrom(QMailAddress("account1@example.org"));
          message.setTo(QMailAddress("fred@example.net"));
          message.setSubject("archivedMessage1");
@@ -316,7 +316,7 @@ index e90402e2..6f690e83 100644
          message.setStatus(QMailMessage::Outgoing, true);
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Sent, true);
-@@ -415,8 +415,8 @@ void tst_QMailStorageAction::initTestCase()
+@@ -418,8 +418,8 @@ void tst_QMailStorageAction::initTestCase()
          message.setFrom(QMailAddress("account1@example.org"));
          message.setTo(QMailAddress("account2@example.org"));
          message.setSubject("Fwd:inboxMessage2");
@@ -327,7 +327,7 @@ index e90402e2..6f690e83 100644
          message.setStatus(QMailMessage::Incoming, true);
          message.setStatus(QMailMessage::New, true);
          message.setStatus(QMailMessage::Read, true);
-@@ -442,8 +442,8 @@ void tst_QMailStorageAction::initTestCase()
+@@ -445,8 +445,8 @@ void tst_QMailStorageAction::initTestCase()
          message.setFrom(QMailAddress("fred@example.net"));
          message.setTo(QMailAddressList() << QMailAddress("account2@example.org") << QMailAddress("testing@test"));
          message.setSubject("Re:savedMessage2");
@@ -338,7 +338,7 @@ index e90402e2..6f690e83 100644
          message.setStatus(QMailMessage::Incoming, true);
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, false);
-@@ -487,8 +487,8 @@ void tst_QMailStorageAction::test_storageaction_add()
+@@ -490,8 +490,8 @@ void tst_QMailStorageAction::test_storageaction_add()
      message.setFrom(QMailAddress("wilma@example.net"));
      message.setTo(QMailAddressList() << QMailAddress("account2@example.org") << QMailAddress("testing@test"));
      message.setSubject("Simple test message");
@@ -349,7 +349,7 @@ index e90402e2..6f690e83 100644
      message.setStatus(QMailMessage::Incoming, true);
      message.setStatus(QMailMessage::New, false);
      message.setStatus(QMailMessage::Read, false);
-@@ -739,8 +739,8 @@ void tst_QMailStorageAction::test_storageaction_rollBackUpdates()
+@@ -742,8 +742,8 @@ void tst_QMailStorageAction::test_storageaction_rollBackUpdates()
      message.setFrom(QMailAddress("barney@example.net"));
      message.setTo(QMailAddressList() << QMailAddress("account3@example.org") << QMailAddress("testing@test"));
      message.setSubject("Rollback test message");
@@ -360,7 +360,7 @@ index e90402e2..6f690e83 100644
      message.setStatus(QMailMessage::Incoming, true);
      message.setStatus(QMailMessage::New, false);
      message.setStatus(QMailMessage::Read, false);
-@@ -836,8 +836,8 @@ void tst_QMailStorageAction::test_storageaction_discardMessages()
+@@ -839,8 +839,8 @@ void tst_QMailStorageAction::test_storageaction_discardMessages()
      message.setFrom(QMailAddress("barney@example.net"));
      message.setTo(QMailAddressList() << QMailAddress("account2@example.org") << QMailAddress("testing@test"));
      message.setSubject("Another test message");
@@ -372,12 +372,12 @@ index e90402e2..6f690e83 100644
      message.setStatus(QMailMessage::New, false);
      message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailstore/tst_qmailstore.cpp b/tests/tst_qmailstore/tst_qmailstore.cpp
-index 8d552ba7..deec061a 100644
+index 534d8b7d..382a31ac 100644
 --- a/tests/tst_qmailstore/tst_qmailstore.cpp
 +++ b/tests/tst_qmailstore/tst_qmailstore.cpp
-@@ -1773,8 +1773,8 @@ void tst_QMailStore::message()
+@@ -1778,8 +1778,8 @@ void tst_QMailStore::message()
      msg2.setParentAccountId(account2.id());
-     msg2.setParentFolderId(QMailFolder::LocalStorageFolderId);
+     msg2.setParentFolderId(QMailFolderId::LocalStorageFolderId);
      msg2.setSubject("email message test");
 -    msg2.setDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
 -    msg2.setReceivedDate(QMailTimeStamp(QDate::currentDate().startOfDay()));
@@ -387,7 +387,7 @@ index 8d552ba7..deec061a 100644
      msg2.setStatus(QMailMessage::New, true);
      msg2.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
-index f92689d8..6648d2e5 100644
+index 0b6d8c9b..9ff5ae44 100644
 --- a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
 +++ b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
 @@ -339,8 +339,8 @@ void tst_QMailStoreKeys::initTestCase()
@@ -464,7 +464,7 @@ index f92689d8..6648d2e5 100644
      yesterday = yesterday.toUTC();
      lastWeek = lastWeek.toUTC();
 diff --git a/tests/tst_qmailthread/tst_qmailthread.cpp b/tests/tst_qmailthread/tst_qmailthread.cpp
-index 504257e0..e7b8104d 100644
+index 3f4088ab..c3d590a0 100644
 --- a/tests/tst_qmailthread/tst_qmailthread.cpp
 +++ b/tests/tst_qmailthread/tst_qmailthread.cpp
 @@ -284,8 +284,8 @@ void tst_qmailthread::initTestCase()
@@ -523,7 +523,7 @@ index 504257e0..e7b8104d 100644
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_storagemanager/tst_storagemanager.cpp b/tests/tst_storagemanager/tst_storagemanager.cpp
-index 8724db84..3b4ea8dd 100644
+index 20acd7f0..e02c4edd 100644
 --- a/tests/tst_storagemanager/tst_storagemanager.cpp
 +++ b/tests/tst_storagemanager/tst_storagemanager.cpp
 @@ -154,8 +154,8 @@ void tst_StorageManager::initTestCase()
