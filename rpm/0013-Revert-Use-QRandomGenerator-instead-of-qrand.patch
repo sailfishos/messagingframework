@@ -11,10 +11,10 @@ This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
  3 files changed, 31 insertions(+), 6 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index 2251f706..e0bf771a 100644
+index 47b43ecd..8a61ca96 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
-@@ -50,7 +50,6 @@
+@@ -49,7 +49,6 @@
  #include <QFile>
  #include <QFileInfo>
  #include <QRegularExpression>
@@ -22,7 +22,7 @@ index 2251f706..e0bf771a 100644
  #include <QDataStream>
  #include <QTextStream>
  #include <QTextCodec>
-@@ -7914,6 +7913,25 @@ uint QMailMessagePrivate::indicativeSize() const
+@@ -7907,6 +7906,25 @@ uint QMailMessagePrivate::indicativeSize() const
      return (size + 1);
  }
  
@@ -48,7 +48,7 @@ index 2251f706..e0bf771a 100644
  static QByteArray gBoundaryString;
  
  void QMF_EXPORT setQMailMessageBoundaryString(const QByteArray &boundary)
-@@ -7930,7 +7948,7 @@ static QByteArray boundaryString(const QByteArray &hash)
+@@ -7923,7 +7941,7 @@ static QByteArray boundaryString(const QByteArray &hash)
          return gBoundaryString;
  
      // Formulate a boundary that is very unlikely to clash with the content
@@ -58,7 +58,7 @@ index 2251f706..e0bf771a 100644
  
  template <typename F>
 diff --git a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
-index f42a916e..e3075622 100644
+index e650f4a7..d834d2de 100644
 --- a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
 +++ b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
 @@ -42,7 +42,6 @@
