@@ -10,7 +10,7 @@ Subject: [PATCH] Revert core5compat addition
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmfclient.pro b/src/libraries/qmfclient/qmfclient.pro
-index b44e8054..05b0ee48 100644
+index 1d7bb24a..9c937d12 100644
 --- a/src/libraries/qmfclient/qmfclient.pro
 +++ b/src/libraries/qmfclient/qmfclient.pro
 @@ -1,5 +1,5 @@

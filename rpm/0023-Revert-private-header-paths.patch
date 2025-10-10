@@ -22,7 +22,7 @@ Subject: [PATCH] Revert private header paths
  15 files changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 53d25ecd..47a7e3d2 100644
+index 766db260..76cc59e0 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -36,7 +36,7 @@
@@ -48,7 +48,7 @@ index 41f2409e..8adf29dc 100644
  #include <qmailtransport.h>
  #include <qmailcredentials.h>
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index 3e588e3b..97c03f71 100644
+index 09b0ccfa..a0169a26 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
 @@ -35,7 +35,7 @@
@@ -74,7 +74,7 @@ index b5e5d49a..1fa78f7b 100644
  #include <qmailmessagebuffer.h>
  #include <qmailtransport.h>
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index d966135b..c6720f05 100644
+index 97896fcf..10048358 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
 @@ -33,7 +33,7 @@
@@ -83,9 +83,9 @@ index d966135b..c6720f05 100644
  #include "servicehandler.h"
 -#include <longstream_p.h>
 +#include <private/longstream_p.h>
- #include <qmflist.h>
  #include <qmailmessageserver.h>
  #include <qmailserviceconfiguration.h>
+ #include <qmailstore.h>
 diff --git a/tests/tst_locks/tst_locks.cpp b/tests/tst_locks/tst_locks.cpp
 index 423b4657..61cca92c 100644
 --- a/tests/tst_locks/tst_locks.cpp
