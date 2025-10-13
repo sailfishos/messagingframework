@@ -5,15 +5,18 @@ Subject: [PATCH] Adjust for Qt 5.6
 
 ---
  src/libraries/qmfclient/libaccounts_p.cpp      |  4 ++--
+ src/libraries/qmfclient/mailkeyimpl_p.h        |  6 +++---
+ src/libraries/qmfclient/mailsortkeyimpl_p.h    |  4 ++--
+ src/libraries/qmfclient/qmailkeyargument.h     |  2 +-
  .../qmfmessageserver/qmailtransport.cpp        |  4 ++--
  tests/tst_smtp/tst_smtp.cpp                    | 18 +++++++++---------
- 3 files changed, 13 insertions(+), 13 deletions(-)
+ 6 files changed, 19 insertions(+), 19 deletions(-)
 
 diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
-index 25225988..546e3418 100644
+index 79645a03..390e73e8 100644
 --- a/src/libraries/qmfclient/libaccounts_p.cpp
 +++ b/src/libraries/qmfclient/libaccounts_p.cpp
-@@ -551,7 +551,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
+@@ -569,7 +569,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
      if ((static_cast<uint>(account->valueAsUInt64(QLatin1String("lastSynchronized")))) == 0) {
          result.setLastSynchronized(QMailTimeStamp());
      } else {
@@ -22,17 +25,70 @@ index 25225988..546e3418 100644
      }
  
      result.setIconPath(account->valueAsString(QLatin1String("iconPath")));
-@@ -904,7 +904,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
-         sharedAccount->setValue(QLatin1String("emailaddress"), account->fromAddress().address());
+@@ -924,7 +924,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
          sharedAccount->setValue(QLatin1String("fullName"), account->fromAddress().name());
+         sharedAccount->setValue(QLatin1String("emailAliases"), toStringList(account->fromAliases()));
          if (account->lastSynchronized().isValid()) {
 -            sharedAccount->setValue(QLatin1String("lastSynchronized"), static_cast<quint64>(account->lastSynchronized().toLocalTime().toSecsSinceEpoch()));
 +            sharedAccount->setValue(QLatin1String("lastSynchronized"), static_cast<quint64>(account->lastSynchronized().toLocalTime().toTime_t()));
          } else {
              sharedAccount->setValue(QLatin1String("lastSynchronized"), quint64(0));
          }
+diff --git a/src/libraries/qmfclient/mailkeyimpl_p.h b/src/libraries/qmfclient/mailkeyimpl_p.h
+index 1ba71738..8e3da7a7 100644
+--- a/src/libraries/qmfclient/mailkeyimpl_p.h
++++ b/src/libraries/qmfclient/mailkeyimpl_p.h
+@@ -295,16 +295,16 @@ void MailKeyImpl<Key>::deserialize(Stream &stream)
+     combiner = static_cast<QMailKey::Combiner>(i);
+     stream >> negated;
+ 
+-    qsizetype s;
++    int s;
+     stream >> s;
+-    for (qsizetype j = 0; j < s; ++j) {
++    for (int j = 0; j < s; ++j) {
+         Argument a;
+         a.deserialize(stream);
+         arguments.append(a);
+     }
+ 
+     stream >> s;
+-    for (qsizetype j = 0; j < s; ++j) {
++    for (int j = 0; j < s; ++j) {
+         Key subKey;
+         subKey.deserialize(stream);
+         subKeys.append(subKey);
+diff --git a/src/libraries/qmfclient/mailsortkeyimpl_p.h b/src/libraries/qmfclient/mailsortkeyimpl_p.h
+index d6171f62..95cd5e9f 100644
+--- a/src/libraries/qmfclient/mailsortkeyimpl_p.h
++++ b/src/libraries/qmfclient/mailsortkeyimpl_p.h
+@@ -133,9 +133,9 @@ template<typename Key>
+ template <typename Stream>
+ void MailSortKeyImpl<Key>::deserialize(Stream &stream)
+ {
+-    qsizetype i = 0;
++    int i = 0;
+     stream >> i;
+-    for (qsizetype j = 0; j < i; ++j) {
++    for (int j = 0; j < i; ++j) {
+         Argument a;
+         a.deserialize(stream);
+         _arguments.append(a);
+diff --git a/src/libraries/qmfclient/qmailkeyargument.h b/src/libraries/qmfclient/qmailkeyargument.h
+index 04fc97af..eeff26d5 100644
+--- a/src/libraries/qmfclient/qmailkeyargument.h
++++ b/src/libraries/qmfclient/qmailkeyargument.h
+@@ -162,7 +162,7 @@ public:
+         {
+             clear();
+ 
+-            qsizetype v = 0;
++            int v = 0;
+             stream >> v;
+             for (int i = 0; i < v; ++i) {
+                 QVariant var;
 diff --git a/src/libraries/qmfmessageserver/qmailtransport.cpp b/src/libraries/qmfmessageserver/qmailtransport.cpp
-index 746fe48d..a2682105 100644
+index 337702ab..fe0fa111 100644
 --- a/src/libraries/qmfmessageserver/qmailtransport.cpp
 +++ b/src/libraries/qmfmessageserver/qmailtransport.cpp
 @@ -189,13 +189,13 @@ void QMailTransport::createSocket(EncryptType encryptType)

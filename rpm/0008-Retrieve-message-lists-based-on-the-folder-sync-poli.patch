@@ -18,10 +18,10 @@ Also captures the sync policy as part of the QMailAccount structure.
  7 files changed, 129 insertions(+), 12 deletions(-)
 
 diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
-index 254ac40c..25225988 100644
+index 3422b4b5..79645a03 100644
 --- a/src/libraries/qmfclient/libaccounts_p.cpp
 +++ b/src/libraries/qmfclient/libaccounts_p.cpp
-@@ -437,6 +437,41 @@ bool AccountSatisfyTheKey(Accounts::Account* account, const QMailAccountKey& key
+@@ -452,6 +452,41 @@ bool AccountSatisfyTheKey(Accounts::Account* account, const QMailAccountKey& key
      return false;
  }
  
@@ -63,7 +63,7 @@ index 254ac40c..25225988 100644
  }
  
  static QSharedPointer<Accounts::Manager> managerInstance;
-@@ -488,6 +523,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
+@@ -503,6 +538,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
  
      account->selectService();
      const bool enabled = account->enabled();
@@ -71,7 +71,7 @@ index 254ac40c..25225988 100644
  
      account->selectService(service);
      QString name = account->valueAsString(QLatin1String("email/email_box_name"));
-@@ -659,6 +695,9 @@ bool LibAccountManager::addAccount(QMailAccount *account,
+@@ -677,6 +713,9 @@ bool LibAccountManager::addAccount(QMailAccount *account,
      sharedAccount->setDisplayName(account->name());
      sharedAccount->setEnabled(account->status() & QMailAccount::Enabled);
  
@@ -81,7 +81,7 @@ index 254ac40c..25225988 100644
      Accounts::ServiceList services = sharedAccount->services(QLatin1String("e-mail"));
      if (!services.count()) {
          qCWarning(lcMessaging) << "E-mail Services not found, make sure that *.service and *.provider files are properly installed.";
-@@ -852,6 +891,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
+@@ -871,6 +910,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
          } else {
              sharedAccount->setDisplayName(account->name());
          }
@@ -90,10 +90,10 @@ index 254ac40c..25225988 100644
          sharedAccount->selectService(service);
          sharedAccount->setValue(QLatin1String("type"), static_cast<int>(account->messageType()));
 diff --git a/src/libraries/qmfclient/qmailaccount.cpp b/src/libraries/qmfclient/qmailaccount.cpp
-index a744d581..88dc8221 100644
+index afa4a3c9..af4ee15e 100644
 --- a/src/libraries/qmfclient/qmailaccount.cpp
 +++ b/src/libraries/qmfclient/qmailaccount.cpp
-@@ -88,6 +88,7 @@ public:
+@@ -89,6 +89,7 @@ public:
      QStringList _sinks;
      QMap<QMailFolder::StandardFolder, QMailFolderId> _standardFolders;
      QString _iconPath;
@@ -101,7 +101,7 @@ index a744d581..88dc8221 100644
  
      QMap<QString, QString> _customFields;
      bool _customFieldsModified;
-@@ -733,3 +734,13 @@ void QMailAccount::addMessageSink(const QString &sink)
+@@ -762,3 +763,13 @@ void QMailAccount::addMessageSink(const QString &sink)
  {
      d->_sinks.append(sink);
  }
@@ -116,7 +116,7 @@ index a744d581..88dc8221 100644
 +    d->_folderSyncPolicy = policy;
 +}
 diff --git a/src/libraries/qmfclient/qmailaccount.h b/src/libraries/qmfclient/qmailaccount.h
-index bb44a846..813ee54e 100644
+index 5396aa96..7ae52514 100644
 --- a/src/libraries/qmfclient/qmailaccount.h
 +++ b/src/libraries/qmfclient/qmailaccount.h
 @@ -72,6 +72,13 @@ public:
@@ -133,7 +133,7 @@ index bb44a846..813ee54e 100644
      QMailAccount();
      explicit QMailAccount(const QMailAccountId& id);
      QMailAccount(const QMailAccount& other);
-@@ -109,6 +116,9 @@ public:
+@@ -112,6 +119,9 @@ public:
  
      const QMap<QMailFolder::StandardFolder, QMailFolderId> &standardFolders() const;
  
@@ -144,7 +144,7 @@ index bb44a846..813ee54e 100644
      void setStatus(quint64 newStatus);
      void setStatus(quint64 mask, bool set);
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index a4859d7a..21e21357 100644
+index d6c3148f..4a65b61d 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -218,7 +218,7 @@ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, co
@@ -225,10 +225,10 @@ index a4859d7a..21e21357 100644
      if (!_unavailable)
          return initiateStrategy();
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index ce8809dc..ccc10e54 100644
+index 6e6d6a0b..3fb02e51 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
-@@ -2315,14 +2315,53 @@ void ImapSynchronizeBaseStrategy::previewDiscoveredMessages(ImapStrategyContextB
+@@ -2318,14 +2318,53 @@ void ImapSynchronizeBaseStrategy::previewDiscoveredMessages(ImapStrategyContextB
      }
  }
  

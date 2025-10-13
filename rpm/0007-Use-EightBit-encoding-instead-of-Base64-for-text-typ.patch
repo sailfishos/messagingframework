@@ -16,10 +16,10 @@ Signed-off-by: Tomi Leppänen <tomi.leppanen@jolla.com>
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index 2575585f..2251f706 100644
+index 71c8682d..47b43ecd 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
-@@ -1555,7 +1555,11 @@ namespace attachments
+@@ -1551,7 +1551,11 @@ namespace attachments
                  disposition.setParameter("filename*", QMailMessageContentDisposition::encodeParameter(input, "UTF-8"));
              }
  
