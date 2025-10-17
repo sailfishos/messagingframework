@@ -27,10 +27,10 @@ index 409f8e8b..980f3f3d 100644
      int tokenCount = tokens.count();
      if ( tokenCount > 0 ) {
 diff --git a/src/libraries/qmfclient/support/qmailnamespace.cpp b/src/libraries/qmfclient/support/qmailnamespace.cpp
-index 5e6e8430..f1a443f9 100644
+index 948e9b12..f88cb1fd 100644
 --- a/src/libraries/qmfclient/support/qmailnamespace.cpp
 +++ b/src/libraries/qmfclient/support/qmailnamespace.cpp
-@@ -421,24 +421,24 @@ QMap<QByteArray, QStringList> standardFolderTranslations()
+@@ -395,24 +395,24 @@ QMap<QByteArray, QStringList> standardFolderTranslations()
      QTextStream in(&file);
      while (!in.atEnd()) {
          QString line = in.readLine();
@@ -75,7 +75,7 @@ index 810bfe75..99b4fbeb 100644
  
  void ImapConfiguration::setCapabilities(const QStringList &s)
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index ec72217c..e72d2cba 100644
+index 5d8ca1ba..b04d4b95 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -405,10 +405,10 @@ void ImapState::untaggedResponse(ImapContext *c, const QString &line)
@@ -132,10 +132,10 @@ index 3daa98a4..fde4d0e8 100644
          bool ok = false;
          int index = s.indexOf(":");
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 0315e01e..15073bfa 100644
+index 7c08eadc..47f01d16 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
-@@ -527,7 +527,7 @@ void SmtpClient::nextAction(const QString &response)
+@@ -528,7 +528,7 @@ void SmtpClient::nextAction(const QString &response)
                      QStringList authCaps;
                      foreach (QString const& capability, capabilities) {
                          if (capability.startsWith("AUTH", Qt::CaseInsensitive)) {
