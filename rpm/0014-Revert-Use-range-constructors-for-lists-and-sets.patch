@@ -22,10 +22,10 @@ This reverts commit 260cb748a7556b1e6a70efa05522c01200dda823.
  14 files changed, 73 insertions(+), 110 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessagekey.cpp b/src/libraries/qmfclient/qmailmessagekey.cpp
-index ee36ab9f..6376a6b9 100644
+index fec58c1d..4bfdde46 100644
 --- a/src/libraries/qmfclient/qmailmessagekey.cpp
 +++ b/src/libraries/qmfclient/qmailmessagekey.cpp
-@@ -379,8 +379,7 @@ QMailMessageKey QMailMessageKey::id(const QMailMessageIdList &ids, QMailDataComp
+@@ -376,8 +376,7 @@ QMailMessageKey QMailMessageKey::id(const QMailMessageIdList &ids, QMailDataComp
      if (ids.count() >= IdLookupThreshold) {
          // If there are a large number of IDs, they will be inserted into a temporary table
          // with a uniqueness constraint; ensure only unique values are supplied
@@ -33,9 +33,9 @@ index ee36ab9f..6376a6b9 100644
 -        return QMailMessageKey(uniqueIds.values(), Id, QMailKey::comparator(cmp));
 +        return QMailMessageKey(ids.toSet().toList(), Id, QMailKey::comparator(cmp));
      }
- #endif
  
-@@ -660,8 +659,7 @@ QMailMessageKey QMailMessageKey::serverUid(const QStringList &uids, QMailDataCom
+     return QMailMessageKey(ids, Id, QMailKey::comparator(cmp));
+@@ -655,8 +654,7 @@ QMailMessageKey QMailMessageKey::serverUid(const QStringList &uids, QMailDataCom
      if (uids.count() >= IdLookupThreshold) {
          // If there are a large number of UIDs, they will be inserted into a temporary table
          // with a uniqueness constraint; ensure only unique values are supplied
@@ -43,9 +43,9 @@ index ee36ab9f..6376a6b9 100644
 -        return QMailMessageKey(uniqueIds.values(), ServerUid, QMailKey::comparator(cmp));
 +        return QMailMessageKey(uids.toSet().toList(), ServerUid, QMailKey::comparator(cmp));
      }
- #endif
  
-@@ -992,8 +990,7 @@ QMailMessageKey QMailMessageKey::copyServerUid(const QStringList &uids, QMailDat
+     return QMailMessageKey(uids, ServerUid, QMailKey::comparator(cmp));
+@@ -985,8 +983,7 @@ QMailMessageKey QMailMessageKey::copyServerUid(const QStringList &uids, QMailDat
      if (uids.count() >= IdLookupThreshold) {
          // If there are a large number of UIDs, they will be inserted into a temporary table
          // with a uniqueness constraint; ensure only unique values are supplied
@@ -53,8 +53,8 @@ index ee36ab9f..6376a6b9 100644
 -        return QMailMessageKey(uniqueIds.values(), CopyServerUid, QMailKey::comparator(cmp));
 +        return QMailMessageKey(uids.toSet().toList(), CopyServerUid, QMailKey::comparator(cmp));
      }
- #endif
  
+     return QMailMessageKey(uids, CopyServerUid, QMailKey::comparator(cmp));
 diff --git a/src/libraries/qmfclient/qmailmessagelistmodel.cpp b/src/libraries/qmfclient/qmailmessagelistmodel.cpp
 index 907eb793..f9ed017f 100644
 --- a/src/libraries/qmfclient/qmailmessagelistmodel.cpp
@@ -71,31 +71,31 @@ index 907eb793..f9ed017f 100644
      QMap<QMailMessageId, int> newPositions;
  
 diff --git a/src/libraries/qmfclient/qmailmessageset.cpp b/src/libraries/qmfclient/qmailmessageset.cpp
-index 7b6335ed..a31e2652 100644
+index e263f195..95678793 100644
 --- a/src/libraries/qmfclient/qmailmessageset.cpp
 +++ b/src/libraries/qmfclient/qmailmessageset.cpp
-@@ -956,7 +956,7 @@ void QMailFilterMessageSet::messagesAdded(const QMailMessageIdList &ids)
+@@ -976,7 +976,7 @@ void QMailFilterMessageSet::messagesAdded(const QMailMessageIdList &ids)
          QMailMessageIdList matchingIds = QMailStore::instance()->queryMessages(key & idFilter);
          if (!matchingIds.isEmpty()) {
              // Our filtered message set has changed
--            impl(this)->_messageIds.unite(QSet<QMailMessageId>(matchingIds.constBegin(), matchingIds.constEnd()));
-+            impl(this)->_messageIds.unite(QSet<QMailMessageId>::fromList(matchingIds));
+-            d->_messageIds.unite(QSet<QMailMessageId>(matchingIds.constBegin(), matchingIds.constEnd()));
++            d->_messageIds.unite(QSet<QMailMessageId>::fromList(matchingIds));
              update(this);
          }
      }
-@@ -967,7 +967,7 @@ void QMailFilterMessageSet::messagesRemoved(const QMailMessageIdList &ids)
- {
-     QSet<QMailMessageId>& _messageIds = impl(this)->_messageIds;
+@@ -989,7 +989,7 @@ void QMailFilterMessageSet::messagesRemoved(const QMailMessageIdList &ids)
+ 
+     QSet<QMailMessageId>& _messageIds = d->_messageIds;
      if (!_messageIds.isEmpty()) {
 -        QSet<QMailMessageId> removedIds = QSet<QMailMessageId>(ids.constBegin(), ids.constEnd());
 +        QSet<QMailMessageId> removedIds = QSet<QMailMessageId>::fromList(ids);
  
          // See if any of these messages are in our set
          removedIds.intersect(_messageIds);
-@@ -984,12 +984,11 @@ void QMailFilterMessageSet::messagesUpdated(const QMailMessageIdList &ids)
+@@ -1008,12 +1008,11 @@ void QMailFilterMessageSet::messagesUpdated(const QMailMessageIdList &ids)
      QMailMessageKey key(messageKey());
      if (!key.isNonMatching()) {
-         QSet<QMailMessageId>& _messageIds = impl(this)->_messageIds;
+         QSet<QMailMessageId>& _messageIds = d->_messageIds;
 -        QSet<QMailMessageId> updatedIds = QSet<QMailMessageId>(ids.constBegin(), ids.constEnd());
 +        QSet<QMailMessageId> updatedIds = QSet<QMailMessageId>::fromList(ids);
  
@@ -107,23 +107,23 @@ index 7b6335ed..a31e2652 100644
  
          QSet<QMailMessageId> presentIds = updatedIds;
          QSet<QMailMessageId> absentIds = updatedIds;
-@@ -1036,8 +1035,7 @@ void QMailFilterMessageSet::folderContentsModified(const QMailFolderIdList &)
- void QMailFilterMessageSet::resyncState()
- {
-     if (impl(this)->_minimized) {
+@@ -1062,8 +1061,7 @@ void QMailFilterMessageSet::resyncState()
+     Q_D(QMailFilterMessageSet);
+ 
+     if (d->_minimized) {
 -        const QMailMessageIdList ids = QMailStore::instance()->queryMessages(messageKey());
--        impl(this)->_messageIds = QSet<QMailMessageId>(ids.constBegin(), ids.constEnd());
-+        impl(this)->_messageIds = QSet<QMailMessageId>::fromList(QMailStore::instance()->queryMessages(messageKey()));
+-        d->_messageIds = QSet<QMailMessageId>(ids.constBegin(), ids.constEnd());
++        d->_messageIds = QSet<QMailMessageId>::fromList(QMailStore::instance()->queryMessages(messageKey()));
      } else {
-         impl(this)->_messageIds.clear();
+         d->_messageIds.clear();
      }
-@@ -1057,8 +1055,7 @@ void QMailFilterMessageSet::reset()
-     if (impl(this)->_minimized) {
+@@ -1085,8 +1083,7 @@ void QMailFilterMessageSet::reset()
+     if (d->_minimized) {
          disconnect(model(), SIGNAL(folderContentsModified(QMailFolderIdList)), this, SLOT(folderContentsModified(QMailFolderIdList)));
  
 -        const QMailMessageIdList ids = QMailStore::instance()->queryMessages(messageKey());
--        impl(this)->_messageIds = QSet<QMailMessageId>(ids.constBegin(), ids.constEnd());
-+        impl(this)->_messageIds = QSet<QMailMessageId>::fromList(QMailStore::instance()->queryMessages(messageKey()));
+-        d->_messageIds = QSet<QMailMessageId>(ids.constBegin(), ids.constEnd());
++        d->_messageIds = QSet<QMailMessageId>::fromList(QMailStore::instance()->queryMessages(messageKey()));
  
          connect(model(), SIGNAL(messagesAdded(QMailMessageIdList)), this, SLOT(messagesAdded(QMailMessageIdList)));
          connect(model(), SIGNAL(messagesRemoved(QMailMessageIdList)), this, SLOT(messagesRemoved(QMailMessageIdList)));
@@ -309,10 +309,10 @@ index 162801bb..e8de2bef 100644
          transmissionInProgressIds = idSet;
          transmissionSetInitialized = true;
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 4a65b61d..aa4adecb 100644
+index 25195358..09913959 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1225,7 +1225,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
+@@ -1197,7 +1197,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
          bool external(false);
  
          // Are these messages being resolved for internal or external references?
@@ -322,7 +322,7 @@ index 4a65b61d..aa4adecb 100644
  
          for (const QMailMessageMetaData &metaData : QMailStore::instance()->messagesMetaData(key, props)) {
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index 3fb02e51..09b0ccfa 100644
+index 990bc828..a4c86536 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
 @@ -347,15 +347,13 @@ QSet<QMailFolderId> foldersApplicableTo(QMailMessageKey const& messagekey, QSet<
@@ -391,7 +391,7 @@ index 3c7c90cc..1cfea43e 100644
          } else {
              completionList.clear();
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index 637effbc..97896fcf 100644
+index 38e0908c..78c010bc 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
 @@ -913,11 +913,6 @@ QSet<QMailMessageService*> ServiceHandler::sourceServiceSet(const QSet<QMailAcco
@@ -481,7 +481,7 @@ index 637effbc..97896fcf 100644
      return true;
  }
  
-@@ -2118,7 +2109,7 @@ void ServiceHandler::onlineDeleteMessages(quint64 action, const QMailMessageIdLi
+@@ -2072,7 +2063,7 @@ void ServiceHandler::onlineDeleteMessages(quint64 action, const QMailMessageIdLi
          discardMessages(action, messageIds);
      } else {
          QMap<QMailAccountId, QMailMessageIdList> messageLists(accountMessages(messageIds));
@@ -490,7 +490,7 @@ index 637effbc..97896fcf 100644
          if (sources.isEmpty()) {
              reportFailure(action, QMailServiceAction::Status::ErrNoConnection, tr("Unable to delete messages for unconfigured account"));
          } else {
-@@ -2313,7 +2304,7 @@ void ServiceHandler::onlineMoveMessages(quint64 action, const QMailMessageIdList
+@@ -2267,7 +2258,7 @@ void ServiceHandler::onlineMoveMessages(quint64 action, const QMailMessageIdList
      QSet<QMailMessageService*> sources;
  
      QMap<QMailAccountId, QMailMessageIdList> messageLists(accountMessages(messageIds));
@@ -499,7 +499,7 @@ index 637effbc..97896fcf 100644
      if (sources.isEmpty()) {
          reportFailure(action, QMailServiceAction::Status::ErrNoConnection, tr("Unable to move messages for unconfigured account"));
      } else {
-@@ -2368,7 +2359,7 @@ void ServiceHandler::onlineFlagMessagesAndMoveToStandardFolder(quint64 action, c
+@@ -2322,7 +2313,7 @@ void ServiceHandler::onlineFlagMessagesAndMoveToStandardFolder(quint64 action, c
      QSet<QMailMessageService*> sources;
  
      QMap<QMailAccountId, QMailMessageIdList> messageLists(accountMessages(messageIds));
@@ -508,7 +508,7 @@ index 637effbc..97896fcf 100644
      if (sources.isEmpty()) {
          reportFailure(action, QMailServiceAction::Status::ErrNoConnection, tr("Unable to flag messages for unconfigured account"));
      } else {
-@@ -2815,7 +2806,7 @@ void ServiceHandler::searchMessages(quint64 action, const QMailMessageKey &filte
+@@ -2769,7 +2760,7 @@ void ServiceHandler::searchMessages(quint64 action, const QMailMessageKey &filte
  {
      if (spec == QMailSearchAction::Remote) {
          // Find the accounts that we need to search within from the criteria
@@ -517,7 +517,7 @@ index 637effbc..97896fcf 100644
  
          QSet<QMailMessageService*> sources(sourceServiceSet(searchAccountIds));
          if (sources.isEmpty()) {
-@@ -3410,7 +3401,7 @@ void ServiceHandler::setRetrievalInProgress(const QMailAccountId &accountId, boo
+@@ -3364,7 +3355,7 @@ void ServiceHandler::setRetrievalInProgress(const QMailAccountId &accountId, boo
      }
  
      if (modified) {
@@ -526,7 +526,7 @@ index 637effbc..97896fcf 100644
      }
  }
  
-@@ -3427,7 +3418,7 @@ void ServiceHandler::setTransmissionInProgress(const QMailAccountId &accountId,
+@@ -3381,7 +3372,7 @@ void ServiceHandler::setTransmissionInProgress(const QMailAccountId &accountId,
      }
  
      if (modified) {
@@ -536,10 +536,10 @@ index 637effbc..97896fcf 100644
  }
  
 diff --git a/src/tools/messageserver/servicehandler.h b/src/tools/messageserver/servicehandler.h
-index b95e42f1..9e26a4fb 100644
+index 1f21e043..4c17585f 100644
 --- a/src/tools/messageserver/servicehandler.h
 +++ b/src/tools/messageserver/servicehandler.h
-@@ -246,7 +246,6 @@ private:
+@@ -244,7 +244,6 @@ private:
  
      QSet<QMailMessageService*> sourceServiceSet(const QMailAccountId &id) const;
      QSet<QMailMessageService*> sourceServiceSet(const QSet<QMailAccountId> &ids) const;
@@ -561,10 +561,10 @@ index 75c9dfc9..4dc4f38d 100644
      QMailDisconnected::copyToFolder(QMailMessageIdList() << inboxMessage1, archivedId1);
      QMailDisconnected::copyToStandardFolder(QMailMessageIdList() << inboxMessage1, QMailFolder::JunkFolder);
 diff --git a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
-index 65d168e8..d45eb156 100644
+index f604a851..b09b4c43 100644
 --- a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
 +++ b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
-@@ -408,7 +408,7 @@ void tst_QMailServiceAction::test_retrievalaction()
+@@ -407,7 +407,7 @@ void tst_QMailServiceAction::test_retrievalaction()
      uint min = 10240u;
      action.retrieveFolderList(accountId1, inboxId1);
      action.retrieveMessageList(accountId2, inboxId2);
@@ -574,10 +574,10 @@ index 65d168e8..d45eb156 100644
  
      action.exportUpdates(accountId1);
 diff --git a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
-index a38930a4..0b6d8c9b 100644
+index 0ab873d1..728ab6b8 100644
 --- a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
 +++ b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
-@@ -97,8 +97,7 @@ private:
+@@ -98,8 +98,7 @@ private:
      // We only want to compare sets, disregarding ordering
      const QSet<QMailAccountId> accountSet(const QMailAccountKey &key) const
      {
@@ -587,7 +587,7 @@ index a38930a4..0b6d8c9b 100644
      }
  
      QSet<QMailAccountId> accountSet() const
-@@ -108,8 +107,7 @@ private:
+@@ -109,8 +108,7 @@ private:
  
      const QSet<QMailFolderId> folderSet(const QMailFolderKey &key) const
      {
@@ -597,7 +597,7 @@ index a38930a4..0b6d8c9b 100644
      }
  
      QSet<QMailFolderId> folderSet() const
-@@ -119,8 +117,7 @@ private:
+@@ -120,8 +118,7 @@ private:
  
      const QSet<QMailMessageId> messageSet(const QMailMessageKey &key) const
      {
@@ -607,7 +607,7 @@ index a38930a4..0b6d8c9b 100644
      }
  
      QSet<QMailMessageId> messageSet() const
-@@ -569,9 +566,8 @@ void tst_QMailStoreKeys::accountId()
+@@ -570,9 +567,8 @@ void tst_QMailStoreKeys::accountId()
      QCOMPARE(accountSet(~QMailAccountKey::id(QMailAccountId(), NotEqual)), noAccounts);
  
      // List inclusion
@@ -619,7 +619,7 @@ index a38930a4..0b6d8c9b 100644
      QCOMPARE(accountSet(QMailAccountKey::id(QMailAccountIdList() << accountId1)), accountSet() << accountId1);
      QCOMPARE(accountSet(~QMailAccountKey::id(QMailAccountIdList() << accountId1)), accountSet() << accountId2 << accountId3 << accountId4);
      QCOMPARE(accountSet(QMailAccountKey::id(QMailAccountIdList() << accountId2)), accountSet() << accountId2);
-@@ -580,8 +576,8 @@ void tst_QMailStoreKeys::accountId()
+@@ -581,8 +577,8 @@ void tst_QMailStoreKeys::accountId()
      QCOMPARE(accountSet(~QMailAccountKey::id(QMailAccountIdList() << accountId1 << accountId2)), accountSet() << accountId3 << accountId4);
  
      // List exclusion
@@ -630,7 +630,7 @@ index a38930a4..0b6d8c9b 100644
      QCOMPARE(accountSet(QMailAccountKey::id(QMailAccountIdList() << accountId1, Excludes)), accountSet() << accountId2 << accountId3 << accountId4);
      QCOMPARE(accountSet(~QMailAccountKey::id(QMailAccountIdList() << accountId1, Excludes)), accountSet() << accountId1);
      QCOMPARE(accountSet(QMailAccountKey::id(QMailAccountIdList() << accountId2, Excludes)), accountSet() << accountId1 << accountId3 << accountId4);
-@@ -841,9 +837,8 @@ void tst_QMailStoreKeys::folderId()
+@@ -842,9 +838,8 @@ void tst_QMailStoreKeys::folderId()
      QCOMPARE(folderSet(~QMailFolderKey::id(QMailFolderId(), NotEqual)), noFolders);
  
      // List inclusion
@@ -642,7 +642,7 @@ index a38930a4..0b6d8c9b 100644
      QCOMPARE(folderSet(QMailFolderKey::id(QMailFolderIdList() << inboxId1)), folderSet() << inboxId1);
      QCOMPARE(folderSet(~QMailFolderKey::id(QMailFolderIdList() << inboxId1)), standardFolders + folderSet() << savedId1 << archivedId1 << inboxId2 << savedId2 << archivedId2);
      QCOMPARE(folderSet(QMailFolderKey::id(QMailFolderIdList() << archivedId2)), folderSet() << archivedId2);
-@@ -852,8 +847,8 @@ void tst_QMailStoreKeys::folderId()
+@@ -853,8 +848,8 @@ void tst_QMailStoreKeys::folderId()
      QCOMPARE(folderSet(~QMailFolderKey::id(QMailFolderIdList() << inboxId1 << archivedId2)), standardFolders + folderSet() << savedId1 << archivedId1 << inboxId2 << savedId2);
  
      // List exclusion
@@ -653,7 +653,7 @@ index a38930a4..0b6d8c9b 100644
      QCOMPARE(folderSet(QMailFolderKey::id(QMailFolderIdList() << inboxId1, Excludes)), standardFolders + folderSet() << savedId1 << archivedId1 << inboxId2 << savedId2 << archivedId2);
      QCOMPARE(folderSet(~QMailFolderKey::id(QMailFolderIdList() << inboxId1, Excludes)), folderSet() << inboxId1);
      QCOMPARE(folderSet(QMailFolderKey::id(QMailFolderIdList() << archivedId2, Excludes)), standardFolders + folderSet() << inboxId1 << savedId1 << archivedId1 << inboxId2 << savedId2);
-@@ -1323,9 +1318,8 @@ void tst_QMailStoreKeys::messageId()
+@@ -1324,9 +1319,8 @@ void tst_QMailStoreKeys::messageId()
      QCOMPARE(messageSet(~QMailMessageKey::id(QMailMessageId(), NotEqual)), noMessages);
  
      // List inclusion
@@ -665,7 +665,7 @@ index a38930a4..0b6d8c9b 100644
      QCOMPARE(messageSet(QMailMessageKey::id(QMailMessageIdList() << smsMessage)), messageSet() << smsMessage);
      QCOMPARE(messageSet(~QMailMessageKey::id(QMailMessageIdList() << smsMessage)), allEmailMessages);
      QCOMPARE(messageSet(QMailMessageKey::id(QMailMessageIdList() << inboxMessage1)), messageSet() << inboxMessage1);
-@@ -1334,8 +1328,8 @@ void tst_QMailStoreKeys::messageId()
+@@ -1335,8 +1329,8 @@ void tst_QMailStoreKeys::messageId()
      QCOMPARE(messageSet(~QMailMessageKey::id(QMailMessageIdList() << smsMessage << inboxMessage1)), messageSet() << archivedMessage1 << inboxMessage2 << savedMessage2);
  
      // List Exclusion
