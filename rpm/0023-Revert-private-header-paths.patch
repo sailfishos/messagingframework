@@ -13,16 +13,15 @@ Subject: [PATCH] Revert private header paths
  tests/tst_longstream/tst_longstream.cpp                         | 2 +-
  tests/tst_longstring/tst_longstring.cpp                         | 2 +-
  tests/tst_python_email/tst_python_email.cpp                     | 2 +-
- tests/tst_qmailmessageset/tst_qmailmessageset.cpp               | 2 +-
  tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp         | 2 +-
  tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp         | 2 +-
  tests/tst_qmailstore/tst_qmailstore.cpp                         | 2 +-
  tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp                 | 2 +-
  tests/tst_qprivateimplementation/tst_qprivateimplementation.cpp | 2 +-
- 15 files changed, 15 insertions(+), 15 deletions(-)
+ 14 files changed, 14 insertions(+), 14 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 766db260..76cc59e0 100644
+index d7857a1b..bd9ec23e 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -36,7 +36,7 @@
@@ -48,7 +47,7 @@ index 41f2409e..8adf29dc 100644
  #include <qmailtransport.h>
  #include <qmailcredentials.h>
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index 09b0ccfa..a0169a26 100644
+index a4c86536..0c8b2c35 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
 @@ -35,7 +35,7 @@
@@ -61,20 +60,20 @@ index 09b0ccfa..a0169a26 100644
  #include <qmailaccount.h>
  #include <qmailcrypto.h>
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index b5e5d49a..1fa78f7b 100644
+index f4f10d7c..b730767e 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
-@@ -37,7 +37,7 @@
- #include "popauthenticator.h"
+@@ -39,7 +39,7 @@
  #include "popconfiguration.h"
  #include "poplog.h"
+ 
 -#include <longstream_p.h>
 +#include <private/longstream_p.h>
  #include <qmailstore.h>
  #include <qmailmessagebuffer.h>
  #include <qmailtransport.h>
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index 97896fcf..10048358 100644
+index 78c010bc..e6357cf4 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
 @@ -33,7 +33,7 @@
@@ -87,7 +86,7 @@ index 97896fcf..10048358 100644
  #include <qmailserviceconfiguration.h>
  #include <qmailstore.h>
 diff --git a/tests/tst_locks/tst_locks.cpp b/tests/tst_locks/tst_locks.cpp
-index 423b4657..61cca92c 100644
+index b05a3f0f..254dbf75 100644
 --- a/tests/tst_locks/tst_locks.cpp
 +++ b/tests/tst_locks/tst_locks.cpp
 @@ -34,7 +34,7 @@
@@ -100,7 +99,7 @@ index 423b4657..61cca92c 100644
  #include <ctype.h>
  
 diff --git a/tests/tst_longstream/tst_longstream.cpp b/tests/tst_longstream/tst_longstream.cpp
-index 0e37852a..0d29c28f 100644
+index fc604464..92fa3eb0 100644
 --- a/tests/tst_longstream/tst_longstream.cpp
 +++ b/tests/tst_longstream/tst_longstream.cpp
 @@ -37,7 +37,7 @@
@@ -126,7 +125,7 @@ index 400d3ea1..fc151d7f 100644
  
  /*
 diff --git a/tests/tst_python_email/tst_python_email.cpp b/tests/tst_python_email/tst_python_email.cpp
-index b539983f..fe34af80 100644
+index 3f0e9fee..2f9155b1 100644
 --- a/tests/tst_python_email/tst_python_email.cpp
 +++ b/tests/tst_python_email/tst_python_email.cpp
 @@ -36,7 +36,7 @@
@@ -138,21 +137,8 @@ index b539983f..fe34af80 100644
  #include <qmailnamespace.h>
  #include <ctype.h>
  
-diff --git a/tests/tst_qmailmessageset/tst_qmailmessageset.cpp b/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
-index 46061608..8e737886 100644
---- a/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
-+++ b/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
-@@ -35,7 +35,7 @@
- #include <QTest>
- #include <ctype.h>
- #include "qmailmessageset.h"
--#include <qmailmessageset_p.h>
-+#include <private/qmailmessageset_p.h>
- #include "qmailstore.h"
- 
- /*
 diff --git a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
-index 9c338eb2..62f28cbe 100644
+index 4fbaf3e2..20585add 100644
 --- a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
 +++ b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
 @@ -36,7 +36,7 @@
@@ -191,12 +177,12 @@ index 382a31ac..617886f7 100644
  /*
      Unit test for QMailStore class.
 diff --git a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
-index 9ff5ae44..898a1a5f 100644
+index 2b24647f..b6ae42f9 100644
 --- a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
 +++ b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
-@@ -38,7 +38,7 @@
+@@ -39,7 +39,7 @@
+ #include <qmailmessagethreadedmodel.h>
  #include <qmailstore.h>
- #include <QSettings>
  #include <qmailnamespace.h>
 -#include <locks_p.h>
 +#include <private/locks_p.h>

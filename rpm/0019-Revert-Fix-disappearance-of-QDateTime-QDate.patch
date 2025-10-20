@@ -162,7 +162,7 @@ index 4dc4f38d..a9bfb6c5 100644
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailmessageset/tst_qmailmessageset.cpp b/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
-index 999f1d4f..46061608 100644
+index f57d275a..ff23c16d 100644
 --- a/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
 +++ b/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
 @@ -267,8 +267,8 @@ void tst_QMailMessageSet::initTestCase()
@@ -221,7 +221,7 @@ index 999f1d4f..46061608 100644
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
-index d45eb156..9c338eb2 100644
+index b09b4c43..4fbaf3e2 100644
 --- a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
 +++ b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
 @@ -265,8 +265,8 @@ void tst_QMailServiceAction::initTestCase()
@@ -387,10 +387,10 @@ index 534d8b7d..382a31ac 100644
      msg2.setStatus(QMailMessage::New, true);
      msg2.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
-index 0b6d8c9b..9ff5ae44 100644
+index 728ab6b8..2b24647f 100644
 --- a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
 +++ b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
-@@ -339,8 +339,8 @@ void tst_QMailStoreKeys::initTestCase()
+@@ -340,8 +340,8 @@ void tst_QMailStoreKeys::initTestCase()
          message.setFrom(QMailAddress("0404404040"));
          message.setTo(QMailAddress("0404040404"));
          message.setSubject("Where are you?");
@@ -401,7 +401,7 @@ index 0b6d8c9b..9ff5ae44 100644
          message.setStatus(QMailMessage::Incoming, true);
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, true);
-@@ -363,8 +363,8 @@ void tst_QMailStoreKeys::initTestCase()
+@@ -364,8 +364,8 @@ void tst_QMailStoreKeys::initTestCase()
          message.setFrom(QMailAddress("account2@example.org"));
          message.setTo(QMailAddress("account1@example.org"));
          message.setSubject("inboxMessage1");
@@ -412,7 +412,7 @@ index 0b6d8c9b..9ff5ae44 100644
          message.setStatus(QMailMessage::Incoming, true);
          message.setStatus(QMailMessage::New, true);
          message.setStatus(QMailMessage::Read, false);
-@@ -387,8 +387,8 @@ void tst_QMailStoreKeys::initTestCase()
+@@ -388,8 +388,8 @@ void tst_QMailStoreKeys::initTestCase()
          message.setFrom(QMailAddress("account1@example.org"));
          message.setTo(QMailAddress("fred@example.net"));
          message.setSubject("archivedMessage1");
@@ -423,7 +423,7 @@ index 0b6d8c9b..9ff5ae44 100644
          message.setStatus(QMailMessage::Outgoing, true);
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Sent, true);
-@@ -416,8 +416,8 @@ void tst_QMailStoreKeys::initTestCase()
+@@ -417,8 +417,8 @@ void tst_QMailStoreKeys::initTestCase()
          message.setFrom(QMailAddress("account1@example.org"));
          message.setTo(QMailAddress("account2@example.org"));
          message.setSubject("Fwd:inboxMessage2");
@@ -434,7 +434,7 @@ index 0b6d8c9b..9ff5ae44 100644
          message.setStatus(QMailMessage::Incoming, true);
          message.setStatus(QMailMessage::New, true);
          message.setStatus(QMailMessage::Read, true);
-@@ -443,8 +443,8 @@ void tst_QMailStoreKeys::initTestCase()
+@@ -444,8 +444,8 @@ void tst_QMailStoreKeys::initTestCase()
          message.setFrom(QMailAddress("fred@example.net"));
          message.setTo(QMailAddressList() << QMailAddress("account2@example.org") << QMailAddress("testing@test"));
          message.setSubject("Re:savedMessage2");
@@ -445,7 +445,7 @@ index 0b6d8c9b..9ff5ae44 100644
          message.setStatus(QMailMessage::Incoming, true);
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, false);
-@@ -1627,7 +1627,7 @@ void tst_QMailStoreKeys::messageSubject()
+@@ -1628,7 +1628,7 @@ void tst_QMailStoreKeys::messageSubject()
  
  void tst_QMailStoreKeys::messageTimeStamp()
  {
@@ -454,7 +454,7 @@ index 0b6d8c9b..9ff5ae44 100644
      today = today.toUTC();
      yesterday = yesterday.toUTC();
      lastWeek = lastWeek.toUTC();
-@@ -1687,7 +1687,7 @@ void tst_QMailStoreKeys::messageTimeStamp()
+@@ -1688,7 +1688,7 @@ void tst_QMailStoreKeys::messageTimeStamp()
  
  void tst_QMailStoreKeys::messageReceptionTimeStamp()
  {
