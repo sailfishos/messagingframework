@@ -4,24 +4,23 @@ Date: Thu, 21 Nov 2024 15:31:07 +0100
 Subject: [PATCH] Revert private header paths
 
 ---
- src/plugins/messageservices/imap/imapclient.cpp                 | 2 +-
- src/plugins/messageservices/imap/imapprotocol.h                 | 2 +-
- src/plugins/messageservices/imap/imapstrategy.cpp               | 2 +-
- src/plugins/messageservices/pop/popclient.cpp                   | 2 +-
- src/tools/messageserver/servicehandler.cpp                      | 2 +-
- tests/tst_locks/tst_locks.cpp                                   | 2 +-
- tests/tst_longstream/tst_longstream.cpp                         | 2 +-
- tests/tst_longstring/tst_longstring.cpp                         | 2 +-
- tests/tst_python_email/tst_python_email.cpp                     | 2 +-
- tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp         | 2 +-
- tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp         | 2 +-
- tests/tst_qmailstore/tst_qmailstore.cpp                         | 2 +-
- tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp                 | 2 +-
- tests/tst_qprivateimplementation/tst_qprivateimplementation.cpp | 2 +-
- 14 files changed, 14 insertions(+), 14 deletions(-)
+ src/plugins/messageservices/imap/imapclient.cpp         | 2 +-
+ src/plugins/messageservices/imap/imapprotocol.h         | 2 +-
+ src/plugins/messageservices/imap/imapstrategy.cpp       | 2 +-
+ src/plugins/messageservices/pop/popclient.cpp           | 2 +-
+ src/tools/messageserver/servicehandler.cpp              | 2 +-
+ tests/tst_locks/tst_locks.cpp                           | 2 +-
+ tests/tst_longstream/tst_longstream.cpp                 | 2 +-
+ tests/tst_longstring/tst_longstring.cpp                 | 2 +-
+ tests/tst_python_email/tst_python_email.cpp             | 2 +-
+ tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp | 2 +-
+ tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp | 2 +-
+ tests/tst_qmailstore/tst_qmailstore.cpp                 | 2 +-
+ tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp         | 2 +-
+ 13 files changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index d7857a1b..bd9ec23e 100644
+index ced60ec2..386b9c15 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -36,7 +36,7 @@
@@ -47,7 +46,7 @@ index 41f2409e..8adf29dc 100644
  #include <qmailtransport.h>
  #include <qmailcredentials.h>
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index a4c86536..0c8b2c35 100644
+index 5ebb2cb6..84bd3d8a 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
 @@ -35,7 +35,7 @@
@@ -60,7 +59,7 @@ index a4c86536..0c8b2c35 100644
  #include <qmailaccount.h>
  #include <qmailcrypto.h>
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index f4f10d7c..b730767e 100644
+index 41a1f73c..5b6190ed 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
 @@ -39,7 +39,7 @@
@@ -73,7 +72,7 @@ index f4f10d7c..b730767e 100644
  #include <qmailmessagebuffer.h>
  #include <qmailtransport.h>
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index 78c010bc..e6357cf4 100644
+index 10ffdf6e..a3a29564 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
 @@ -33,7 +33,7 @@
@@ -151,7 +150,7 @@ index 4fbaf3e2..20585add 100644
  
  
 diff --git a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
-index b854a74d..a860f2e3 100644
+index bbc2e70f..4cfd58d0 100644
 --- a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
 +++ b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
 @@ -32,7 +32,7 @@
@@ -189,16 +188,3 @@ index 2b24647f..b6ae42f9 100644
  
  class tst_QMailStoreKeys : public QObject
  {
-diff --git a/tests/tst_qprivateimplementation/tst_qprivateimplementation.cpp b/tests/tst_qprivateimplementation/tst_qprivateimplementation.cpp
-index 5d48cd22..54b8db36 100644
---- a/tests/tst_qprivateimplementation/tst_qprivateimplementation.cpp
-+++ b/tests/tst_qprivateimplementation/tst_qprivateimplementation.cpp
-@@ -33,7 +33,7 @@
- 
- // We're effectively part of the QMF library for this test:
- #define QMF_INTERNAL
--#include <qprivateimplementationdef_p.h>
-+#include <private/qprivateimplementationdef_p.h>
- 
- #include <QObject>
- #include <QString>

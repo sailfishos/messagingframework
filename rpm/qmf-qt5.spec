@@ -49,12 +49,11 @@ Patch0014: 0014-Revert-Use-range-constructors-for-lists-and-sets.patch
 Patch0015: 0015-Revert-Adjust-to-Qt6-QMetaType-API-changes.patch
 Patch0016: 0016-Revert-Replace-deprecated-QString-SplitBehavior.patch
 Patch0017: 0017-Revert-core5compat-addition.patch
-Patch0019: 0018-Revert-loadRelax.patch
-Patch0020: 0019-Revert-Fix-disappearance-of-QDateTime-QDate.patch
-Patch0021: 0020-Revert-Set-PLUGIN_CLASS_NAME-in-plugin-.pro-files.patch
-Patch0022: 0021-Revert-Bump-version-to-6.0.0-since-we-build-against-.patch
-Patch0023: 0022-Fallback-to-sso-credential-plugin.patch
-Patch0024: 0023-Revert-private-header-paths.patch
+Patch0018: 0018-Revert-Fix-disappearance-of-QDateTime-QDate.patch
+Patch0019: 0019-Revert-Set-PLUGIN_CLASS_NAME-in-plugin-.pro-files.patch
+Patch0020: 0020-Revert-Bump-version-to-6.0.0-since-we-build-against-.patch
+Patch0021: 0021-Fallback-to-sso-credential-plugin.patch
+Patch0022: 0022-Revert-private-header-paths.patch
 
 
 %description

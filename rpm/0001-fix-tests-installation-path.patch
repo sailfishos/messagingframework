@@ -5,12 +5,12 @@ Subject: [PATCH] fix tests installation path.
 
 ---
  .../tst_messageserver/tst_messageserver.pro   |   2 +-
- tests/qt5/tests.xml                           | 532 +++++++++---------
+ tests/qt5/tests.xml                           | 530 +++++++++---------
  tests/tests.pri                               |   2 +-
  tests/tests.pro                               |   2 +-
- tests/tests.xml                               | 530 ++++++++---------
+ tests/tests.xml                               | 528 ++++++++---------
  tests/tst_python_email/tst_python_email.pro   |   2 +-
- 6 files changed, 535 insertions(+), 535 deletions(-)
+ 6 files changed, 533 insertions(+), 533 deletions(-)
 
 diff --git a/benchmarks/tst_messageserver/tst_messageserver.pro b/benchmarks/tst_messageserver/tst_messageserver.pro
 index c64f40f9..dfe36bb0 100644
@@ -26,7 +26,7 @@ index c64f40f9..dfe36bb0 100644
  DEPENDPATH += . 3rdparty
  
 diff --git a/tests/qt5/tests.xml b/tests/qt5/tests.xml
-index ffbb593f..ac9464a6 100644
+index 7147903c..f456198e 100644
 --- a/tests/qt5/tests.xml
 +++ b/tests/qt5/tests.xml
 @@ -5,123 +5,123 @@
@@ -183,16 +183,7 @@ index ffbb593f..ac9464a6 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -132,7 +132,7 @@
-       <description>libqmf-tests:tst_qprivateimplementation</description>
-       <case name="tst_qprivateimplementation-basicTest">
-         <description>libqmf-tests:tst_qprivateimplementation:basicTest</description>
--        <step>/usr/tests/qmf-qt5/tst_qprivateimplementation basicTest</step>
-+        <step>/opt/tests/qmf-qt5/tst_qprivateimplementation basicTest</step>
-       </case>
-       <environments>
-         <scratchbox>true</scratchbox>
-@@ -143,75 +143,75 @@
+@@ -132,75 +132,75 @@
        <description>libqmf-tests:tst_qmailmessagepart</description>
        <case name="tst_qmailmessagepart-contentID">
          <description>libqmf-tests:tst_qmailmessagepart:contentID</description>
@@ -286,7 +277,7 @@ index ffbb593f..ac9464a6 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -222,19 +222,19 @@
+@@ -211,19 +211,19 @@
        <description>libqmf-tests:tst_qmailmessagebody</description>
        <case name="tst_qmailmessagebody-fromQByteArray">
          <description>libqmf-tests:tst_qmailmessagebody:fromQByteArray</description>
@@ -310,7 +301,7 @@ index ffbb593f..ac9464a6 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -245,23 +245,23 @@
+@@ -234,23 +234,23 @@
        <description>libqmf-tests:tst_qmailcodec</description>
        <case name="tst_qmailcodec-encode">
          <description>libqmf-tests:tst_qmailcodec:encode</description>
@@ -339,7 +330,7 @@ index ffbb593f..ac9464a6 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -272,7 +272,7 @@
+@@ -261,7 +261,7 @@
        <description>libqmf-tests:tst_qmailmessageheader</description>
        <case name="tst_qmailmessageheader-">
          <description>libqmf-tests:tst_qmailmessageheader:</description>
@@ -348,7 +339,7 @@ index ffbb593f..ac9464a6 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -283,27 +283,27 @@
+@@ -272,27 +272,27 @@
        <description>libqmf-tests:tst_qlogsystem</description>
        <case name="tst_qlogsystem-loggerConstruction">
          <description>libqmf-tests:tst_qlogsystem:loggerConstruction</description>
@@ -382,7 +373,7 @@ index ffbb593f..ac9464a6 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -314,61 +314,61 @@
+@@ -303,61 +303,61 @@
        <description>libqmf-tests:tst_qmailstore</description>
        <case name="tst_qmailstore-addAccount">
          <description>libqmf-tests:tst_qmailstore:addAccount</description>
@@ -458,7 +449,7 @@ index ffbb593f..ac9464a6 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -379,19 +379,19 @@
+@@ -368,19 +368,19 @@
        <description>libqmf-tests:tst_longstring</description>
        <case name="tst_longstring-indexOf">
          <description>libqmf-tests:tst_longstring:indexOf</description>
@@ -482,7 +473,7 @@ index ffbb593f..ac9464a6 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -402,371 +402,371 @@
+@@ -391,371 +391,371 @@
        <description>libqmf-tests:tst_python_email</description>
        <case name="tst_python_email-test_get_all">
          <description>libqmf-tests:tst_python_email:test_get_all</description>
@@ -946,7 +937,7 @@ index ffbb593f..ac9464a6 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -777,63 +777,63 @@
+@@ -766,63 +766,63 @@
        <description>libqmf-tests:tst_qmailaddress</description>
        <case name="tst_qmailaddress-constructor1">
          <description>libqmf-tests:tst_qmailaddress:constructor1</description>
@@ -1025,7 +1016,7 @@ index ffbb593f..ac9464a6 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -844,147 +844,147 @@
+@@ -833,147 +833,147 @@
        <description>libqmf-tests:tst_qmailstorekeys</description>
        <case name="tst_qmailstorekeys-simpleKeys">
          <description>libqmf-tests:tst_qmailstorekeys:simpleKeys</description>
@@ -1209,7 +1200,7 @@ index ffbb593f..ac9464a6 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -995,19 +995,19 @@
+@@ -984,19 +984,19 @@
        <description>libqmf-tests:tst_longstream</description>
        <case name="tst_longstream-test_new_stream">
          <description>libqmf-tests:tst_longstream:test_new_stream</description>
@@ -1233,7 +1224,7 @@ index ffbb593f..ac9464a6 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -1018,11 +1018,11 @@
+@@ -1007,11 +1007,11 @@
        <description>libqmf-tests:tst_locks</description>
        <case name="tst_locks-testLock">
          <description>libqmf-tests:tst_locks:testLock</description>
@@ -1247,7 +1238,7 @@ index ffbb593f..ac9464a6 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -1033,23 +1033,23 @@
+@@ -1022,23 +1022,23 @@
        <description>libqmf-tests:tst_qcop</description>
        <case name="tst_qcop-test_qcopchannel">
          <description>libqmf-tests:tst_qcop:test_qcopchannel</description>
@@ -1276,7 +1267,7 @@ index ffbb593f..ac9464a6 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -1060,15 +1060,15 @@
+@@ -1049,15 +1049,15 @@
        <description>libqmf-tests:tst_qmaillog</description>
        <case name="tst_qmaillog-test_qmaillog">
          <description>libqmf-tests:tst_qmaillog:test_qmaillog</description>
@@ -1295,7 +1286,7 @@ index ffbb593f..ac9464a6 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -1079,7 +1079,7 @@
+@@ -1068,7 +1068,7 @@
        <description>libqmf-tests:tst_qmailnamespace</description>
        <case name="tst_qmailnamespace-test_qmailnamespace">
          <description>libqmf-tests:tst_qmailnamespace:test_qmailnamespace</description>
@@ -1304,7 +1295,7 @@ index ffbb593f..ac9464a6 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -1090,15 +1090,15 @@
+@@ -1079,15 +1079,15 @@
        <description>libqmf-tests:tst_qmail_listmodels</description>
          <case name="tst_qmail_listmodels-test_qmailaccountlistmodel">
            <description>libqmf-tests:tst_qmail_listmodels:test_qmailaccountlistmodel</description>
@@ -1323,7 +1314,7 @@ index ffbb593f..ac9464a6 100644
          </case>
         <environments>
              <scratchbox>true</scratchbox>
-@@ -1109,15 +1109,15 @@
+@@ -1098,15 +1098,15 @@
          <description>libqmf-tests:tst_qmail_sortkeys</description>
            <case name="tst_qmail_sortkeys-test_foldersortkey">
              <description>libqmf-tests:tst_qmail_sortkeys:test_foldersortkey</description>
@@ -1342,7 +1333,7 @@ index ffbb593f..ac9464a6 100644
            </case>
           <environments>
              <scratchbox>true</scratchbox>
-@@ -1128,7 +1128,7 @@
+@@ -1117,7 +1117,7 @@
          <description>libqmf-tests:tst_qmaildisconnected</description>
            <case name="tst_qmaildisconnected-test_qmaildisconnected">
              <description>libqmf-tests:tst_qmaildisconnected:test_qmaildisconnected</description>
@@ -1351,7 +1342,7 @@ index ffbb593f..ac9464a6 100644
            </case>
           <environments>
              <scratchbox>true</scratchbox>
-@@ -1139,19 +1139,19 @@
+@@ -1128,19 +1128,19 @@
          <description>libqmf-tests:tst_qmailmessageset</description>
            <case name="tst_qmailmessageset-test_foldermessageset">
              <description>libqmf-tests:tst_qmailmessageset:test_foldermessageset</description>
@@ -1375,7 +1366,7 @@ index ffbb593f..ac9464a6 100644
            </case>
           <environments>
              <scratchbox>true</scratchbox>
-@@ -1162,19 +1162,19 @@
+@@ -1151,19 +1151,19 @@
          <description>libqmf-tests:tst_qmailserviceaction</description>
            <case name="tst_qmailserviceaction-test_retrievalaction">
              <description>libqmf-tests:tst_qmailserviceaction:test_retrievalaction</description>
@@ -1399,7 +1390,7 @@ index ffbb593f..ac9464a6 100644
            </case>
           <environments>
              <scratchbox>true</scratchbox>
-@@ -1185,19 +1185,19 @@
+@@ -1174,19 +1174,19 @@
          <description>libqmf-tests:tst_storagemanager</description>
            <case name="tst_storagemanager-test_init">
              <description>libqmf-tests:tst_storagemanager:test_init</description>
@@ -1423,7 +1414,7 @@ index ffbb593f..ac9464a6 100644
            </case>
           <environments>
              <scratchbox>true</scratchbox>
-@@ -1208,23 +1208,23 @@
+@@ -1197,23 +1197,23 @@
          <description>libqmf-tests:tst_qmailthread</description>
            <case name="tst_qmailthread-test_messageCount">
              <description>libqmf-tests:tst_qmailthread:test_messageCount</description>
@@ -1452,7 +1443,7 @@ index ffbb593f..ac9464a6 100644
            </case>
           <environments>
              <scratchbox>true</scratchbox>
-@@ -1235,7 +1235,7 @@
+@@ -1224,7 +1224,7 @@
          <description>libqmf-tests:</description>
            <case name="-">
              <description>libqmf-tests::</description>
@@ -1474,10 +1465,10 @@ index 11065508..872fa50b 100644
  
  INSTALLS += target
 diff --git a/tests/tests.pro b/tests/tests.pro
-index 5ae8d571..798eadbc 100644
+index ffce10c6..4a9d8c18 100644
 --- a/tests/tests.pro
 +++ b/tests/tests.pro
-@@ -34,5 +34,5 @@ CONFIG += unittest
+@@ -33,5 +33,5 @@ CONFIG += unittest
  
  # Install test file description
  test_description.files = qt5/tests.xml
@@ -1485,7 +1476,7 @@ index 5ae8d571..798eadbc 100644
 +test_description.path  = /opt/tests/qmf-qt5/test-definition
  INSTALLS += test_description
 diff --git a/tests/tests.xml b/tests/tests.xml
-index 77a879f6..8b4de93a 100644
+index c71d091c..768370ea 100644
 --- a/tests/tests.xml
 +++ b/tests/tests.xml
 @@ -5,123 +5,123 @@
@@ -1642,16 +1633,7 @@ index 77a879f6..8b4de93a 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -132,7 +132,7 @@
-       <description>libqmf-tests:tst_qprivateimplementation</description>
-       <case name="tst_qprivateimplementation-basicTest">
-         <description>libqmf-tests:tst_qprivateimplementation:basicTest</description>
--        <step>/usr/tests/qmf/tst_qprivateimplementation basicTest</step>
-+        <step>/opt/tests/qmf/tst_qprivateimplementation basicTest</step>
-       </case>
-       <environments>
-         <scratchbox>true</scratchbox>
-@@ -143,75 +143,75 @@
+@@ -132,75 +132,75 @@
        <description>libqmf-tests:tst_qmailmessagepart</description>
        <case name="tst_qmailmessagepart-contentID">
          <description>libqmf-tests:tst_qmailmessagepart:contentID</description>
@@ -1745,7 +1727,7 @@ index 77a879f6..8b4de93a 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -222,19 +222,19 @@
+@@ -211,19 +211,19 @@
        <description>libqmf-tests:tst_qmailmessagebody</description>
        <case name="tst_qmailmessagebody-fromQByteArray">
          <description>libqmf-tests:tst_qmailmessagebody:fromQByteArray</description>
@@ -1769,7 +1751,7 @@ index 77a879f6..8b4de93a 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -245,23 +245,23 @@
+@@ -234,23 +234,23 @@
        <description>libqmf-tests:tst_qmailcodec</description>
        <case name="tst_qmailcodec-encode">
          <description>libqmf-tests:tst_qmailcodec:encode</description>
@@ -1798,7 +1780,7 @@ index 77a879f6..8b4de93a 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -272,7 +272,7 @@
+@@ -261,7 +261,7 @@
        <description>libqmf-tests:tst_qmailmessageheader</description>
        <case name="tst_qmailmessageheader-">
          <description>libqmf-tests:tst_qmailmessageheader:</description>
@@ -1807,7 +1789,7 @@ index 77a879f6..8b4de93a 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -283,27 +283,27 @@
+@@ -272,27 +272,27 @@
        <description>libqmf-tests:tst_qlogsystem</description>
        <case name="tst_qlogsystem-loggerConstruction">
          <description>libqmf-tests:tst_qlogsystem:loggerConstruction</description>
@@ -1841,7 +1823,7 @@ index 77a879f6..8b4de93a 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -314,61 +314,61 @@
+@@ -303,61 +303,61 @@
        <description>libqmf-tests:tst_qmailstore</description>
        <case name="tst_qmailstore-addAccount">
          <description>libqmf-tests:tst_qmailstore:addAccount</description>
@@ -1917,7 +1899,7 @@ index 77a879f6..8b4de93a 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -379,19 +379,19 @@
+@@ -368,19 +368,19 @@
        <description>libqmf-tests:tst_longstring</description>
        <case name="tst_longstring-indexOf">
          <description>libqmf-tests:tst_longstring:indexOf</description>
@@ -1941,7 +1923,7 @@ index 77a879f6..8b4de93a 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -402,371 +402,371 @@
+@@ -391,371 +391,371 @@
        <description>libqmf-tests:tst_python_email</description>
        <case name="tst_python_email-test_get_all">
          <description>libqmf-tests:tst_python_email:test_get_all</description>
@@ -2405,7 +2387,7 @@ index 77a879f6..8b4de93a 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -777,63 +777,63 @@
+@@ -766,63 +766,63 @@
        <description>libqmf-tests:tst_qmailaddress</description>
        <case name="tst_qmailaddress-constructor1">
          <description>libqmf-tests:tst_qmailaddress:constructor1</description>
@@ -2484,7 +2466,7 @@ index 77a879f6..8b4de93a 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -844,147 +844,147 @@
+@@ -833,147 +833,147 @@
        <description>libqmf-tests:tst_qmailstorekeys</description>
        <case name="tst_qmailstorekeys-simpleKeys">
          <description>libqmf-tests:tst_qmailstorekeys:simpleKeys</description>
@@ -2668,7 +2650,7 @@ index 77a879f6..8b4de93a 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -995,19 +995,19 @@
+@@ -984,19 +984,19 @@
        <description>libqmf-tests:tst_longstream</description>
        <case name="tst_longstream-test_new_stream">
          <description>libqmf-tests:tst_longstream:test_new_stream</description>
@@ -2692,7 +2674,7 @@ index 77a879f6..8b4de93a 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -1018,11 +1018,11 @@
+@@ -1007,11 +1007,11 @@
        <description>libqmf-tests:tst_locks</description>
        <case name="tst_locks-testLock">
          <description>libqmf-tests:tst_locks:testLock</description>
@@ -2706,7 +2688,7 @@ index 77a879f6..8b4de93a 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -1033,23 +1033,23 @@
+@@ -1022,23 +1022,23 @@
        <description>libqmf-tests:tst_qcop</description>
        <case name="tst_qcop-test_qcopchannel">
          <description>libqmf-tests:tst_qcop:test_qcopchannel</description>
@@ -2735,7 +2717,7 @@ index 77a879f6..8b4de93a 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -1060,15 +1060,15 @@
+@@ -1049,15 +1049,15 @@
        <description>libqmf-tests:tst_qmaillog</description>
        <case name="tst_qmaillog-test_qmaillog">
          <description>libqmf-tests:tst_qmaillog:test_qmaillog</description>
@@ -2754,7 +2736,7 @@ index 77a879f6..8b4de93a 100644
        </case>
        <environments>
          <scratchbox>true</scratchbox>
-@@ -1079,15 +1079,15 @@
+@@ -1068,15 +1068,15 @@
        <description>libqmf-tests:tst_qmail_listmodels</description>
          <case name="tst_qmail_listmodels-test_qmailaccountlistmodel">
            <description>libqmf-tests:tst_qmail_listmodels:test_qmailaccountlistmodel</description>
@@ -2773,7 +2755,7 @@ index 77a879f6..8b4de93a 100644
          </case>
         <environments>
              <scratchbox>true</scratchbox>
-@@ -1098,15 +1098,15 @@
+@@ -1087,15 +1087,15 @@
          <description>libqmf-tests:tst_qmail_sortkeys</description>
            <case name="tst_qmail_sortkeys-test_foldersortkey">
              <description>libqmf-tests:tst_qmail_sortkeys:test_foldersortkey</description>
@@ -2792,7 +2774,7 @@ index 77a879f6..8b4de93a 100644
            </case>
           <environments>
              <scratchbox>true</scratchbox>
-@@ -1117,7 +1117,7 @@
+@@ -1106,7 +1106,7 @@
          <description>libqmf-tests:tst_qmaildisconnected</description>
            <case name="tst_qmaildisconnected-test_qmaildisconnected">
              <description>libqmf-tests:tst_qmaildisconnected:test_qmaildisconnected</description>
@@ -2801,7 +2783,7 @@ index 77a879f6..8b4de93a 100644
            </case>
           <environments>
              <scratchbox>true</scratchbox>
-@@ -1128,19 +1128,19 @@
+@@ -1117,19 +1117,19 @@
          <description>libqmf-tests:tst_qmailmessageset</description>
            <case name="tst_qmailmessageset-test_foldermessageset">
              <description>libqmf-tests:tst_qmailmessageset:test_foldermessageset</description>
@@ -2825,7 +2807,7 @@ index 77a879f6..8b4de93a 100644
            </case>
           <environments>
              <scratchbox>true</scratchbox>
-@@ -1151,19 +1151,19 @@
+@@ -1140,19 +1140,19 @@
          <description>libqmf-tests:tst_qmailserviceaction</description>
            <case name="tst_qmailserviceaction-test_retrievalaction">
              <description>libqmf-tests:tst_qmailserviceaction:test_retrievalaction</description>
@@ -2849,7 +2831,7 @@ index 77a879f6..8b4de93a 100644
            </case>
           <environments>
              <scratchbox>true</scratchbox>
-@@ -1174,19 +1174,19 @@
+@@ -1163,19 +1163,19 @@
          <description>libqmf-tests:tst_storagemanager</description>
            <case name="tst_storagemanager-test_init">
              <description>libqmf-tests:tst_storagemanager:test_init</description>
@@ -2873,7 +2855,7 @@ index 77a879f6..8b4de93a 100644
            </case>
           <environments>
              <scratchbox>true</scratchbox>
-@@ -1197,23 +1197,23 @@
+@@ -1186,23 +1186,23 @@
          <description>libqmf-tests:tst_qmailthread</description>
            <case name="tst_qmailthread-test_messageCount">
              <description>libqmf-tests:tst_qmailthread:test_messageCount</description>
@@ -2902,7 +2884,7 @@ index 77a879f6..8b4de93a 100644
            </case>
           <environments>
              <scratchbox>true</scratchbox>
-@@ -1224,7 +1224,7 @@
+@@ -1213,7 +1213,7 @@
          <description>libqmf-tests:</description>
            <case name="-">
              <description>libqmf-tests::</description>
