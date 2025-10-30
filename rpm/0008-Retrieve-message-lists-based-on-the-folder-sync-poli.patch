@@ -11,11 +11,11 @@ Also captures the sync policy as part of the QMailAccount structure.
  src/libraries/qmfclient/libaccounts_p.cpp     | 40 +++++++++++++++++
  src/libraries/qmfclient/qmailaccount.cpp      | 11 +++++
  src/libraries/qmfclient/qmailaccount.h        | 10 +++++
- .../messageservices/imap/imapservice.cpp      | 16 ++++---
+ .../messageservices/imap/imapservice.cpp      | 11 +++--
  .../messageservices/imap/imapstrategy.cpp     | 45 +++++++++++++++++--
  .../messageservices/imap/imapstrategy.h       |  7 +--
  .../messageservices/pop/popservice.cpp        |  7 +++
- 7 files changed, 125 insertions(+), 11 deletions(-)
+ 7 files changed, 121 insertions(+), 10 deletions(-)
 
 diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
 index 3422b4b5..79645a03 100644
@@ -144,10 +144,10 @@ index 5396aa96..7ae52514 100644
      void setStatus(quint64 newStatus);
      void setStatus(quint64 mask, bool set);
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 2ca4d34e..25195358 100644
+index 2800734a..152c8dbd 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -217,7 +217,7 @@ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, co
+@@ -215,7 +215,7 @@ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, co
      _service->_client->strategyContext()->foldersOnlyStrategy.setBase(folderId);
      _service->_client->strategyContext()->foldersOnlyStrategy.setQuickList(!folderId.isValid());
      _service->_client->strategyContext()->foldersOnlyStrategy.setDescending(descending);
@@ -156,7 +156,7 @@ index 2ca4d34e..25195358 100644
      appendStrategy(&_service->_client->strategyContext()->foldersOnlyStrategy);
      if (!_unavailable)
          return initiateStrategy();
-@@ -246,10 +246,10 @@ bool ImapService::Source::retrieveMessageList(const QMailAccountId &accountId, c
+@@ -244,10 +244,10 @@ bool ImapService::Source::retrieveMessageList(const QMailAccountId &accountId, c
  {
      Q_ASSERT(!_unavailable);
      if (folderId.isValid()) {
@@ -169,7 +169,7 @@ index 2ca4d34e..25195358 100644
  }
  
  bool ImapService::Source::retrieveNewMessages(const QMailAccountId &accountId, const QMailFolderIdList &folderIds)
-@@ -291,6 +291,9 @@ bool ImapService::Source::retrieveMessageLists(const QMailAccountId &accountId,
+@@ -289,6 +289,9 @@ bool ImapService::Source::retrieveMessageLists(const QMailAccountId &accountId,
          qCWarning(lcIMAP) << "IMAP Search sorting not yet implemented!";
      }
  
@@ -179,7 +179,7 @@ index 2ca4d34e..25195358 100644
      QMailFolderIdList folderIds;
      uint adjustedMinimum = minimum ? minimum : INT_MAX; // zero means retrieve all mail
      _service->_client->strategyContext()->retrieveMessageListStrategy.clearSelection();
-@@ -310,7 +313,7 @@ bool ImapService::Source::retrieveMessageLists(const QMailAccountId &accountId,
+@@ -308,7 +311,7 @@ bool ImapService::Source::retrieveMessageLists(const QMailAccountId &accountId,
  
      _service->_client->strategyContext()->retrieveMessageListStrategy.setOperation(_service->_client->strategyContext(), QMailRetrievalAction::Auto);
      _service->_client->strategyContext()->retrieveMessageListStrategy.selectedFoldersAppend(folderIds);
@@ -188,30 +188,11 @@ index 2ca4d34e..25195358 100644
      appendStrategy(&_service->_client->strategyContext()->retrieveMessageListStrategy);
      if (!_unavailable)
          return initiateStrategy();
-@@ -547,6 +550,9 @@ bool ImapService::Source::synchronize(const QMailAccountId &accountId)
-         return false;
-     }
- 
-+    QMailAccount account(accountId);
-+    QMailAccount::FolderSyncPolicy folderSyncPolicy = account.folderSyncPolicy();
-+
-     queueDisconnectedOperations(accountId);
- 
-     _service->_client->strategyContext()->synchronizeAccountStrategy.clearSelection();
-@@ -554,7 +560,7 @@ bool ImapService::Source::synchronize(const QMailAccountId &accountId)
-     _service->_client->strategyContext()->synchronizeAccountStrategy.setQuickList(false);
-     _service->_client->strategyContext()->synchronizeAccountStrategy.setDescending(true);
-     _service->_client->strategyContext()->synchronizeAccountStrategy.setOperation(_service->_client->strategyContext(), QMailRetrievalAction::Auto);
--    _service->_client->strategyContext()->synchronizeAccountStrategy.setIgnoreSyncFlag(false);
-+    _service->_client->strategyContext()->synchronizeAccountStrategy.setFolderSyncPolicy(folderSyncPolicy);
-     appendStrategy(&_service->_client->strategyContext()->synchronizeAccountStrategy);
-     if (!_unavailable)
-         return initiateStrategy();
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index 319dc937..990bc828 100644
+index 1d51fac8..049ed6a7 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
-@@ -2318,14 +2318,53 @@ void ImapSynchronizeBaseStrategy::previewDiscoveredMessages(ImapStrategyContextB
+@@ -2316,14 +2316,53 @@ void ImapSynchronizeBaseStrategy::previewDiscoveredMessages(ImapStrategyContextB
      }
  }
  
@@ -269,7 +250,7 @@ index 319dc937..990bc828 100644
  
  bool ImapSynchronizeBaseStrategy::nextFolder()
 diff --git a/src/plugins/messageservices/imap/imapstrategy.h b/src/plugins/messageservices/imap/imapstrategy.h
-index d7f50a08..a7c850d3 100644
+index 44ced05c..b6263852 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.h
 +++ b/src/plugins/messageservices/imap/imapstrategy.h
 @@ -42,6 +42,7 @@
@@ -280,7 +261,7 @@ index d7f50a08..a7c850d3 100644
  #include <qmailfolder.h>
  #include <qmailmessagebuffer.h>
  
-@@ -457,14 +458,14 @@ private:
+@@ -466,14 +467,14 @@ private:
  class ImapSynchronizeBaseStrategy : public ImapFolderListStrategy
  {
  public:
@@ -297,7 +278,7 @@ index d7f50a08..a7c850d3 100644
  
  protected:
      void handleLogin(ImapStrategyContextBase *context) override;
-@@ -490,7 +491,7 @@ protected:
+@@ -499,7 +500,7 @@ protected:
      int _outstandingPreviews;
  
  private:

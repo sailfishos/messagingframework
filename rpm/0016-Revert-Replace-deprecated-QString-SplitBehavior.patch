@@ -132,7 +132,7 @@ index 3daa98a4..fde4d0e8 100644
          bool ok = false;
          int index = s.indexOf(":");
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 7c08eadc..47f01d16 100644
+index 8e3d83b4..9757ebe1 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -528,7 +528,7 @@ void SmtpClient::nextAction(const QString &response)

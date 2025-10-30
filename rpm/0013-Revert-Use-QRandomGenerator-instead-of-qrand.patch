@@ -11,7 +11,7 @@ This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
  3 files changed, 31 insertions(+), 6 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index 99cffe81..82a00cc2 100644
+index 0f0ee471..3094e6ac 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
 @@ -50,7 +50,6 @@
@@ -22,8 +22,8 @@ index 99cffe81..82a00cc2 100644
  #include <QDataStream>
  #include <QTextStream>
  #include <QTextCodec>
-@@ -7921,6 +7920,25 @@ uint QMailMessagePrivate::indicativeSize() const
-     return (size + 1);
+@@ -7983,6 +7982,25 @@ bool QMailMessagePrivate::hasRecipients() const
+     return false;
  }
  
 +static uint currentTimeValue()
@@ -48,7 +48,7 @@ index 99cffe81..82a00cc2 100644
  static QByteArray gBoundaryString;
  
  void QMF_EXPORT setQMailMessageBoundaryString(const QByteArray &boundary)
-@@ -7937,7 +7955,7 @@ static QByteArray boundaryString(const QByteArray &hash)
+@@ -7999,7 +8017,7 @@ static QByteArray boundaryString(const QByteArray &hash)
          return gBoundaryString;
  
      // Formulate a boundary that is very unlikely to clash with the content
@@ -79,7 +79,7 @@ index 74a9f73d..e4b459e3 100644
          if (r>57) r+=7;
          if (r>90) r+=6;
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index ec03b460..7c08eadc 100644
+index 2c69f723..8e3d83b4 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -42,7 +42,6 @@
