@@ -20,7 +20,7 @@ Subject: [PATCH] Revert private header paths
  13 files changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index ced60ec2..386b9c15 100644
+index fcd80f79..6e7af1ee 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -36,7 +36,7 @@
@@ -46,7 +46,7 @@ index 41f2409e..8adf29dc 100644
  #include <qmailtransport.h>
  #include <qmailcredentials.h>
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index 5ebb2cb6..84bd3d8a 100644
+index df6302c2..f2182fa1 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
 @@ -35,7 +35,7 @@
@@ -59,7 +59,7 @@ index 5ebb2cb6..84bd3d8a 100644
  #include <qmailaccount.h>
  #include <qmailcrypto.h>
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index 41a1f73c..5b6190ed 100644
+index 097e706c..4e5353c7 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
 @@ -39,7 +39,7 @@
@@ -72,7 +72,7 @@ index 41a1f73c..5b6190ed 100644
  #include <qmailmessagebuffer.h>
  #include <qmailtransport.h>
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index 10ffdf6e..a3a29564 100644
+index 9fce8756..53231158 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
 @@ -33,7 +33,7 @@

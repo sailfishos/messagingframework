@@ -220,18 +220,18 @@ install -m 644 -p %{SOURCE2} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 %{_bindir}/qmf-accountscheck
 %{_datadir}/mapplauncherd/privileges.d/*
 %{_libdir}/libQmfMessageServer.so.*
-%{_libdir}/qt5/plugins/messageservices
-%{_libdir}/qt5/plugins/messagecredentials
+%{_libdir}/qt5/plugins/messagingframework/messageservices
+%{_libdir}/qt5/plugins/messagingframework/messagecredentials
 %{_userunitdir}/*.service
 %{_userunitdir}/user-session.target.wants/*.service
 
 %files -n libqmfclient1-qt5
 %license LICENSE.LGPLv* LGPL_EXCEPTION.txt
 %{_libdir}/libQmfClient.so.*
-%{_libdir}/qt5/plugins/contentmanagers
+%{_libdir}/qt5/plugins/messagingframework/contentmanagers
 
 %files -n libqmfclient1-qt5-cryptoplugins
-%{_libdir}/qt5/plugins/crypto
+%{_libdir}/qt5/plugins/messagingframework/crypto
 
 %if 0
 %files tests
