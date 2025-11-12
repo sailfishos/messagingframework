@@ -14,73 +14,73 @@ This reverts commit 2051e62107bb25c43d228241a2e054c02d440d2f.
  6 files changed, 6 deletions(-)
 
 diff --git a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.pro b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.pro
-index 60fdd366..e34de9d4 100644
+index bfe7c778..9c0c4fe9 100644
 --- a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.pro
 +++ b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.pro
 @@ -1,7 +1,6 @@
  TEMPLATE = lib 
  TARGET = qmfstoragemanager
- PLUGIN_TYPE = contentmanagers
+ PLUGIN_TYPE = messagingframework/contentmanagers
 -PLUGIN_CLASS_NAME = QmfStorageManagerPlugin
  load(qt_plugin)
  QT = core qmfclient
  
 diff --git a/src/plugins/crypto/gpgme/gpgme.pro b/src/plugins/crypto/gpgme/gpgme.pro
-index 90b3435f..8c8c4156 100644
+index dcfcaae4..b4898376 100644
 --- a/src/plugins/crypto/gpgme/gpgme.pro
 +++ b/src/plugins/crypto/gpgme/gpgme.pro
 @@ -1,7 +1,6 @@
  TEMPLATE = lib
  TARGET = gpgme
- PLUGIN_TYPE = crypto
+ PLUGIN_TYPE = messagingframework/crypto
 -PLUGIN_CLASS_NAME = QMailCryptoGpgmePlugin
  load(qt_plugin)
  QT = core qmfclient
  
 diff --git a/src/plugins/crypto/smime/smime.pro b/src/plugins/crypto/smime/smime.pro
-index 80e9d53d..257549b5 100644
+index b640745d..34bbb17b 100644
 --- a/src/plugins/crypto/smime/smime.pro
 +++ b/src/plugins/crypto/smime/smime.pro
 @@ -1,7 +1,6 @@
  TEMPLATE = lib
  TARGET = smime
- PLUGIN_TYPE = crypto
+ PLUGIN_TYPE = messagingframework/crypto
 -PLUGIN_CLASS_NAME = QMailCryptoSmimePlugin
  load(qt_plugin)
  QT = core qmfclient
  
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
-index d3d826d8..a747b107 100644
+index 4a47f3dd..84ad86f2 100644
 --- a/src/plugins/messageservices/imap/imap.pro
 +++ b/src/plugins/messageservices/imap/imap.pro
 @@ -1,7 +1,6 @@
  TEMPLATE = lib
  TARGET = imap
- PLUGIN_TYPE = messageservices
+ PLUGIN_TYPE = messagingframework/messageservices
 -PLUGIN_CLASS_NAME = QmfImapPlugin
  load(qt_plugin)
  
  QT = core network qmfclient qmfclient-private qmfmessageserver qmfmessageserver-private
 diff --git a/src/plugins/messageservices/pop/pop.pro b/src/plugins/messageservices/pop/pop.pro
-index 388330ce..8b2047ca 100644
+index 549d0329..1e4ce29b 100644
 --- a/src/plugins/messageservices/pop/pop.pro
 +++ b/src/plugins/messageservices/pop/pop.pro
 @@ -1,7 +1,6 @@
  TEMPLATE = lib
  TARGET = pop
- PLUGIN_TYPE = messageservices
+ PLUGIN_TYPE = messagingframework/messageservices
 -PLUGIN_CLASS_NAME = QmfPopPlugin
  load(qt_plugin)
  
  QT = core network qmfclient qmfclient-private qmfmessageserver qmfmessageserver-private
 diff --git a/src/plugins/messageservices/smtp/smtp.pro b/src/plugins/messageservices/smtp/smtp.pro
-index bcae20cd..d3c920fb 100644
+index d74447ce..33b75ab3 100644
 --- a/src/plugins/messageservices/smtp/smtp.pro
 +++ b/src/plugins/messageservices/smtp/smtp.pro
 @@ -1,7 +1,6 @@
  TEMPLATE = lib 
  TARGET = smtp 
- PLUGIN_TYPE = messageservices
+ PLUGIN_TYPE = messagingframework/messageservices
 -PLUGIN_CLASS_NAME = QmfSmtpPlugin
  load(qt_plugin)
  

@@ -16,7 +16,7 @@ Signed-off-by: Tomi Leppänen <tomi.leppanen@jolla.com>
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index 46ba821e..0f0ee471 100644
+index d050609b..eda1060b 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
 @@ -1565,7 +1565,11 @@ namespace attachments

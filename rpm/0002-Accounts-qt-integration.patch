@@ -171,7 +171,7 @@ index de7f66b8..5cac25f9 100644
  
  SSOPlugin::SSOPlugin(QObject *parent)
 diff --git a/src/plugins/credentials/sso/sso.pro b/src/plugins/credentials/sso/sso.pro
-index 9abae1c7..ac8c2902 100644
+index b6e85668..56ff2137 100644
 --- a/src/plugins/credentials/sso/sso.pro
 +++ b/src/plugins/credentials/sso/sso.pro
 @@ -5,7 +5,7 @@ load(qt_plugin)
@@ -198,7 +198,7 @@ index 6c9464c2..a647ade7 100644
 +}
 +}
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index 3606ca7b..cd1693b2 100644
+index 657dc74c..5098a24c 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
 @@ -696,10 +696,23 @@ void ServiceHandler::onAccountsAdded(const QMailAccountIdList &ids)
