@@ -7,6 +7,7 @@ URL:        https://github.com/sailfishos/messagingframework
 Source0:    %{name}-%{version}.tar.bz2
 Source1:    %{name}.privileges
 Source2:    qmf-accountscheck.privileges
+Source3:    move-data.sh
 Requires:   systemd-user-session-targets
 BuildRequires:  pkgconfig(zlib)
 BuildRequires:  pkgconfig(icu-i18n)
@@ -29,7 +30,9 @@ BuildRequires:  qt5-plugin-platform-minimal
 BuildRequires:  qt5-plugin-sqldriver-sqlite
 BuildRequires:  fdupes
 BuildRequires:  gpgme-devel
+BuildRequires:  oneshot
 Requires:       buteo-syncfw-qt5 >= 0.7.16 
+%{_oneshot_requires_post}
 
 # i=1; for j in 00*patch; do printf "Patch%04d: %s\n" $i $j; i=$((i+1));done
 Patch0001: 0001-fix-tests-installation-path.patch
@@ -168,7 +171,6 @@ touch .git
     QT_BUILD_PARTS+=tests \
     QMF_INSTALL_ROOT=%{_prefix} \
     DEFINES+=MESSAGESERVER_PLUGINS \
-    DEFINES+=QMF_NO_MESSAGE_SERVICE_EDITOR \
     DEFINES+=QMF_NO_WIDGETS \
     DEFINES+=USE_ACCOUNTS_QT \
     DEFINES+=USE_KEEPALIVE \
@@ -187,9 +189,14 @@ mkdir -p %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 install -m 644 -p %{SOURCE1} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 install -m 644 -p %{SOURCE2} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 
+mkdir -p %{buildroot}%{_oneshotdir}/
+install -m 755 %{SOURCE3} %{buildroot}%{_oneshotdir}/
+
 %fdupes  %{buildroot}/%{_includedir}
 
-%post -n libqmfmessageserver1-qt5 -p /sbin/ldconfig
+%post -n libqmfmessageserver1-qt5
+/sbin/ldconfig
+%{_bindir}/add-oneshot --user --now move-data.sh || :
 
 %postun -n libqmfmessageserver1-qt5 -p /sbin/ldconfig
 
@@ -224,6 +231,7 @@ install -m 644 -p %{SOURCE2} %{buildroot}%{_datadir}/mapplauncherd/privileges.d
 %{_libdir}/qt5/plugins/messagingframework/messagecredentials
 %{_userunitdir}/*.service
 %{_userunitdir}/user-session.target.wants/*.service
+%{_oneshotdir}/move-data.sh
 
 %files -n libqmfclient1-qt5
 %license LICENSE.LGPLv* LGPL_EXCEPTION.txt
