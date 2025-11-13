@@ -54,6 +54,7 @@ Patch0019: 0019-Revert-Set-PLUGIN_CLASS_NAME-in-plugin-.pro-files.patch
 Patch0020: 0020-Revert-Bump-version-to-6.0.0-since-we-build-against-.patch
 Patch0021: 0021-Fallback-to-sso-credential-plugin.patch
 Patch0022: 0022-Revert-private-header-paths.patch
+Patch0023: 0023-Try-harder-to-ensure-which-is-the-proper-data-path.patch
 
 
 %description

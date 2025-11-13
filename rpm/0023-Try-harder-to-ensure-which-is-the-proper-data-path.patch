@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Pekka Vuorela <pekka.vuorela@jolla.com>
+Date: Thu, 13 Nov 2025 16:28:30 +0200
+Subject: [PATCH] Try harder to ensure which is the proper data path
+
+Avoid getting confused if something like sailjail just creates an
+empty directory.
+---
+ src/libraries/qmfclient/support/qmailnamespace.cpp | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/libraries/qmfclient/support/qmailnamespace.cpp b/src/libraries/qmfclient/support/qmailnamespace.cpp
+index a3e45c25..317918af 100644
+--- a/src/libraries/qmfclient/support/qmailnamespace.cpp
++++ b/src/libraries/qmfclient/support/qmailnamespace.cpp
+@@ -105,12 +105,13 @@ QString QMail::dataPath()
+ 
+     QString path = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/qmf/";
+ 
+-    if (QDir(path).exists()) {
++    // ensure that path exists with the qmf database
++    if (QDir(path + QStringLiteral("database")).exists()) {
+         cached = path;
+     } else {
+         // for backwards compatibility return the older data path if it exists and the new doesn't
+         QString oldPath = QDir::homePath() + QLatin1String("/.qmf/");
+-        cached = QDir(oldPath).exists() ? oldPath : path;
++        cached = QDir(oldPath + QStringLiteral("database")).exists() ? oldPath : path;
+     }
+ 
+     return cached;
