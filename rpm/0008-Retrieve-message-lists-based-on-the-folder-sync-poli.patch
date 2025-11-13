@@ -144,10 +144,10 @@ index 5396aa96..7ae52514 100644
      void setStatus(quint64 newStatus);
      void setStatus(quint64 mask, bool set);
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 8bb6e911..32b0a495 100644
+index 5e0894e7..8660ea1e 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -217,7 +217,7 @@ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, co
+@@ -215,7 +215,7 @@ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, co
      _service->_client->strategyContext()->foldersOnlyStrategy.setBase(folderId);
      _service->_client->strategyContext()->foldersOnlyStrategy.setQuickList(!folderId.isValid());
      _service->_client->strategyContext()->foldersOnlyStrategy.setDescending(descending);
@@ -156,7 +156,7 @@ index 8bb6e911..32b0a495 100644
      appendStrategy(&_service->_client->strategyContext()->foldersOnlyStrategy);
      if (!_unavailable)
          return initiateStrategy();
-@@ -292,6 +292,9 @@ bool ImapService::Source::doRetrieveMessageLists(const QMailAccountId &accountId
+@@ -290,6 +290,9 @@ bool ImapService::Source::doRetrieveMessageLists(const QMailAccountId &accountId
          qCWarning(lcIMAP) << "IMAP Search sorting not yet implemented!";
      }
  
@@ -166,7 +166,7 @@ index 8bb6e911..32b0a495 100644
      QMailFolderIdList folderIds;
      uint adjustedMinimum = minimum ? minimum : INT_MAX; // zero means retrieve all mail
      _service->_client->strategyContext()->retrieveMessageListStrategy.clearSelection();
-@@ -311,7 +314,7 @@ bool ImapService::Source::doRetrieveMessageLists(const QMailAccountId &accountId
+@@ -309,7 +312,7 @@ bool ImapService::Source::doRetrieveMessageLists(const QMailAccountId &accountId
  
      _service->_client->strategyContext()->retrieveMessageListStrategy.setOperation(_service->_client->strategyContext(), QMailRetrievalAction::Auto);
      _service->_client->strategyContext()->retrieveMessageListStrategy.selectedFoldersAppend(folderIds);
@@ -275,10 +275,10 @@ index aa56889c..b73b32be 100644
      uint _total;
  };
 diff --git a/src/plugins/messageservices/pop/popservice.cpp b/src/plugins/messageservices/pop/popservice.cpp
-index c5f1cfb5..a466312a 100644
+index 7eeb3868..43cc6ae4 100644
 --- a/src/plugins/messageservices/pop/popservice.cpp
 +++ b/src/plugins/messageservices/pop/popservice.cpp
-@@ -102,6 +102,7 @@ private:
+@@ -100,6 +100,7 @@ private:
      bool _unavailable;
      bool _mailCheckQueued;
      bool _queuedMailCheckInProgress;
@@ -286,7 +286,7 @@ index c5f1cfb5..a466312a 100644
      QTimer _intervalTimer;
  };
  
-@@ -144,6 +145,9 @@ bool PopService::Source::retrieveMessageList(const QMailAccountId &accountId, co
+@@ -142,6 +143,9 @@ bool PopService::Source::retrieveMessageList(const QMailAccountId &accountId, co
          return false;
      }
  
@@ -296,7 +296,7 @@ index c5f1cfb5..a466312a 100644
      QMailMessageKey countKey(QMailMessageKey::parentAccountId(accountId));
      countKey &= ~QMailMessageKey::status(QMailMessage::Temporary);
      uint existing = QMailStore::instance()->countMessages(countKey);
-@@ -212,6 +216,9 @@ bool PopService::Source::synchronize(const QMailAccountId &accountId)
+@@ -210,6 +214,9 @@ bool PopService::Source::synchronize(const QMailAccountId &accountId)
          return false;
      }
  

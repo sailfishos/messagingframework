@@ -25,11 +25,11 @@ index 68426c6e..1c93d7b8 100644
  #ifdef USE_HTML_PARSER
      // Need for html parsing by <QTextdocument> in qmailmessage.cpp, but don't need real UI
 diff --git a/src/tools/messageserver/messageserver.pro b/src/tools/messageserver/messageserver.pro
-index c0773f31..b11cf134 100644
+index 1ecfbdf6..6c763575 100644
 --- a/src/tools/messageserver/messageserver.pro
 +++ b/src/tools/messageserver/messageserver.pro
-@@ -11,6 +11,13 @@ contains(DEFINES, USE_HTML_PARSER) {
-     QT += gui widgets
+@@ -7,6 +7,13 @@ contains(DEFINES, USE_HTML_PARSER) {
+     QT += gui
  }
  
 +packagesExist(qt5-boostable) {
