@@ -13,7 +13,7 @@ Subject: [PATCH] fix tests installation path.
  6 files changed, 533 insertions(+), 533 deletions(-)
 
 diff --git a/benchmarks/tst_messageserver/tst_messageserver.pro b/benchmarks/tst_messageserver/tst_messageserver.pro
-index c64f40f9..dfe36bb0 100644
+index 6b79f069..0c29793a 100644
 --- a/benchmarks/tst_messageserver/tst_messageserver.pro
 +++ b/benchmarks/tst_messageserver/tst_messageserver.pro
 @@ -2,7 +2,7 @@ TEMPLATE = app

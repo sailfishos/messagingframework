@@ -9,13 +9,13 @@ and activate/deactivate IMAP IDLE.
 ---
  src/plugins/messageservices/imap/imap.pro     |  1 +
  .../imap/imapconfiguration.cpp                |  4 +--
- .../messageservices/imap/imapservice.cpp      | 29 +++++++++++++++++++
+ .../messageservices/imap/imapservice.cpp      | 28 +++++++++++++++++++
  .../messageservices/imap/imapservice.h        |  2 ++
  src/tools/systemd/messageserver5.service      |  2 +-
- 5 files changed, 35 insertions(+), 3 deletions(-)
+ 5 files changed, 34 insertions(+), 3 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
-index 9a00e16a..0fd8db32 100644
+index 2a9bbaa2..a6e5199f 100644
 --- a/src/plugins/messageservices/imap/imap.pro
 +++ b/src/plugins/messageservices/imap/imap.pro
 @@ -5,6 +5,7 @@ PLUGIN_CLASS_NAME = QmfImapPlugin
@@ -49,10 +49,10 @@ index 4192d1f0..b484b737 100644
  
  void ImapConfigurationEditor::setBaseFolder(const QString &s)
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index f4f0d1dd..8bb6e911 100644
+index c432216e..5e0894e7 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -46,6 +46,10 @@
+@@ -44,6 +44,10 @@
  #include <QCoreApplication>
  #include <typeinfo>
  
@@ -63,7 +63,7 @@ index f4f0d1dd..8bb6e911 100644
  namespace {
  
  const QString serviceKey("imap4");
-@@ -1416,6 +1420,13 @@ ImapService::ImapService(const QMailAccountId &accountId)
+@@ -1414,6 +1418,13 @@ ImapService::ImapService(const QMailAccountId &accountId)
      connect(_restartPushEmailTimer, SIGNAL(timeout()), this, SLOT(restartPushEmail()));
      connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)),
              this, SLOT(accountsUpdated(const QMailAccountIdList&)));
@@ -77,7 +77,7 @@ index f4f0d1dd..8bb6e911 100644
  }
  
  void ImapService::enable()
-@@ -1788,6 +1799,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
+@@ -1786,6 +1797,23 @@ void ImapService::setPersistentConnectionStatus(bool status)
      _idling = status;
  }
  
@@ -98,12 +98,11 @@ index f4f0d1dd..8bb6e911 100644
 +        }
 +    }
 +}
-+
- class ImapConfigurator : public QMailMessageServiceConfigurator
- {
- public:
+ 
+ ImapServicePlugin::ImapServicePlugin()
+     : QMailMessageServicePlugin()
 diff --git a/src/plugins/messageservices/imap/imapservice.h b/src/plugins/messageservices/imap/imapservice.h
-index 5adb68a5..7795ed50 100644
+index 727c2b0f..8557b710 100644
 --- a/src/plugins/messageservices/imap/imapservice.h
 +++ b/src/plugins/messageservices/imap/imapservice.h
 @@ -75,6 +75,8 @@ protected slots:
