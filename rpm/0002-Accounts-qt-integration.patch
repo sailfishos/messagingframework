@@ -198,10 +198,10 @@ index 6c9464c2..a647ade7 100644
 +}
 +}
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index 46d37bee..239d9d50 100644
+index 24569f8a..83865b8c 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
-@@ -699,10 +699,23 @@ void ServiceHandler::onAccountsAdded(const QMailAccountIdList &ids)
+@@ -701,10 +701,23 @@ void ServiceHandler::onAccountsAdded(const QMailAccountIdList &ids)
  
  void ServiceHandler::onAccountsUpdated(const QMailAccountIdList &ids)
  {

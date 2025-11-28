@@ -13,7 +13,7 @@ DEFINES+=USE_KEEPALIVE
  4 files changed, 32 insertions(+)
 
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
-index 09955b59..2a9bbaa2 100644
+index d8d34b55..aa12edab 100644
 --- a/src/plugins/messageservices/imap/imap.pro
 +++ b/src/plugins/messageservices/imap/imap.pro
 @@ -6,6 +6,10 @@ load(qt_plugin)
