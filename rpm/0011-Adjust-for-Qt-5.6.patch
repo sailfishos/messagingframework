@@ -3,15 +3,26 @@ From: Damien Caliste <dcaliste@free.fr>
 Date: Tue, 21 Nov 2023 09:51:51 +0100
 Subject: [PATCH] Adjust for Qt 5.6
 
+Revert "Fix bundled zlib detection"
+This reverts commit 7e2579c1fbfc077f3d95eceed5c79236752acb87.
+
+qtConfig() not available before 5.8.0 so reverting the change until
+qt gets updated.
+
+Revert "Use QRandomGenerator instead of qrand"
+This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
 ---
  src/libraries/qmfclient/libaccounts_p.cpp     |  4 ++--
  src/libraries/qmfclient/mailkeyimpl_p.h       |  6 ++---
  src/libraries/qmfclient/mailsortkeyimpl_p.h   |  4 ++--
  src/libraries/qmfclient/qmailkeyargument.h    |  2 +-
+ src/libraries/qmfclient/qmailmessage.cpp      | 22 +++++++++++++++--
  src/libraries/qmfclient/qmailmessageset.h     | 24 +++++++++++++++++++
- .../qmfmessageserver/qmailtransport.cpp       |  4 ++--
+ .../qmfstoragemanager/qmfstoragemanager.cpp   |  3 +--
+ src/plugins/messageservices/imap/imap.pro     | 14 ++++++++---
+ .../messageservices/smtp/smtpclient.cpp       | 12 ++++++++--
  tests/tst_smtp/tst_smtp.cpp                   | 18 +++++++-------
- 7 files changed, 43 insertions(+), 19 deletions(-)
+ 10 files changed, 83 insertions(+), 26 deletions(-)
 
 diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
 index 79645a03..390e73e8 100644
@@ -36,10 +47,10 @@ index 79645a03..390e73e8 100644
              sharedAccount->setValue(QLatin1String("lastSynchronized"), quint64(0));
          }
 diff --git a/src/libraries/qmfclient/mailkeyimpl_p.h b/src/libraries/qmfclient/mailkeyimpl_p.h
-index 1ba71738..8e3da7a7 100644
+index 3a39d1e5..c143140b 100644
 --- a/src/libraries/qmfclient/mailkeyimpl_p.h
 +++ b/src/libraries/qmfclient/mailkeyimpl_p.h
-@@ -295,16 +295,16 @@ void MailKeyImpl<Key>::deserialize(Stream &stream)
+@@ -292,16 +292,16 @@ void MailKeyImpl<Key>::deserialize(Stream &stream)
      combiner = static_cast<QMailKey::Combiner>(i);
      stream >> negated;
  
@@ -76,7 +87,7 @@ index d6171f62..95cd5e9f 100644
          a.deserialize(stream);
          _arguments.append(a);
 diff --git a/src/libraries/qmfclient/qmailkeyargument.h b/src/libraries/qmfclient/qmailkeyargument.h
-index 04fc97af..eeff26d5 100644
+index 42cdc23f..79495cff 100644
 --- a/src/libraries/qmfclient/qmailkeyargument.h
 +++ b/src/libraries/qmfclient/qmailkeyargument.h
 @@ -162,7 +162,7 @@ public:
@@ -88,6 +99,53 @@ index 04fc97af..eeff26d5 100644
              stream >> v;
              for (int i = 0; i < v; ++i) {
                  QVariant var;
+diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
+index ba09f440..4e31da6d 100644
+--- a/src/libraries/qmfclient/qmailmessage.cpp
++++ b/src/libraries/qmfclient/qmailmessage.cpp
+@@ -50,7 +50,6 @@
+ #include <QFile>
+ #include <QFileInfo>
+ #include <QRegularExpression>
+-#include <QRandomGenerator>
+ #include <QDataStream>
+ #include <QTextStream>
+ #include <QTextCodec>
+@@ -7970,6 +7969,25 @@ bool QMailMessagePrivate::hasRecipients() const
+     return false;
+ }
+ 
++static uint currentTimeValue()
++{
++    return QDateTime::currentDateTime().toTime_t();
++}
++
++static bool seedRng()
++{
++    qsrand(currentTimeValue());
++    return true;
++}
++
++static int randomNumber()
++{
++    static bool initialised = seedRng();
++    Q_UNUSED(initialised)
++
++    return qrand();
++}
++
+ static QByteArray gBoundaryString;
+ 
+ void QMF_EXPORT setQMailMessageBoundaryString(const QByteArray &boundary)
+@@ -7986,7 +8004,7 @@ static QByteArray boundaryString(const QByteArray &hash)
+         return gBoundaryString;
+ 
+     // Formulate a boundary that is very unlikely to clash with the content
+-    return boundaryLeader + "qmf:" + QByteArray::number(QRandomGenerator::global()->generate()) + hash.toBase64() + boundaryTrailer;
++    return boundaryLeader + "qmf:" + QByteArray::number(randomNumber()) + hash.toBase64() + boundaryTrailer;
+ }
+ 
+ template <typename F>
 diff --git a/src/libraries/qmfclient/qmailmessageset.h b/src/libraries/qmfclient/qmailmessageset.h
 index 483c8c47..3f494b98 100644
 --- a/src/libraries/qmfclient/qmailmessageset.h
@@ -164,26 +222,85 @@ index 483c8c47..3f494b98 100644
  
      friend class QMailMessageSetContainer;
      friend class QMailMessageSet;
-diff --git a/src/libraries/qmfmessageserver/qmailtransport.cpp b/src/libraries/qmfmessageserver/qmailtransport.cpp
-index 337702ab..fe0fa111 100644
---- a/src/libraries/qmfmessageserver/qmailtransport.cpp
-+++ b/src/libraries/qmfmessageserver/qmailtransport.cpp
-@@ -189,13 +189,13 @@ void QMailTransport::createSocket(EncryptType encryptType)
-     mSocket = new Socket(this);
-     encryption = encryptType;
-     connect(mSocket, &QSslSocket::encrypted, this, &QMailTransport::encryptionEstablished);
--    connect(mSocket, &QSslSocket::sslErrors, this, &QMailTransport::connectionFailed);
-+    connect(mSocket, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(connectionFailed(QList<QSslError>)));
+diff --git a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
+index cb75f987..96b538e6 100644
+--- a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
++++ b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
+@@ -43,7 +43,6 @@
+ #include <QFile>
+ #include <QtPlugin>
+ #include <QUrl>
+-#include <QRandomGenerator>
  
-     const int bufferLimit = 101*1024; // Limit memory used when downloading
-     mSocket->setReadBufferSize( bufferLimit );
-     mSocket->setObjectName(QString::fromUtf8(mName) + QString::fromLatin1("-socket"));
-     connect(mSocket, &QAbstractSocket::connected, this, &QMailTransport::connectionEstablished);
--    connect(mSocket, &QAbstractSocket::errorOccurred, this, &QMailTransport::socketError);
-+    connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
-     connect(mSocket, &QAbstractSocket::readyRead, this, &QMailTransport::readyRead);
-     connect(mSocket, &QAbstractSocket::bytesWritten, this, &QMailTransport::bytesWritten);
+ #if defined(Q_OS_WIN)
+ #include <windows.h>
+@@ -79,7 +78,7 @@ QString randomString(int length)
  
+     int i = 0;
+     while (length--) {
+-        int r = QRandomGenerator::global()->generate() % 62;
++        int r = qrand() % 62;
+         r += 48;
+         if (r>57) r+=7;
+         if (r>90) r+=6;
+diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
+index 54addffe..e9c8dc35 100644
+--- a/src/plugins/messageservices/imap/imap.pro
++++ b/src/plugins/messageservices/imap/imap.pro
+@@ -38,10 +38,18 @@ SOURCES += imapclient.cpp \
+            serviceactionqueue.cpp \
+            idlenetworksession.cpp
+ 
+-qtConfig(system-zlib) {
+-    QMAKE_USE_PRIVATE += zlib
++!contains(QT_CONFIG, system-zlib) {
++    INCLUDEPATH += $$[QT_INSTALL_HEADERS]/QtZlib
++    DEFINES += QT_QMF_HAVE_ZLIB
++} else:packagesExist(zlib) {
++    CONFIG += link_pkgconfig
++    PKGCONFIG += zlib
++    DEFINES += QT_QMF_HAVE_ZLIB
++} else:macx:exists("/usr/include/zlib.h") {
++    LIBS += -lz
++    DEFINES += QT_QMF_HAVE_ZLIB
+ } else {
+-    QT_PRIVATE += zlib-private
++    warning("IMAP COMPRESS capability requires zlib")
+ }
+ 
+ # hack longstream work without the private/ on include
+diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
+index f437a0c7..347f7165 100644
+--- a/src/plugins/messageservices/smtp/smtpclient.cpp
++++ b/src/plugins/messageservices/smtp/smtpclient.cpp
+@@ -42,7 +42,6 @@
+ #include <QDir>
+ #include <QHostInfo>
+ #include <QNetworkInterface>
+-#include <QRandomGenerator>
+ #include <QRegularExpression>
+ #include <QSslSocket>
+ 
+@@ -58,9 +57,18 @@ Q_LOGGING_CATEGORY(lcSMTP, "org.qt.messageserver.smtp", QtWarningMsg)
+ // Only this many bytes is queued to be sent at a time.
+ #define SENDING_BUFFER_SIZE 5000
+ 
++static bool initialiseRng()
++{
++    qsrand(QDateTime::currentDateTime().toUTC().toTime_t());
++    return true;
++}
++
+ static QByteArray messageId(const QByteArray& domainName, quint32 addressComponent)
+ {
+-    quint32 randomComponent(QRandomGenerator::global()->generate());
++    static bool rngInitialised(initialiseRng());
++    Q_UNUSED(rngInitialised)
++
++    quint32 randomComponent(static_cast<quint32>(qrand()));
+     quint32 timeComponent(QDateTime::currentDateTimeUtc().toMSecsSinceEpoch() / 1000);
+ 
+     return ('<' +
 diff --git a/tests/tst_smtp/tst_smtp.cpp b/tests/tst_smtp/tst_smtp.cpp
 index 99d534af..104393fa 100644
 --- a/tests/tst_smtp/tst_smtp.cpp

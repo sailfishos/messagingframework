@@ -15,7 +15,7 @@ and activate/deactivate IMAP IDLE.
  5 files changed, 34 insertions(+), 3 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imap.pro b/src/plugins/messageservices/imap/imap.pro
-index 2a9bbaa2..a6e5199f 100644
+index aa12edab..54addffe 100644
 --- a/src/plugins/messageservices/imap/imap.pro
 +++ b/src/plugins/messageservices/imap/imap.pro
 @@ -5,6 +5,7 @@ PLUGIN_CLASS_NAME = QmfImapPlugin
