@@ -28,12 +28,12 @@ index d8d34b55..aa12edab 100644
             imapconfiguration.h \
             imaplog.h \
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 52652235..0d244ad8 100644
+index 59a562c3..106b882d 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
-@@ -431,9 +431,15 @@ ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
-     connect(&_inactiveTimer, SIGNAL(timeout()),
-             this, SLOT(connectionInactive()));
+@@ -432,9 +432,15 @@ ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
+     connect(&_inactiveTimer, &QTimer::timeout,
+             this, &ImapClient::connectionInactive);
  
 +#ifdef USE_KEEPALIVE
 +    _backgroundActivity = new BackgroundActivity(this);
@@ -45,9 +45,9 @@ index 52652235..0d244ad8 100644
      connect(&_idleTimer, &QTimer::timeout, this, &ImapClient::renewPushEmail);
 +#endif
  
-     connect(QMailMessageBuffer::instance(), SIGNAL(flushed()), this, SLOT(messageBufferFlushed()));
- 
-@@ -1622,10 +1628,16 @@ bool ImapClient::isPushEmailEstablished()
+     connect(QMailMessageBuffer::instance(), &QMailMessageBuffer::flushed,
+             this, &ImapClient::messageBufferFlushed);
+@@ -1620,10 +1626,16 @@ bool ImapClient::isPushEmailEstablished()
  
  void ImapClient::setIdlingForFolder(const QMailFolderId &id)
  {
@@ -64,7 +64,7 @@ index 52652235..0d244ad8 100644
      if (!_waitingForIdleFolderIds.isEmpty()) {
          _waitingForIdleFolderIds.removeOne(id);
          if (_waitingForIdleFolderIds.isEmpty()) {
-@@ -1655,7 +1667,11 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
+@@ -1653,7 +1665,11 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
      static int count(0);
  
      if (mailboxIds.isEmpty()) {
@@ -77,7 +77,7 @@ index 52652235..0d244ad8 100644
  
      foreach (const QMailFolderId &id, _monitored.keys()) {
 diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
-index 5956900f..81595d7a 100644
+index 6851e0a4..2f47160d 100644
 --- a/src/plugins/messageservices/imap/imapclient.h
 +++ b/src/plugins/messageservices/imap/imapclient.h
 @@ -47,6 +47,9 @@

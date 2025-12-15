@@ -47,7 +47,7 @@ index 79645a03..390e73e8 100644
              sharedAccount->setValue(QLatin1String("lastSynchronized"), quint64(0));
          }
 diff --git a/src/libraries/qmfclient/mailkeyimpl_p.h b/src/libraries/qmfclient/mailkeyimpl_p.h
-index 3a39d1e5..c143140b 100644
+index 5170f2a9..6f9f53b2 100644
 --- a/src/libraries/qmfclient/mailkeyimpl_p.h
 +++ b/src/libraries/qmfclient/mailkeyimpl_p.h
 @@ -292,16 +292,16 @@ void MailKeyImpl<Key>::deserialize(Stream &stream)
@@ -87,7 +87,7 @@ index d6171f62..95cd5e9f 100644
          a.deserialize(stream);
          _arguments.append(a);
 diff --git a/src/libraries/qmfclient/qmailkeyargument.h b/src/libraries/qmfclient/qmailkeyargument.h
-index 42cdc23f..79495cff 100644
+index 0d776be7..d1f0ec8e 100644
 --- a/src/libraries/qmfclient/qmailkeyargument.h
 +++ b/src/libraries/qmfclient/qmailkeyargument.h
 @@ -162,7 +162,7 @@ public:
@@ -100,7 +100,7 @@ index 42cdc23f..79495cff 100644
              for (int i = 0; i < v; ++i) {
                  QVariant var;
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index ba09f440..4e31da6d 100644
+index 37aee1c2..d1fc9c56 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
 @@ -50,7 +50,6 @@
@@ -111,7 +111,7 @@ index ba09f440..4e31da6d 100644
  #include <QDataStream>
  #include <QTextStream>
  #include <QTextCodec>
-@@ -7970,6 +7969,25 @@ bool QMailMessagePrivate::hasRecipients() const
+@@ -8003,6 +8002,25 @@ bool QMailMessagePrivate::hasRecipients() const
      return false;
  }
  
@@ -137,7 +137,7 @@ index ba09f440..4e31da6d 100644
  static QByteArray gBoundaryString;
  
  void QMF_EXPORT setQMailMessageBoundaryString(const QByteArray &boundary)
-@@ -7986,7 +8004,7 @@ static QByteArray boundaryString(const QByteArray &hash)
+@@ -8019,7 +8037,7 @@ static QByteArray boundaryString(const QByteArray &hash)
          return gBoundaryString;
  
      // Formulate a boundary that is very unlikely to clash with the content
@@ -147,7 +147,7 @@ index ba09f440..4e31da6d 100644
  
  template <typename F>
 diff --git a/src/libraries/qmfclient/qmailmessageset.h b/src/libraries/qmfclient/qmailmessageset.h
-index 483c8c47..3f494b98 100644
+index a4545ce5..4ea9c5ac 100644
 --- a/src/libraries/qmfclient/qmailmessageset.h
 +++ b/src/libraries/qmfclient/qmailmessageset.h
 @@ -79,7 +79,11 @@ protected:
@@ -223,7 +223,7 @@ index 483c8c47..3f494b98 100644
      friend class QMailMessageSetContainer;
      friend class QMailMessageSet;
 diff --git a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
-index cb75f987..96b538e6 100644
+index c3167088..06c333fd 100644
 --- a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
 +++ b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
 @@ -43,7 +43,6 @@
@@ -270,7 +270,7 @@ index 54addffe..e9c8dc35 100644
  
  # hack longstream work without the private/ on include
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index f437a0c7..347f7165 100644
+index 9be40d99..e7ba6121 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -42,7 +42,6 @@
@@ -302,7 +302,7 @@ index f437a0c7..347f7165 100644
  
      return ('<' +
 diff --git a/tests/tst_smtp/tst_smtp.cpp b/tests/tst_smtp/tst_smtp.cpp
-index 99d534af..104393fa 100644
+index 5784e7c0..e7f197d5 100644
 --- a/tests/tst_smtp/tst_smtp.cpp
 +++ b/tests/tst_smtp/tst_smtp.cpp
 @@ -94,9 +94,9 @@ void tst_SmtpClient::test_connection()
