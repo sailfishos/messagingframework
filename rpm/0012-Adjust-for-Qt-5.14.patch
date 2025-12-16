@@ -41,10 +41,10 @@ This reverts commit a8db671f00ebf5aa56e57d1bdf1511d9af22c809.
  26 files changed, 179 insertions(+), 216 deletions(-)
 
 diff --git a/src/libraries/qmfclient/qmailmessagekey.cpp b/src/libraries/qmfclient/qmailmessagekey.cpp
-index fec58c1d..4bfdde46 100644
+index 31f8541c..7be74e21 100644
 --- a/src/libraries/qmfclient/qmailmessagekey.cpp
 +++ b/src/libraries/qmfclient/qmailmessagekey.cpp
-@@ -376,8 +376,7 @@ QMailMessageKey QMailMessageKey::id(const QMailMessageIdList &ids, QMailDataComp
+@@ -378,8 +378,7 @@ QMailMessageKey QMailMessageKey::id(const QMailMessageIdList &ids, QMailDataComp
      if (ids.count() >= IdLookupThreshold) {
          // If there are a large number of IDs, they will be inserted into a temporary table
          // with a uniqueness constraint; ensure only unique values are supplied
@@ -54,7 +54,7 @@ index fec58c1d..4bfdde46 100644
      }
  
      return QMailMessageKey(ids, Id, QMailKey::comparator(cmp));
-@@ -655,8 +654,7 @@ QMailMessageKey QMailMessageKey::serverUid(const QStringList &uids, QMailDataCom
+@@ -657,8 +656,7 @@ QMailMessageKey QMailMessageKey::serverUid(const QStringList &uids, QMailDataCom
      if (uids.count() >= IdLookupThreshold) {
          // If there are a large number of UIDs, they will be inserted into a temporary table
          // with a uniqueness constraint; ensure only unique values are supplied
@@ -64,7 +64,7 @@ index fec58c1d..4bfdde46 100644
      }
  
      return QMailMessageKey(uids, ServerUid, QMailKey::comparator(cmp));
-@@ -985,8 +983,7 @@ QMailMessageKey QMailMessageKey::copyServerUid(const QStringList &uids, QMailDat
+@@ -989,8 +987,7 @@ QMailMessageKey QMailMessageKey::copyServerUid(const QStringList &uids, QMailDat
      if (uids.count() >= IdLookupThreshold) {
          // If there are a large number of UIDs, they will be inserted into a temporary table
          // with a uniqueness constraint; ensure only unique values are supplied
@@ -75,7 +75,7 @@ index fec58c1d..4bfdde46 100644
  
      return QMailMessageKey(uids, CopyServerUid, QMailKey::comparator(cmp));
 diff --git a/src/libraries/qmfclient/qmailmessagelistmodel.cpp b/src/libraries/qmfclient/qmailmessagelistmodel.cpp
-index 907eb793..f9ed017f 100644
+index d8f69875..2b1dd8b1 100644
 --- a/src/libraries/qmfclient/qmailmessagelistmodel.cpp
 +++ b/src/libraries/qmfclient/qmailmessagelistmodel.cpp
 @@ -402,9 +402,7 @@ bool QMailMessageListModelPrivate::updateMessages(const QMailMessageIdList &ids)
@@ -90,7 +90,7 @@ index 907eb793..f9ed017f 100644
      QMap<QMailMessageId, int> newPositions;
  
 diff --git a/src/libraries/qmfclient/qmailmessageset.cpp b/src/libraries/qmfclient/qmailmessageset.cpp
-index e263f195..95678793 100644
+index 72242950..12b57a4d 100644
 --- a/src/libraries/qmfclient/qmailmessageset.cpp
 +++ b/src/libraries/qmfclient/qmailmessageset.cpp
 @@ -976,7 +976,7 @@ void QMailFilterMessageSet::messagesAdded(const QMailMessageIdList &ids)
@@ -147,7 +147,7 @@ index e263f195..95678793 100644
          connect(model(), SIGNAL(messagesAdded(QMailMessageIdList)), this, SLOT(messagesAdded(QMailMessageIdList)));
          connect(model(), SIGNAL(messagesRemoved(QMailMessageIdList)), this, SLOT(messagesRemoved(QMailMessageIdList)));
 diff --git a/src/libraries/qmfclient/qmailmessagethreadedmodel.cpp b/src/libraries/qmfclient/qmailmessagethreadedmodel.cpp
-index 9c57a120..9e7dbfb7 100644
+index 452f7c55..4eb5afa3 100644
 --- a/src/libraries/qmfclient/qmailmessagethreadedmodel.cpp
 +++ b/src/libraries/qmfclient/qmailmessagethreadedmodel.cpp
 @@ -543,13 +543,12 @@ bool QMailMessageThreadedModelPrivate::processMessagesUpdated(const QMailMessage
@@ -189,10 +189,10 @@ index 9c57a120..9e7dbfb7 100644
  
      return true;
 diff --git a/src/libraries/qmfclient/qmailstore.cpp b/src/libraries/qmfclient/qmailstore.cpp
-index f35896b1..7ae0104e 100644
+index b85f4a1e..9f1b8135 100644
 --- a/src/libraries/qmfclient/qmailstore.cpp
 +++ b/src/libraries/qmfclient/qmailstore.cpp
-@@ -1235,8 +1235,7 @@ void QMailStore::emitAccountNotification(ChangeType type, const QMailAccountIdLi
+@@ -1255,8 +1255,7 @@ void QMailStore::emitAccountNotification(ChangeType type, const QMailAccountIdLi
      Q_ASSERT(!ids.contains(QMailAccountId()));
      if (!ids.isEmpty()) {
          // Ensure there are no duplicates in the list
@@ -202,7 +202,7 @@ index f35896b1..7ae0104e 100644
  
          d->notifyAccountsChange(type, idList);
  
-@@ -1266,8 +1265,7 @@ void QMailStore::emitFolderNotification(ChangeType type, const QMailFolderIdList
+@@ -1286,8 +1285,7 @@ void QMailStore::emitFolderNotification(ChangeType type, const QMailFolderIdList
      Q_ASSERT(!ids.contains(QMailFolderId()));
      if (!ids.isEmpty()) {
          // Ensure there are no duplicates in the list
@@ -212,7 +212,7 @@ index f35896b1..7ae0104e 100644
  
          d->notifyFoldersChange(type, idList);
  
-@@ -1297,8 +1295,7 @@ void QMailStore::emitThreadNotification(ChangeType type, const QMailThreadIdList
+@@ -1317,8 +1315,7 @@ void QMailStore::emitThreadNotification(ChangeType type, const QMailThreadIdList
      Q_ASSERT(!ids.contains(QMailThreadId()));
      if (!ids.isEmpty()) {
          // Ensure there are no duplicates in the list
@@ -222,7 +222,7 @@ index f35896b1..7ae0104e 100644
  
          d->notifyThreadsChange(type, idList);
  
-@@ -1328,8 +1325,7 @@ void QMailStore::emitMessageNotification(ChangeType type, const QMailMessageIdLi
+@@ -1348,8 +1345,7 @@ void QMailStore::emitMessageNotification(ChangeType type, const QMailMessageIdLi
      Q_ASSERT(!ids.contains(QMailMessageId()));
      if (!ids.isEmpty()) {
          // Ensure there are no duplicates in the list
@@ -232,7 +232,7 @@ index f35896b1..7ae0104e 100644
  
          d->notifyMessagesChange(type, idList);
  
-@@ -1400,8 +1396,7 @@ void QMailStore::emitRemovalRecordNotification(ChangeType type, const QMailAccou
+@@ -1420,8 +1416,7 @@ void QMailStore::emitRemovalRecordNotification(ChangeType type, const QMailAccou
  {
      if (!ids.isEmpty()) {
          // Ensure there are no duplicates in the list
@@ -328,7 +328,7 @@ index 8a2fbe13..87508cec 100644
          transmissionInProgressIds = idSet;
          transmissionSetInitialized = true;
 diff --git a/src/libraries/qmfclient/qmailtimestamp.cpp b/src/libraries/qmfclient/qmailtimestamp.cpp
-index 409f8e8b..980f3f3d 100644
+index bcb18710..3f4a60da 100644
 --- a/src/libraries/qmfclient/qmailtimestamp.cpp
 +++ b/src/libraries/qmfclient/qmailtimestamp.cpp
 @@ -120,7 +120,7 @@ QMailTimeStampPrivate::QMailTimeStampPrivate(const QString& timeText)
@@ -341,10 +341,10 @@ index 409f8e8b..980f3f3d 100644
      int tokenCount = tokens.count();
      if ( tokenCount > 0 ) {
 diff --git a/src/libraries/qmfclient/support/qmailnamespace.cpp b/src/libraries/qmfclient/support/qmailnamespace.cpp
-index 8efa64b6..524db8df 100644
+index 45240aa0..2e30986d 100644
 --- a/src/libraries/qmfclient/support/qmailnamespace.cpp
 +++ b/src/libraries/qmfclient/support/qmailnamespace.cpp
-@@ -392,24 +392,24 @@ static QMap<QByteArray, QStringList> standardFolderTranslations()
+@@ -388,24 +388,24 @@ static QMap<QByteArray, QStringList> standardFolderTranslations()
      QTextStream in(&file);
      while (!in.atEnd()) {
          QString line = in.readLine();
@@ -389,7 +389,7 @@ index 810bfe75..99b4fbeb 100644
  
  void ImapConfiguration::setCapabilities(const QStringList &s)
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index 7d59b316..d73885dc 100644
+index c16339e1..21a612c1 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -533,10 +533,10 @@ void ImapState::untaggedResponse(ImapContext *c, const QString &line)
@@ -433,10 +433,10 @@ index 7d59b316..d73885dc 100644
          quint32 exists = c->exists();
          if (exists > 0) {
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 8660ea1e..f66827a6 100644
+index 8d986a58..a4e8f0a8 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1166,7 +1166,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
+@@ -1168,7 +1168,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
          bool external(false);
  
          // Are these messages being resolved for internal or external references?
@@ -446,7 +446,7 @@ index 8660ea1e..f66827a6 100644
  
          for (const QMailMessageMetaData &metaData : QMailStore::instance()->messagesMetaData(key, props)) {
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index 4f8b242b..df6302c2 100644
+index efb853eb..59863e7c 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
 @@ -347,15 +347,13 @@ QSet<QMailFolderId> foldersApplicableTo(QMailMessageKey const& messagekey, QSet<
@@ -515,10 +515,10 @@ index 3daa98a4..fde4d0e8 100644
          bool ok = false;
          int index = s.indexOf(":");
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 347f7165..1735e736 100644
+index e7ba6121..86bb828b 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
-@@ -528,7 +528,7 @@ void SmtpClient::nextAction(const QString &response)
+@@ -531,7 +531,7 @@ void SmtpClient::nextAction(const QString &response)
                      QStringList authCaps;
                      foreach (QString const& capability, capabilities) {
                          if (capability.startsWith("AUTH", Qt::CaseInsensitive)) {
@@ -528,10 +528,10 @@ index 347f7165..1735e736 100644
                      }
                      QMail::SaslMechanism authType = QMailAuthenticator::authFromCapabilities(authCaps);
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index 83865b8c..2384df55 100644
+index da6f4f1a..3d633126 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
-@@ -930,11 +930,6 @@ QSet<QMailMessageService*> ServiceHandler::sourceServiceSet(const QSet<QMailAcco
+@@ -948,11 +948,6 @@ QSet<QMailMessageService*> ServiceHandler::sourceServiceSet(const QSet<QMailAcco
      return services;
  }
  
@@ -543,7 +543,7 @@ index 83865b8c..2384df55 100644
  QSet<QMailMessageService*> ServiceHandler::sinkServiceSet(const QMailAccountId &id) const
  {
      QSet<QMailMessageService*> services;
-@@ -1196,12 +1191,10 @@ void ServiceHandler::expireAction()
+@@ -1214,12 +1209,10 @@ void ServiceHandler::expireAction()
                      }
  
                      if (retrievalSetModified) {
@@ -558,7 +558,7 @@ index 83865b8c..2384df55 100644
                      }
  
                      mActiveActions.erase(it);
-@@ -1210,7 +1203,7 @@ void ServiceHandler::expireAction()
+@@ -1228,7 +1221,7 @@ void ServiceHandler::expireAction()
                  mActionExpiry.removeFirst();
  
                  // Restart the service(s) for each of these accounts
@@ -567,7 +567,7 @@ index 83865b8c..2384df55 100644
                  deregisterAccountServices(ids, QMailServiceAction::Status::ErrTimeout, tr("Request is not progressing"));
                  registerAccountServices(ids);
  
-@@ -1275,12 +1268,10 @@ void ServiceHandler::cancelTransfer(quint64 action)
+@@ -1293,12 +1286,10 @@ void ServiceHandler::cancelTransfer(quint64 action)
          }
  
          if (retrievalSetModified) {
@@ -582,7 +582,7 @@ index 83865b8c..2384df55 100644
          }
  
          //The ActionData might have already been deleted by actionCompleted, triggered by cancelOperation
-@@ -1356,7 +1347,7 @@ void ServiceHandler::transmitMessages(quint64 action, const QMailAccountId &acco
+@@ -1374,7 +1365,7 @@ void ServiceHandler::transmitMessages(quint64 action, const QMailAccountId &acco
                   QList<QPair<QMailMessagePart::Location,
                               QMailMessagePart::Location> > > unresolvedLists(messageResolvers(unresolvedMessages));
  
@@ -591,7 +591,7 @@ index 83865b8c..2384df55 100644
  
              // Emit no signal after completing preparation
              enqueueRequest(new PrepareMessagesRequest(unresolvedLists), action, sources, &ServiceHandler::dispatchPrepareMessages, 0);
-@@ -1405,7 +1396,7 @@ void ServiceHandler::transmitMessage(quint64 action, const QMailMessageId &messa
+@@ -1423,7 +1414,7 @@ void ServiceHandler::transmitMessage(quint64 action, const QMailMessageId &messa
                   QList<QPair<QMailMessagePart::Location,
                               QMailMessagePart::Location> > > unresolvedLists(messageResolvers(unresolvedMessages));
  
@@ -600,7 +600,7 @@ index 83865b8c..2384df55 100644
  
              // Emit no signal after completing preparation
              enqueueRequest(new PrepareMessagesRequest(unresolvedLists), action, sources, &ServiceHandler::dispatchPrepareMessages, 0);
-@@ -1768,7 +1759,7 @@ void ServiceHandler::retrieveMessages(quint64 action, const QMailMessageIdList &
+@@ -1786,7 +1777,7 @@ void ServiceHandler::retrieveMessages(quint64 action, const QMailMessageIdList &
  {
      QMap<QMailAccountId, QMailMessageIdList> messageLists(accountMessages(messageIds));
  
@@ -609,7 +609,7 @@ index 83865b8c..2384df55 100644
      if (sources.isEmpty()) {
          reportFailure(action, QMailServiceAction::Status::ErrNoConnection,
                        tr("Unable to retrieve messages for unconfigured account"));
-@@ -1803,7 +1794,7 @@ bool ServiceHandler::dispatchRetrieveMessages(Request *req)
+@@ -1821,7 +1812,7 @@ bool ServiceHandler::dispatchRetrieveMessages(Request *req)
          }
      }
  
@@ -618,7 +618,7 @@ index 83865b8c..2384df55 100644
      return true;
  }
  
-@@ -2021,7 +2012,7 @@ void ServiceHandler::onlineDeleteMessages(quint64 action, const QMailMessageIdLi
+@@ -2039,7 +2030,7 @@ void ServiceHandler::onlineDeleteMessages(quint64 action, const QMailMessageIdLi
          discardMessages(action, messageIds);
      } else {
          QMap<QMailAccountId, QMailMessageIdList> messageLists(accountMessages(messageIds));
@@ -627,7 +627,7 @@ index 83865b8c..2384df55 100644
          if (sources.isEmpty()) {
              reportFailure(action, QMailServiceAction::Status::ErrNoConnection, tr("Unable to delete messages for unconfigured account"));
          } else {
-@@ -2212,7 +2203,7 @@ void ServiceHandler::onlineMoveMessages(quint64 action, const QMailMessageIdList
+@@ -2230,7 +2221,7 @@ void ServiceHandler::onlineMoveMessages(quint64 action, const QMailMessageIdList
      QSet<QMailMessageService*> sources;
  
      QMap<QMailAccountId, QMailMessageIdList> messageLists(accountMessages(messageIds));
@@ -636,7 +636,7 @@ index 83865b8c..2384df55 100644
      if (sources.isEmpty()) {
          reportFailure(action, QMailServiceAction::Status::ErrNoConnection, tr("Unable to move messages for unconfigured account"));
      } else {
-@@ -2265,7 +2256,7 @@ void ServiceHandler::onlineFlagMessagesAndMoveToStandardFolder(quint64 action, c
+@@ -2283,7 +2274,7 @@ void ServiceHandler::onlineFlagMessagesAndMoveToStandardFolder(quint64 action, c
      QSet<QMailMessageService*> sources;
  
      QMap<QMailAccountId, QMailMessageIdList> messageLists(accountMessages(messageIds));
@@ -645,7 +645,7 @@ index 83865b8c..2384df55 100644
      if (sources.isEmpty()) {
          reportFailure(action, QMailServiceAction::Status::ErrNoConnection, tr("Unable to flag messages for unconfigured account"));
      } else {
-@@ -2702,7 +2693,7 @@ void ServiceHandler::searchMessages(quint64 action, const QMailMessageKey &filte
+@@ -2720,7 +2711,7 @@ void ServiceHandler::searchMessages(quint64 action, const QMailMessageKey &filte
  {
      if (spec == QMailSearchAction::Remote) {
          // Find the accounts that we need to search within from the criteria
@@ -654,7 +654,7 @@ index 83865b8c..2384df55 100644
  
          QSet<QMailMessageService*> sources(sourceServiceSet(searchAccountIds));
          if (sources.isEmpty()) {
-@@ -3292,7 +3283,7 @@ void ServiceHandler::setRetrievalInProgress(const QMailAccountId &accountId, boo
+@@ -3310,7 +3301,7 @@ void ServiceHandler::setRetrievalInProgress(const QMailAccountId &accountId, boo
      }
  
      if (modified) {
@@ -663,7 +663,7 @@ index 83865b8c..2384df55 100644
      }
  }
  
-@@ -3309,7 +3300,7 @@ void ServiceHandler::setTransmissionInProgress(const QMailAccountId &accountId,
+@@ -3327,7 +3318,7 @@ void ServiceHandler::setTransmissionInProgress(const QMailAccountId &accountId,
      }
  
      if (modified) {
@@ -685,7 +685,7 @@ index e873e801..f4230242 100644
      QSet<QMailMessageService*> sinkServiceSet(const QMailAccountId &id) const;
      QSet<QMailMessageService*> sinkServiceSet(const QSet<QMailAccountId> &ids) const;
 diff --git a/tests/tst_qmail_listmodels/tst_qmail_listmodels.cpp b/tests/tst_qmail_listmodels/tst_qmail_listmodels.cpp
-index 46493406..bde7c4bb 100644
+index 6d6abd20..a908772d 100644
 --- a/tests/tst_qmail_listmodels/tst_qmail_listmodels.cpp
 +++ b/tests/tst_qmail_listmodels/tst_qmail_listmodels.cpp
 @@ -139,8 +139,8 @@ void tst_QMail_ListModels::initTestCase()
@@ -711,7 +711,7 @@ index 46493406..bde7c4bb 100644
      msg2.setStatus(QMailMessage::New, true);
      msg2.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmail_sortkeys/tst_qmail_sortkeys.cpp b/tests/tst_qmail_sortkeys/tst_qmail_sortkeys.cpp
-index d5cedd4e..1a7a47f6 100644
+index 399c4968..4ab02483 100644
 --- a/tests/tst_qmail_sortkeys/tst_qmail_sortkeys.cpp
 +++ b/tests/tst_qmail_sortkeys/tst_qmail_sortkeys.cpp
 @@ -261,8 +261,8 @@ void tst_QMail_SortKeys::initTestCase()
@@ -770,7 +770,7 @@ index d5cedd4e..1a7a47f6 100644
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmaildisconnected/tst_qmaildisconnected.cpp b/tests/tst_qmaildisconnected/tst_qmaildisconnected.cpp
-index 75c9dfc9..a9bfb6c5 100644
+index dbdcb82c..b6fa02f0 100644
 --- a/tests/tst_qmaildisconnected/tst_qmaildisconnected.cpp
 +++ b/tests/tst_qmaildisconnected/tst_qmaildisconnected.cpp
 @@ -260,8 +260,8 @@ void tst_QMailDisconnected::initTestCase()
@@ -838,7 +838,7 @@ index 75c9dfc9..a9bfb6c5 100644
      QMailDisconnected::copyToFolder(QMailMessageIdList() << inboxMessage1, archivedId1);
      QMailDisconnected::copyToStandardFolder(QMailMessageIdList() << inboxMessage1, QMailFolder::JunkFolder);
 diff --git a/tests/tst_qmailmessageset/tst_qmailmessageset.cpp b/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
-index f57d275a..ff23c16d 100644
+index c63212d8..13854942 100644
 --- a/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
 +++ b/tests/tst_qmailmessageset/tst_qmailmessageset.cpp
 @@ -267,8 +267,8 @@ void tst_QMailMessageSet::initTestCase()
@@ -897,7 +897,7 @@ index f57d275a..ff23c16d 100644
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
-index f604a851..4fbaf3e2 100644
+index aa82f476..efcfad4a 100644
 --- a/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
 +++ b/tests/tst_qmailserviceaction/tst_qmailserviceaction.cpp
 @@ -265,8 +265,8 @@ void tst_QMailServiceAction::initTestCase()
@@ -965,7 +965,7 @@ index f604a851..4fbaf3e2 100644
  
      action.exportUpdates(accountId1);
 diff --git a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
-index c8950d07..bbc2e70f 100644
+index 9a8497a0..a397bc3d 100644
 --- a/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
 +++ b/tests/tst_qmailstorageaction/tst_qmailstorageaction.cpp
 @@ -341,8 +341,8 @@ void tst_QMailStorageAction::initTestCase()
@@ -1057,10 +1057,10 @@ index c8950d07..bbc2e70f 100644
      message.setStatus(QMailMessage::New, false);
      message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailstore/tst_qmailstore.cpp b/tests/tst_qmailstore/tst_qmailstore.cpp
-index 534d8b7d..382a31ac 100644
+index 287befa7..94845204 100644
 --- a/tests/tst_qmailstore/tst_qmailstore.cpp
 +++ b/tests/tst_qmailstore/tst_qmailstore.cpp
-@@ -1778,8 +1778,8 @@ void tst_QMailStore::message()
+@@ -1776,8 +1776,8 @@ void tst_QMailStore::message()
      msg2.setParentAccountId(account2.id());
      msg2.setParentFolderId(QMailFolderId::LocalStorageFolderId);
      msg2.setSubject("email message test");
@@ -1072,7 +1072,7 @@ index 534d8b7d..382a31ac 100644
      msg2.setStatus(QMailMessage::New, true);
      msg2.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
-index 0ab873d1..2b24647f 100644
+index 6891bc78..4a311fee 100644
 --- a/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
 +++ b/tests/tst_qmailstorekeys/tst_qmailstorekeys.cpp
 @@ -98,8 +98,7 @@ private:
@@ -1248,7 +1248,7 @@ index 0ab873d1..2b24647f 100644
      yesterday = yesterday.toUTC();
      lastWeek = lastWeek.toUTC();
 diff --git a/tests/tst_qmailthread/tst_qmailthread.cpp b/tests/tst_qmailthread/tst_qmailthread.cpp
-index ae753c0e..fb1dbdd1 100644
+index 2709c581..7cf80505 100644
 --- a/tests/tst_qmailthread/tst_qmailthread.cpp
 +++ b/tests/tst_qmailthread/tst_qmailthread.cpp
 @@ -284,8 +284,8 @@ void tst_qmailthread::initTestCase()
@@ -1307,7 +1307,7 @@ index ae753c0e..fb1dbdd1 100644
          message.setStatus(QMailMessage::New, false);
          message.setStatus(QMailMessage::Read, false);
 diff --git a/tests/tst_storagemanager/tst_storagemanager.cpp b/tests/tst_storagemanager/tst_storagemanager.cpp
-index 7da2be70..ca528d3b 100644
+index 48926590..ea9f846c 100644
 --- a/tests/tst_storagemanager/tst_storagemanager.cpp
 +++ b/tests/tst_storagemanager/tst_storagemanager.cpp
 @@ -153,8 +153,8 @@ void tst_StorageManager::initTestCase()
