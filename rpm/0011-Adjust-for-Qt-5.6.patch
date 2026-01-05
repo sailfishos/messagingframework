@@ -25,10 +25,10 @@ This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
  10 files changed, 83 insertions(+), 26 deletions(-)
 
 diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
-index 79645a03..390e73e8 100644
+index 6c191bf4..a46c4214 100644
 --- a/src/libraries/qmfclient/libaccounts_p.cpp
 +++ b/src/libraries/qmfclient/libaccounts_p.cpp
-@@ -569,7 +569,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
+@@ -570,7 +570,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
      if ((static_cast<uint>(account->valueAsUInt64(QLatin1String("lastSynchronized")))) == 0) {
          result.setLastSynchronized(QMailTimeStamp());
      } else {
@@ -37,7 +37,7 @@ index 79645a03..390e73e8 100644
      }
  
      result.setIconPath(account->valueAsString(QLatin1String("iconPath")));
-@@ -924,7 +924,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
+@@ -925,7 +925,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
          sharedAccount->setValue(QLatin1String("fullName"), account->fromAddress().name());
          sharedAccount->setValue(QLatin1String("emailAliases"), toStringList(account->fromAliases()));
          if (account->lastSynchronized().isValid()) {
