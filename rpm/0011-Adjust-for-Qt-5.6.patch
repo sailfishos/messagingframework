@@ -25,24 +25,24 @@ This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
  10 files changed, 83 insertions(+), 26 deletions(-)
 
 diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
-index 6c191bf4..a46c4214 100644
+index 5d3f42d6..dab60609 100644
 --- a/src/libraries/qmfclient/libaccounts_p.cpp
 +++ b/src/libraries/qmfclient/libaccounts_p.cpp
-@@ -570,7 +570,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
+@@ -579,7 +579,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
      if ((static_cast<uint>(account->valueAsUInt64(QLatin1String("lastSynchronized")))) == 0) {
          result.setLastSynchronized(QMailTimeStamp());
      } else {
 -        result.setLastSynchronized(QMailTimeStamp(QDateTime::fromSecsSinceEpoch(static_cast<uint>(account->valueAsUInt64(QLatin1String("lastSynchronized"))))));
-+        result.setLastSynchronized(QMailTimeStamp(QDateTime::fromTime_t(static_cast<uint>(account->valueAsUInt64(QLatin1String("lastSynchronized"))))));
++        result.setLastSynchronized(QMailTimeStamp(QDateTime::fromMSecsSinceEpoch(static_cast<uint>(account->valueAsUInt64(QLatin1String("lastSynchronized")) * 1000))));
      }
  
      result.setIconPath(account->valueAsString(QLatin1String("iconPath")));
-@@ -925,7 +925,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
+@@ -936,7 +936,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
          sharedAccount->setValue(QLatin1String("fullName"), account->fromAddress().name());
          sharedAccount->setValue(QLatin1String("emailAliases"), toStringList(account->fromAliases()));
          if (account->lastSynchronized().isValid()) {
 -            sharedAccount->setValue(QLatin1String("lastSynchronized"), static_cast<quint64>(account->lastSynchronized().toLocalTime().toSecsSinceEpoch()));
-+            sharedAccount->setValue(QLatin1String("lastSynchronized"), static_cast<quint64>(account->lastSynchronized().toLocalTime().toTime_t()));
++            sharedAccount->setValue(QLatin1String("lastSynchronized"), static_cast<quint64>(account->lastSynchronized().toLocalTime().toMSecsSinceEpoch() / 1000));
          } else {
              sharedAccount->setValue(QLatin1String("lastSynchronized"), quint64(0));
          }
@@ -100,7 +100,7 @@ index 0d776be7..d1f0ec8e 100644
              for (int i = 0; i < v; ++i) {
                  QVariant var;
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index 37aee1c2..d1fc9c56 100644
+index 37aee1c2..4dc0d538 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
 @@ -50,7 +50,6 @@
@@ -117,7 +117,7 @@ index 37aee1c2..d1fc9c56 100644
  
 +static uint currentTimeValue()
 +{
-+    return QDateTime::currentDateTime().toTime_t();
++    return QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000;
 +}
 +
 +static bool seedRng()
@@ -270,7 +270,7 @@ index 54addffe..e9c8dc35 100644
  
  # hack longstream work without the private/ on include
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 9be40d99..e7ba6121 100644
+index 9be40d99..8ba3ac65 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -42,7 +42,6 @@
@@ -287,7 +287,7 @@ index 9be40d99..e7ba6121 100644
  
 +static bool initialiseRng()
 +{
-+    qsrand(QDateTime::currentDateTime().toUTC().toTime_t());
++    qsrand(QDateTime::currentDateTime().toUTC().toMSecsSinceEpoch() / 1000);
 +    return true;
 +}
 +

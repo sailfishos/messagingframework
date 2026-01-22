@@ -8,20 +8,20 @@ when downloading messages from different folders.
 
 Also captures the sync policy as part of the QMailAccount structure.
 ---
- src/libraries/qmfclient/libaccounts_p.cpp     | 40 +++++++++++++++++
+ src/libraries/qmfclient/libaccounts_p.cpp     | 41 +++++++++++++++++
  src/libraries/qmfclient/qmailaccount.cpp      | 11 +++++
  src/libraries/qmfclient/qmailaccount.h        | 10 +++++
  .../messageservices/imap/imapservice.cpp      |  7 ++-
  .../messageservices/imap/imapstrategy.cpp     | 45 +++++++++++++++++--
  .../messageservices/imap/imapstrategy.h       |  7 +--
  .../messageservices/pop/popservice.cpp        |  7 +++
- 7 files changed, 119 insertions(+), 8 deletions(-)
+ 7 files changed, 120 insertions(+), 8 deletions(-)
 
 diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
-index 75f72499..6c191bf4 100644
+index c6aa4b82..5d3f42d6 100644
 --- a/src/libraries/qmfclient/libaccounts_p.cpp
 +++ b/src/libraries/qmfclient/libaccounts_p.cpp
-@@ -452,6 +452,41 @@ bool AccountSatisfyTheKey(Accounts::Account* account, const QMailAccountKey& key
+@@ -456,6 +456,41 @@ bool AccountSatisfyTheKey(Accounts::Account* account, const QMailAccountKey& key
      return false;
  }
  
@@ -63,7 +63,7 @@ index 75f72499..6c191bf4 100644
  }
  
  static QSharedPointer<Accounts::Manager> managerInstance;
-@@ -503,6 +538,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
+@@ -507,6 +542,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
  
      account->selectService();
      const bool enabled = account->enabled();
@@ -71,7 +71,7 @@ index 75f72499..6c191bf4 100644
  
      account->selectService(service);
      QString name = account->valueAsString(QLatin1String("email/email_box_name"));
-@@ -678,6 +714,9 @@ bool LibAccountManager::addAccount(QMailAccount *account,
+@@ -687,6 +723,9 @@ bool LibAccountManager::addAccount(QMailAccount *account,
      sharedAccount->setDisplayName(account->name());
      sharedAccount->setEnabled(account->status() & QMailAccount::Enabled);
  
@@ -80,12 +80,13 @@ index 75f72499..6c191bf4 100644
 +
      Accounts::ServiceList services = sharedAccount->services(QLatin1String("e-mail"));
      if (!services.count()) {
-         qCWarning(lcMessaging) << "E-mail Services not found, make sure that *.service and *.provider files are properly installed.";
-@@ -872,6 +911,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
+         qCWarning(lcMessaging) << "E-mail Services not found, make sure that *.service and *.provider files are "
+@@ -882,6 +921,8 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
          } else {
              sharedAccount->setDisplayName(account->name());
          }
-+        sharedAccount->setValue(QLatin1String("folderSyncPolicy"), folderSyncPolicyToString(account->folderSyncPolicy()));
++        sharedAccount->setValue(QLatin1String("folderSyncPolicy"),
++                                folderSyncPolicyToString(account->folderSyncPolicy()));
          sharedAccount->setEnabled(account->status() & QMailAccount::Enabled);
          sharedAccount->selectService(service);
          sharedAccount->setValue(QLatin1String("type"), static_cast<int>(account->messageType()));
