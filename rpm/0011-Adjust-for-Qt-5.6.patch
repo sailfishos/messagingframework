@@ -12,7 +12,7 @@ qt gets updated.
 Revert "Use QRandomGenerator instead of qrand"
 This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
 ---
- src/libraries/qmfclient/libaccounts_p.cpp     |  4 ++--
+ src/libraries/qmfclient/libaccounts_p.cpp     |  5 ++--
  src/libraries/qmfclient/mailkeyimpl_p.h       |  6 ++---
  src/libraries/qmfclient/mailsortkeyimpl_p.h   |  4 ++--
  src/libraries/qmfclient/qmailkeyargument.h    |  2 +-
@@ -22,22 +22,23 @@ This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
  src/plugins/messageservices/imap/imap.pro     | 14 ++++++++---
  .../messageservices/smtp/smtpclient.cpp       | 12 ++++++++--
  tests/tst_smtp/tst_smtp.cpp                   | 18 +++++++-------
- 10 files changed, 83 insertions(+), 26 deletions(-)
+ 10 files changed, 84 insertions(+), 26 deletions(-)
 
 diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
-index 5d3f42d6..dab60609 100644
+index 5d3f42d6..ec53ef9a 100644
 --- a/src/libraries/qmfclient/libaccounts_p.cpp
 +++ b/src/libraries/qmfclient/libaccounts_p.cpp
-@@ -579,7 +579,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
+@@ -579,7 +579,8 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
      if ((static_cast<uint>(account->valueAsUInt64(QLatin1String("lastSynchronized")))) == 0) {
          result.setLastSynchronized(QMailTimeStamp());
      } else {
 -        result.setLastSynchronized(QMailTimeStamp(QDateTime::fromSecsSinceEpoch(static_cast<uint>(account->valueAsUInt64(QLatin1String("lastSynchronized"))))));
-+        result.setLastSynchronized(QMailTimeStamp(QDateTime::fromMSecsSinceEpoch(static_cast<uint>(account->valueAsUInt64(QLatin1String("lastSynchronized")) * 1000))));
++        result.setLastSynchronized(QMailTimeStamp(QDateTime::fromMSecsSinceEpoch(
++            account->valueAsUInt64(QLatin1String("lastSynchronized")) * 1000)));
      }
  
      result.setIconPath(account->valueAsString(QLatin1String("iconPath")));
-@@ -936,7 +936,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
+@@ -936,7 +937,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
          sharedAccount->setValue(QLatin1String("fullName"), account->fromAddress().name());
          sharedAccount->setValue(QLatin1String("emailAliases"), toStringList(account->fromAliases()));
          if (account->lastSynchronized().isValid()) {
