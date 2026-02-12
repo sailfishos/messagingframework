@@ -9,13 +9,13 @@ when downloading messages from different folders.
 Also captures the sync policy as part of the QMailAccount structure.
 ---
  src/libraries/qmfclient/libaccounts_p.cpp     | 41 +++++++++++++++++
- src/libraries/qmfclient/qmailaccount.cpp      | 11 +++++
+ src/libraries/qmfclient/qmailaccount.cpp      | 12 +++++
  src/libraries/qmfclient/qmailaccount.h        | 10 +++++
  .../messageservices/imap/imapservice.cpp      |  7 ++-
  .../messageservices/imap/imapstrategy.cpp     | 45 +++++++++++++++++--
  .../messageservices/imap/imapstrategy.h       |  7 +--
  .../messageservices/pop/popservice.cpp        |  7 +++
- 7 files changed, 120 insertions(+), 8 deletions(-)
+ 7 files changed, 121 insertions(+), 8 deletions(-)
 
 diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
 index c6aa4b82..5d3f42d6 100644
@@ -91,10 +91,18 @@ index c6aa4b82..5d3f42d6 100644
          sharedAccount->selectService(service);
          sharedAccount->setValue(QLatin1String("type"), static_cast<int>(account->messageType()));
 diff --git a/src/libraries/qmfclient/qmailaccount.cpp b/src/libraries/qmfclient/qmailaccount.cpp
-index 52324bb5..bb2b115a 100644
+index 52324bb5..e791d896 100644
 --- a/src/libraries/qmfclient/qmailaccount.cpp
 +++ b/src/libraries/qmfclient/qmailaccount.cpp
-@@ -89,6 +89,7 @@ public:
+@@ -70,6 +70,7 @@ public:
+         , _messageType(QMailMessage::None)
+         , _status(0)
+         , _customFieldsModified(false)
++        , _folderSyncPolicy(QMailAccount::SyncInboxOnly)
+     {
+     }
+ 
+@@ -89,6 +90,7 @@ public:
      QStringList _sinks;
      QMap<QMailFolder::StandardFolder, QMailFolderId> _standardFolders;
      QString _iconPath;
@@ -102,7 +110,7 @@ index 52324bb5..bb2b115a 100644
  
      QMap<QString, QString> _customFields;
      bool _customFieldsModified;
-@@ -763,3 +764,13 @@ void QMailAccount::addMessageSink(const QString &sink)
+@@ -763,3 +765,13 @@ void QMailAccount::addMessageSink(const QString &sink)
  {
      d->_sinks.append(sink);
  }
