@@ -91,7 +91,7 @@ index c6aa4b82..5d3f42d6 100644
          sharedAccount->selectService(service);
          sharedAccount->setValue(QLatin1String("type"), static_cast<int>(account->messageType()));
 diff --git a/src/libraries/qmfclient/qmailaccount.cpp b/src/libraries/qmfclient/qmailaccount.cpp
-index 52324bb5..e791d896 100644
+index 52324bb5..ddfc5ad3 100644
 --- a/src/libraries/qmfclient/qmailaccount.cpp
 +++ b/src/libraries/qmfclient/qmailaccount.cpp
 @@ -70,6 +70,7 @@ public:
@@ -102,14 +102,14 @@ index 52324bb5..e791d896 100644
      {
      }
  
-@@ -89,6 +90,7 @@ public:
-     QStringList _sinks;
-     QMap<QMailFolder::StandardFolder, QMailFolderId> _standardFolders;
-     QString _iconPath;
-+    QMailAccount::FolderSyncPolicy _folderSyncPolicy;
+@@ -92,6 +93,7 @@ public:
  
      QMap<QString, QString> _customFields;
      bool _customFieldsModified;
++    QMailAccount::FolderSyncPolicy _folderSyncPolicy;
+ 
+     QString customField(const QString &name) const
+     {
 @@ -763,3 +765,13 @@ void QMailAccount::addMessageSink(const QString &sink)
  {
      d->_sinks.append(sink);

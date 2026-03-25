@@ -75,7 +75,7 @@ index 31f8541c..7be74e21 100644
  
      return QMailMessageKey(uids, CopyServerUid, QMailKey::comparator(cmp));
 diff --git a/src/libraries/qmfclient/qmailmessagelistmodel.cpp b/src/libraries/qmfclient/qmailmessagelistmodel.cpp
-index d8f69875..2b1dd8b1 100644
+index 518b983b..e059aee9 100644
 --- a/src/libraries/qmfclient/qmailmessagelistmodel.cpp
 +++ b/src/libraries/qmfclient/qmailmessagelistmodel.cpp
 @@ -402,9 +402,7 @@ bool QMailMessageListModelPrivate::updateMessages(const QMailMessageIdList &ids)
@@ -90,10 +90,10 @@ index d8f69875..2b1dd8b1 100644
      QMap<QMailMessageId, int> newPositions;
  
 diff --git a/src/libraries/qmfclient/qmailmessageset.cpp b/src/libraries/qmfclient/qmailmessageset.cpp
-index 72242950..12b57a4d 100644
+index 0085953d..3fb6bfec 100644
 --- a/src/libraries/qmfclient/qmailmessageset.cpp
 +++ b/src/libraries/qmfclient/qmailmessageset.cpp
-@@ -976,7 +976,7 @@ void QMailFilterMessageSet::messagesAdded(const QMailMessageIdList &ids)
+@@ -985,7 +985,7 @@ void QMailFilterMessageSet::messagesAdded(const QMailMessageIdList &ids)
          QMailMessageIdList matchingIds = QMailStore::instance()->queryMessages(key & idFilter);
          if (!matchingIds.isEmpty()) {
              // Our filtered message set has changed
@@ -102,7 +102,7 @@ index 72242950..12b57a4d 100644
              update(this);
          }
      }
-@@ -989,7 +989,7 @@ void QMailFilterMessageSet::messagesRemoved(const QMailMessageIdList &ids)
+@@ -998,7 +998,7 @@ void QMailFilterMessageSet::messagesRemoved(const QMailMessageIdList &ids)
  
      QSet<QMailMessageId>& _messageIds = d->_messageIds;
      if (!_messageIds.isEmpty()) {
@@ -111,7 +111,7 @@ index 72242950..12b57a4d 100644
  
          // See if any of these messages are in our set
          removedIds.intersect(_messageIds);
-@@ -1008,12 +1008,11 @@ void QMailFilterMessageSet::messagesUpdated(const QMailMessageIdList &ids)
+@@ -1017,12 +1017,11 @@ void QMailFilterMessageSet::messagesUpdated(const QMailMessageIdList &ids)
      QMailMessageKey key(messageKey());
      if (!key.isNonMatching()) {
          QSet<QMailMessageId>& _messageIds = d->_messageIds;
@@ -126,7 +126,7 @@ index 72242950..12b57a4d 100644
  
          QSet<QMailMessageId> presentIds = updatedIds;
          QSet<QMailMessageId> absentIds = updatedIds;
-@@ -1062,8 +1061,7 @@ void QMailFilterMessageSet::resyncState()
+@@ -1071,8 +1070,7 @@ void QMailFilterMessageSet::resyncState()
      Q_D(QMailFilterMessageSet);
  
      if (d->_minimized) {
@@ -136,16 +136,16 @@ index 72242950..12b57a4d 100644
      } else {
          d->_messageIds.clear();
      }
-@@ -1085,8 +1083,7 @@ void QMailFilterMessageSet::reset()
-     if (d->_minimized) {
-         disconnect(model(), SIGNAL(folderContentsModified(QMailFolderIdList)), this, SLOT(folderContentsModified(QMailFolderIdList)));
+@@ -1095,8 +1093,7 @@ void QMailFilterMessageSet::reset()
+         disconnect(model(), &QMailMessageSetModel::folderContentsModified,
+                    this, &QMailFilterMessageSet::folderContentsModified);
  
 -        const QMailMessageIdList ids = QMailStore::instance()->queryMessages(messageKey());
 -        d->_messageIds = QSet<QMailMessageId>(ids.constBegin(), ids.constEnd());
 +        d->_messageIds = QSet<QMailMessageId>::fromList(QMailStore::instance()->queryMessages(messageKey()));
  
-         connect(model(), SIGNAL(messagesAdded(QMailMessageIdList)), this, SLOT(messagesAdded(QMailMessageIdList)));
-         connect(model(), SIGNAL(messagesRemoved(QMailMessageIdList)), this, SLOT(messagesRemoved(QMailMessageIdList)));
+         connect(model(), &QMailMessageSetModel::messagesAdded,
+                 this, &QMailFilterMessageSet::messagesAdded);
 diff --git a/src/libraries/qmfclient/qmailmessagethreadedmodel.cpp b/src/libraries/qmfclient/qmailmessagethreadedmodel.cpp
 index 452f7c55..4eb5afa3 100644
 --- a/src/libraries/qmfclient/qmailmessagethreadedmodel.cpp

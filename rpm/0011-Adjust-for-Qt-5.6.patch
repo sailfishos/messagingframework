@@ -224,7 +224,7 @@ index a4545ce5..4ea9c5ac 100644
      friend class QMailMessageSetContainer;
      friend class QMailMessageSet;
 diff --git a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
-index c3167088..06c333fd 100644
+index ae50579b..2591bbd5 100644
 --- a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
 +++ b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.cpp
 @@ -43,7 +43,6 @@
