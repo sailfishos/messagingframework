@@ -47,7 +47,7 @@ Patch0012: 0012-Adjust-for-Qt-5.14.patch
 Patch0013: 0013-Revert-Set-PLUGIN_CLASS_NAME-in-plugin-.pro-files.patch
 Patch0014: 0014-Revert-Bump-version-to-6.0.0-since-we-build-against-.patch
 Patch0015: 0015-Fallback-to-sso-credential-plugin.patch
-
+Patch0016: 0016-Register-a-dummy-service-for-storage-notifications.patch
 
 %description
 The Qt Messaging Framework, QMF, consists of a C++ library and daemon server
