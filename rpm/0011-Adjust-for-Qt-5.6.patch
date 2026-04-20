@@ -101,7 +101,7 @@ index 0d776be7..d1f0ec8e 100644
              for (int i = 0; i < v; ++i) {
                  QVariant var;
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index 37aee1c2..4dc0d538 100644
+index c5d64f0d..a7793506 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
 @@ -50,7 +50,6 @@
@@ -112,7 +112,7 @@ index 37aee1c2..4dc0d538 100644
  #include <QDataStream>
  #include <QTextStream>
  #include <QTextCodec>
-@@ -8003,6 +8002,25 @@ bool QMailMessagePrivate::hasRecipients() const
+@@ -8012,6 +8011,25 @@ bool QMailMessagePrivate::hasRecipients() const
      return false;
  }
  
@@ -138,7 +138,7 @@ index 37aee1c2..4dc0d538 100644
  static QByteArray gBoundaryString;
  
  void QMF_EXPORT setQMailMessageBoundaryString(const QByteArray &boundary)
-@@ -8019,7 +8037,7 @@ static QByteArray boundaryString(const QByteArray &hash)
+@@ -8028,7 +8046,7 @@ static QByteArray boundaryString(const QByteArray &hash)
          return gBoundaryString;
  
      // Formulate a boundary that is very unlikely to clash with the content
