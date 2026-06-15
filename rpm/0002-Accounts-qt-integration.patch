@@ -8,14 +8,14 @@ level. Also add Sailfish OS specific client id for OAuth2 method.
 
 Change how service are reloaded when account changes.
 ---
- src/plugins/credentials/sso/plugin.cpp     | 123 +++++++++++++++++----
+ src/plugins/credentials/sso/plugin.cpp     | 125 +++++++++++++++++----
  src/plugins/credentials/sso/sso.pro        |   2 +-
  src/plugins/plugins.pro                    |   4 +
  src/tools/messageserver/servicehandler.cpp |  13 +++
- 4 files changed, 119 insertions(+), 23 deletions(-)
+ 4 files changed, 122 insertions(+), 22 deletions(-)
 
 diff --git a/src/plugins/credentials/sso/plugin.cpp b/src/plugins/credentials/sso/plugin.cpp
-index de7f66b8..5cac25f9 100644
+index de7f66b8..cc37e9b3 100644
 --- a/src/plugins/credentials/sso/plugin.cpp
 +++ b/src/plugins/credentials/sso/plugin.cpp
 @@ -42,6 +42,12 @@
@@ -45,7 +45,7 @@ index de7f66b8..5cac25f9 100644
  };
  
  SSOCredentials::SSOCredentials(QObject *parent)
-@@ -58,36 +71,102 @@ SSOCredentials::SSOCredentials(QObject *parent)
+@@ -58,36 +71,106 @@ SSOCredentials::SSOCredentials(QObject *parent)
  {
  }
  
@@ -108,16 +108,19 @@ index de7f66b8..5cac25f9 100644
 +    account->deleteLater();
 +    QVariantMap parameters = auth.parameters();
      parameters.insert("UserName", svcCfg.value(QStringLiteral("username")));
++    // Override the account credentials with specific creds by service (IMAP/SMTP...)
++    uint credentialsId = svcCfg.value(QStringLiteral("CredentialsId")).toUInt();
++    if (!credentialsId)
++        credentialsId = auth.credentialsId();
 +    if (auth.method() == QStringLiteral("oauth2")) {
 +        parameters.insert("ClientId", loadKey(srv.provider(), srv.name(), "client_id"));
 +        parameters.insert("ClientSecret", loadKey(srv.provider(), srv.name(), "client_secret"));
 +    }
  
      qCDebug(lcMessaging) << "Creating SSO identity for the service" << service()
--                         << "from account" << id() << "with creds id" << credentialsId;
+                          << "from account" << id() << "with creds id" << credentialsId;
 -    return SSOManager::init(credentialsId, method, mechanism, parameters);
-+                         << "from account" << id() << "with creds id" << auth.credentialsId();
-+    return SSOManager::init(auth.credentialsId(), auth.method(),
++    return SSOManager::init(credentialsId, auth.method(),
 +                            auth.mechanism(), parameters);
 +}
 +
