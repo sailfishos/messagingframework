@@ -25,7 +25,7 @@ This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
  10 files changed, 84 insertions(+), 26 deletions(-)
 
 diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
-index 5d3f42d6..ec53ef9a 100644
+index 75e4c578..60a767cd 100644
 --- a/src/libraries/qmfclient/libaccounts_p.cpp
 +++ b/src/libraries/qmfclient/libaccounts_p.cpp
 @@ -579,7 +579,8 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
@@ -101,7 +101,7 @@ index 0d776be7..d1f0ec8e 100644
              for (int i = 0; i < v; ++i) {
                  QVariant var;
 diff --git a/src/libraries/qmfclient/qmailmessage.cpp b/src/libraries/qmfclient/qmailmessage.cpp
-index c5d64f0d..a7793506 100644
+index 2f9068ae..149a2207 100644
 --- a/src/libraries/qmfclient/qmailmessage.cpp
 +++ b/src/libraries/qmfclient/qmailmessage.cpp
 @@ -50,7 +50,6 @@
@@ -112,7 +112,7 @@ index c5d64f0d..a7793506 100644
  #include <QDataStream>
  #include <QTextStream>
  #include <QTextCodec>
-@@ -8012,6 +8011,25 @@ bool QMailMessagePrivate::hasRecipients() const
+@@ -8023,6 +8022,25 @@ bool QMailMessagePrivate::hasRecipients() const
      return false;
  }
  
@@ -138,7 +138,7 @@ index c5d64f0d..a7793506 100644
  static QByteArray gBoundaryString;
  
  void QMF_EXPORT setQMailMessageBoundaryString(const QByteArray &boundary)
-@@ -8028,7 +8046,7 @@ static QByteArray boundaryString(const QByteArray &hash)
+@@ -8039,7 +8057,7 @@ static QByteArray boundaryString(const QByteArray &hash)
          return gBoundaryString;
  
      // Formulate a boundary that is very unlikely to clash with the content
