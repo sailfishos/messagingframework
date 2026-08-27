@@ -18,7 +18,7 @@ Also captures the sync policy as part of the QMailAccount structure.
  7 files changed, 121 insertions(+), 8 deletions(-)
 
 diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
-index c6aa4b82..5d3f42d6 100644
+index ee1f075f..75e4c578 100644
 --- a/src/libraries/qmfclient/libaccounts_p.cpp
 +++ b/src/libraries/qmfclient/libaccounts_p.cpp
 @@ -456,6 +456,41 @@ bool AccountSatisfyTheKey(Accounts::Account* account, const QMailAccountKey& key
@@ -66,7 +66,7 @@ index c6aa4b82..5d3f42d6 100644
 @@ -507,6 +542,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
  
      account->selectService();
-     const bool enabled = account->enabled();
+     const bool enabled = account->isEnabled();
 +    result.setFolderSyncPolicy(folderSyncPolicyToEnum(account->valueAsString(QLatin1String("folderSyncPolicy"))));
  
      account->selectService(service);
@@ -153,7 +153,7 @@ index 5396aa96..7ae52514 100644
      void setStatus(quint64 newStatus);
      void setStatus(quint64 mask, bool set);
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 7d341f29..8d986a58 100644
+index 37ad03ed..024846cf 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -217,7 +217,7 @@ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, co
@@ -165,7 +165,7 @@ index 7d341f29..8d986a58 100644
      appendStrategy(&_service->_client->strategyContext()->foldersOnlyStrategy);
      if (!_unavailable)
          return initiateStrategy();
-@@ -292,6 +292,9 @@ bool ImapService::Source::doRetrieveMessageLists(const QMailAccountId &accountId
+@@ -294,6 +294,9 @@ bool ImapService::Source::doRetrieveMessageLists(const QMailAccountId &accountId
          qCWarning(lcIMAP) << "IMAP Search sorting not yet implemented!";
      }
  
@@ -175,9 +175,9 @@ index 7d341f29..8d986a58 100644
      QMailFolderIdList folderIds;
      uint adjustedMinimum = minimum ? minimum : INT_MAX; // zero means retrieve all mail
      _service->_client->strategyContext()->retrieveMessageListStrategy.clearSelection();
-@@ -311,7 +314,7 @@ bool ImapService::Source::doRetrieveMessageLists(const QMailAccountId &accountId
- 
-     _service->_client->strategyContext()->retrieveMessageListStrategy.setOperation(_service->_client->strategyContext(), QMailRetrievalAction::Auto);
+@@ -316,7 +319,7 @@ bool ImapService::Source::doRetrieveMessageLists(const QMailAccountId &accountId
+     _service->_client->strategyContext()->retrieveMessageListStrategy.setOperation(_service->_client->strategyContext(),
+                                                                                    QMailRetrievalAction::Auto);
      _service->_client->strategyContext()->retrieveMessageListStrategy.selectedFoldersAppend(folderIds);
 -    _service->_client->strategyContext()->retrieveMessageListStrategy.setIgnoreSyncFlag(!_folderIds.isEmpty());
 +    _service->_client->strategyContext()->retrieveMessageListStrategy.setFolderSyncPolicy(_folderIds.isEmpty() ? folderSyncPolicy : QMailAccount::SyncEverything);
