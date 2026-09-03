@@ -371,7 +371,7 @@ index 810bfe75..99b4fbeb 100644
  
  void ImapConfiguration::setCapabilities(const QStringList &s)
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index 77d759c0..b8a2eedc 100644
+index fd3d0f55..d989a937 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -533,10 +533,10 @@ void ImapState::untaggedResponse(ImapContext *c, const QString &line)
@@ -415,10 +415,10 @@ index 77d759c0..b8a2eedc 100644
          quint32 exists = c->exists();
          if (exists > 0) {
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 024846cf..91347e7c 100644
+index 2e71cd24..54aa4924 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -1237,7 +1237,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
+@@ -1238,7 +1238,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
          bool external(false);
  
          // Are these messages being resolved for internal or external references?
@@ -428,10 +428,10 @@ index 024846cf..91347e7c 100644
  
          for (const QMailMessageMetaData &metaData : QMailStore::instance()->messagesMetaData(key, props)) {
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index efb853eb..59863e7c 100644
+index 8123d573..f2d19295 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
-@@ -347,15 +347,13 @@ QSet<QMailFolderId> foldersApplicableTo(QMailMessageKey const& messagekey, QSet<
+@@ -349,15 +349,13 @@ QSet<QMailFolderId> foldersApplicableTo(QMailMessageKey const& messagekey, QSet<
                      if (arg.op == QMailKey::Equal || arg.op == QMailKey::Includes) {
                          Q_ASSERT(arg.valueList.count() == 1);
                          Q_ASSERT(arg.valueList[0].canConvert<QMailFolderId>());
@@ -451,7 +451,7 @@ index efb853eb..59863e7c 100644
                      } else {
                          Q_ASSERT(false);
                      }
-@@ -365,15 +363,13 @@ QSet<QMailFolderId> foldersApplicableTo(QMailMessageKey const& messagekey, QSet<
+@@ -367,15 +365,13 @@ QSet<QMailFolderId> foldersApplicableTo(QMailMessageKey const& messagekey, QSet<
                      if (arg.op == QMailKey::Equal || arg.op == QMailKey::Includes) {
                          Q_ASSERT(arg.valueList.count() == 1);
                          Q_ASSERT(arg.valueList[0].canConvert<QMailAccountId>());
@@ -471,7 +471,7 @@ index efb853eb..59863e7c 100644
                      } else {
                          Q_ASSERT(false);
                      }
-@@ -1908,9 +1904,9 @@ void ImapSearchMessageStrategy::folderListCompleted(ImapStrategyContextBase *con
+@@ -1924,9 +1920,9 @@ void ImapSearchMessageStrategy::folderListCompleted(ImapStrategyContextBase *con
          _limit = -1;
          _count = false;
      } else {
@@ -510,7 +510,7 @@ index 8ba3ac65..e2c32f1c 100644
                      }
                      QMail::SaslMechanism authType = QMailAuthenticator::authFromCapabilities(authCaps);
 diff --git a/src/tools/messageserver/servicehandler.cpp b/src/tools/messageserver/servicehandler.cpp
-index 0b5d0a6f..69ee6ee9 100644
+index 0f2e0beb..c58eedc5 100644
 --- a/src/tools/messageserver/servicehandler.cpp
 +++ b/src/tools/messageserver/servicehandler.cpp
 @@ -956,11 +956,6 @@ QSet<QMailMessageService*> ServiceHandler::sourceServiceSet(const QSet<QMailAcco
@@ -525,7 +525,7 @@ index 0b5d0a6f..69ee6ee9 100644
  QSet<QMailMessageService*> ServiceHandler::sinkServiceSet(const QMailAccountId &id) const
  {
      QSet<QMailMessageService*> services;
-@@ -1226,12 +1221,10 @@ void ServiceHandler::expireAction()
+@@ -1225,12 +1220,10 @@ void ServiceHandler::expireAction()
                      }
  
                      if (retrievalSetModified) {
@@ -540,7 +540,7 @@ index 0b5d0a6f..69ee6ee9 100644
                      }
  
                      mActiveActions.erase(it);
-@@ -1240,7 +1233,7 @@ void ServiceHandler::expireAction()
+@@ -1239,7 +1232,7 @@ void ServiceHandler::expireAction()
                  mActionExpiry.removeFirst();
  
                  // Restart the service(s) for each of these accounts
@@ -549,7 +549,7 @@ index 0b5d0a6f..69ee6ee9 100644
                  deregisterAccountServices(ids, QMailServiceAction::Status::ErrTimeout, tr("Request is not progressing"));
                  registerAccountServices(ids);
  
-@@ -1306,12 +1299,10 @@ void ServiceHandler::cancelTransfer(quint64 action)
+@@ -1305,12 +1298,10 @@ void ServiceHandler::cancelTransfer(quint64 action)
          }
  
          if (retrievalSetModified) {
@@ -564,7 +564,7 @@ index 0b5d0a6f..69ee6ee9 100644
          }
  
          // The ActionData might have already been deleted by actionCompleted, triggered by cancelOperation
-@@ -1394,7 +1385,7 @@ void ServiceHandler::transmitMessages(quint64 action, const QMailAccountId &acco
+@@ -1393,7 +1384,7 @@ void ServiceHandler::transmitMessages(quint64 action, const QMailAccountId &acco
                   QList<QPair<QMailMessagePart::Location,
                               QMailMessagePart::Location> > > unresolvedLists(messageResolvers(unresolvedMessages));
  
@@ -573,7 +573,7 @@ index 0b5d0a6f..69ee6ee9 100644
  
              // Emit no signal after completing preparation
              enqueueRequest(new PrepareMessagesRequest(unresolvedLists), action,
-@@ -1445,7 +1436,7 @@ void ServiceHandler::transmitMessage(quint64 action, const QMailMessageId &messa
+@@ -1444,7 +1435,7 @@ void ServiceHandler::transmitMessage(quint64 action, const QMailMessageId &messa
                   QList<QPair<QMailMessagePart::Location,
                               QMailMessagePart::Location> > > unresolvedLists(messageResolvers(unresolvedMessages));
  
@@ -582,7 +582,7 @@ index 0b5d0a6f..69ee6ee9 100644
  
              // Emit no signal after completing preparation
              enqueueRequest(new PrepareMessagesRequest(unresolvedLists), action, sources,
-@@ -1808,7 +1799,7 @@ void ServiceHandler::retrieveMessages(quint64 action, const QMailMessageIdList &
+@@ -1807,7 +1798,7 @@ void ServiceHandler::retrieveMessages(quint64 action, const QMailMessageIdList &
  {
      QMap<QMailAccountId, QMailMessageIdList> messageLists(accountMessages(messageIds));
  
@@ -591,7 +591,7 @@ index 0b5d0a6f..69ee6ee9 100644
      if (sources.isEmpty()) {
          reportFailure(action, QMailServiceAction::Status::ErrNoConnection,
                        tr("Unable to retrieve messages for unconfigured account"),
-@@ -1844,7 +1835,7 @@ bool ServiceHandler::dispatchRetrieveMessages(Request *req)
+@@ -1843,7 +1834,7 @@ bool ServiceHandler::dispatchRetrieveMessages(Request *req)
          }
      }
  
@@ -600,7 +600,7 @@ index 0b5d0a6f..69ee6ee9 100644
      return true;
  }
  
-@@ -2060,7 +2051,7 @@ void ServiceHandler::onlineDeleteMessages(quint64 action, const QMailMessageIdLi
+@@ -2059,7 +2050,7 @@ void ServiceHandler::onlineDeleteMessages(quint64 action, const QMailMessageIdLi
          discardMessages(action, messageIds);
      } else {
          QMap<QMailAccountId, QMailMessageIdList> messageLists(accountMessages(messageIds));
@@ -609,7 +609,7 @@ index 0b5d0a6f..69ee6ee9 100644
          if (sources.isEmpty()) {
              reportFailure(action, QMailServiceAction::Status::ErrNoConnection,
                            tr("Unable to delete messages for unconfigured account"),
-@@ -2262,7 +2253,7 @@ void ServiceHandler::onlineMoveMessages(quint64 action, const QMailMessageIdList
+@@ -2261,7 +2252,7 @@ void ServiceHandler::onlineMoveMessages(quint64 action, const QMailMessageIdList
      QSet<QMailMessageService*> sources;
  
      QMap<QMailAccountId, QMailMessageIdList> messageLists(accountMessages(messageIds));
@@ -618,7 +618,7 @@ index 0b5d0a6f..69ee6ee9 100644
      if (sources.isEmpty()) {
          reportFailure(action, QMailServiceAction::Status::ErrNoConnection,
                        tr("Unable to move messages for unconfigured account"),
-@@ -2318,7 +2309,7 @@ void ServiceHandler::onlineFlagMessagesAndMoveToStandardFolder(quint64 action, c
+@@ -2317,7 +2308,7 @@ void ServiceHandler::onlineFlagMessagesAndMoveToStandardFolder(quint64 action, c
      QSet<QMailMessageService*> sources;
  
      QMap<QMailAccountId, QMailMessageIdList> messageLists(accountMessages(messageIds));
@@ -627,7 +627,7 @@ index 0b5d0a6f..69ee6ee9 100644
      if (sources.isEmpty()) {
          reportFailure(action, QMailServiceAction::Status::ErrNoConnection,
                        tr("Unable to flag messages for unconfigured account"),
-@@ -2768,7 +2759,7 @@ void ServiceHandler::searchMessages(quint64 action, const QMailMessageKey &filte
+@@ -2767,7 +2758,7 @@ void ServiceHandler::searchMessages(quint64 action, const QMailMessageKey &filte
  {
      if (spec == QMailSearchAction::Remote) {
          // Find the accounts that we need to search within from the criteria
@@ -655,7 +655,7 @@ index 0b5d0a6f..69ee6ee9 100644
  }
  
 diff --git a/src/tools/messageserver/servicehandler.h b/src/tools/messageserver/servicehandler.h
-index 3810e211..569754a7 100644
+index 9cbe91e5..1f3b5fcf 100644
 --- a/src/tools/messageserver/servicehandler.h
 +++ b/src/tools/messageserver/servicehandler.h
 @@ -244,7 +244,6 @@ private:

@@ -8,26 +8,27 @@ when downloading messages from different folders.
 
 Also captures the sync policy as part of the QMailAccount structure.
 ---
- src/libraries/qmfclient/libaccounts_p.cpp     | 41 +++++++++++++++++
- src/libraries/qmfclient/qmailaccount.cpp      | 12 +++++
+ src/libraries/qmfclient/libaccounts_p.cpp     | 41 ++++++++++++++++++
+ src/libraries/qmfclient/qmailaccount.cpp      | 12 ++++++
  src/libraries/qmfclient/qmailaccount.h        | 10 +++++
  .../messageservices/imap/imapservice.cpp      |  7 ++-
- .../messageservices/imap/imapstrategy.cpp     | 45 +++++++++++++++++--
+ .../messageservices/imap/imapstrategy.cpp     | 43 +++++++++++++++++--
  .../messageservices/imap/imapstrategy.h       |  7 +--
  .../messageservices/pop/popservice.cpp        |  7 +++
- 7 files changed, 121 insertions(+), 8 deletions(-)
+ 7 files changed, 119 insertions(+), 8 deletions(-)
 
 diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
-index ee1f075f..75e4c578 100644
+index 7f94bff8..4b70087c 100644
 --- a/src/libraries/qmfclient/libaccounts_p.cpp
 +++ b/src/libraries/qmfclient/libaccounts_p.cpp
-@@ -456,6 +456,41 @@ bool AccountSatisfyTheKey(Accounts::Account* account, const QMailAccountKey& key
+@@ -456,6 +456,42 @@ bool AccountSatisfyTheKey(Accounts::Account* account, const QMailAccountKey& key
      return false;
  }
  
 +QMailAccount::FolderSyncPolicy folderSyncPolicyToEnum(const QString &policy)
 +{
 +    QMailAccount::FolderSyncPolicy result = QMailAccount::SyncInboxOnly;
++
 +    if (policy == QStringLiteral("follow-flags")) {
 +        result = QMailAccount::SyncSelectedFolders;
 +    } else if (policy == QStringLiteral("inbox-and-subfolders")) {
@@ -53,7 +54,7 @@ index ee1f075f..75e4c578 100644
 +        folderSyncPolicy = QStringLiteral("follow-flags");
 +        break;
 +    default:
-+        folderSyncPolicy = QStringLiteral("inbox-only");
++        folderSyncPolicy = QStringLiteral("inbox");
 +        break;
 +    }
 +
@@ -63,33 +64,32 @@ index ee1f075f..75e4c578 100644
  }
  
  static QSharedPointer<Accounts::Manager> managerInstance;
-@@ -507,6 +542,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
- 
+@@ -508,6 +544,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
      account->selectService();
-     const bool enabled = account->isEnabled();
+     result.setName(account->displayName());
+     result.setStatus(QMailAccount::Enabled, account->isEnabled());
 +    result.setFolderSyncPolicy(folderSyncPolicyToEnum(account->valueAsString(QLatin1String("folderSyncPolicy"))));
  
      account->selectService(service);
-     QString name = account->valueAsString(QLatin1String("email/email_box_name"));
-@@ -687,6 +723,9 @@ bool LibAccountManager::addAccount(QMailAccount *account,
+     result.setMessageType(static_cast<QMailMessageMetaData::MessageType>(account->valueAsInt(QLatin1String("type"))));
+@@ -683,6 +720,7 @@ bool LibAccountManager::addAccount(QMailAccount *account,
+ 
      sharedAccount->setDisplayName(account->name());
      sharedAccount->setEnabled(account->status() & QMailAccount::Enabled);
- 
-+    sharedAccount->selectService();
 +    sharedAccount->setValue(QLatin1String("folderSyncPolicy"), folderSyncPolicyToString(account->folderSyncPolicy()));
-+
+ 
      Accounts::ServiceList services = sharedAccount->services(QLatin1String("e-mail"));
      if (!services.count()) {
-         qCWarning(lcMessaging) << "E-mail Services not found, make sure that *.service and *.provider files are "
-@@ -882,6 +921,8 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
-         } else {
-             sharedAccount->setDisplayName(account->name());
+@@ -891,6 +929,9 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
+             sharedAccount->setEnabled(enabled);
          }
-+        sharedAccount->setValue(QLatin1String("folderSyncPolicy"),
-+                                folderSyncPolicyToString(account->folderSyncPolicy()));
-         sharedAccount->setEnabled(account->status() & QMailAccount::Enabled);
+ 
++        updateValue(sharedAccount, QLatin1String("folderSyncPolicy"),
++                    folderSyncPolicyToString(account->folderSyncPolicy()));
++
          sharedAccount->selectService(service);
-         sharedAccount->setValue(QLatin1String("type"), static_cast<int>(account->messageType()));
+         bool signatureEnabled = account->status() & QMailAccount::AppendSignature;
+         bool hasPersistentConnection = account->status() & QMailAccount::HasPersistentConnection;
 diff --git a/src/libraries/qmfclient/qmailaccount.cpp b/src/libraries/qmfclient/qmailaccount.cpp
 index 52324bb5..ddfc5ad3 100644
 --- a/src/libraries/qmfclient/qmailaccount.cpp
@@ -153,10 +153,10 @@ index 5396aa96..7ae52514 100644
      void setStatus(quint64 newStatus);
      void setStatus(quint64 mask, bool set);
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 37ad03ed..024846cf 100644
+index 04173594..2e71cd24 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
-@@ -217,7 +217,7 @@ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, co
+@@ -218,7 +218,7 @@ bool ImapService::Source::retrieveFolderList(const QMailAccountId &accountId, co
      _service->_client->strategyContext()->foldersOnlyStrategy.setBase(folderId);
      _service->_client->strategyContext()->foldersOnlyStrategy.setQuickList(!folderId.isValid());
      _service->_client->strategyContext()->foldersOnlyStrategy.setDescending(descending);
@@ -165,7 +165,7 @@ index 37ad03ed..024846cf 100644
      appendStrategy(&_service->_client->strategyContext()->foldersOnlyStrategy);
      if (!_unavailable)
          return initiateStrategy();
-@@ -294,6 +294,9 @@ bool ImapService::Source::doRetrieveMessageLists(const QMailAccountId &accountId
+@@ -295,6 +295,9 @@ bool ImapService::Source::doRetrieveMessageLists(const QMailAccountId &accountId
          qCWarning(lcIMAP) << "IMAP Search sorting not yet implemented!";
      }
  
@@ -175,7 +175,7 @@ index 37ad03ed..024846cf 100644
      QMailFolderIdList folderIds;
      uint adjustedMinimum = minimum ? minimum : INT_MAX; // zero means retrieve all mail
      _service->_client->strategyContext()->retrieveMessageListStrategy.clearSelection();
-@@ -316,7 +319,7 @@ bool ImapService::Source::doRetrieveMessageLists(const QMailAccountId &accountId
+@@ -317,7 +320,7 @@ bool ImapService::Source::doRetrieveMessageLists(const QMailAccountId &accountId
      _service->_client->strategyContext()->retrieveMessageListStrategy.setOperation(_service->_client->strategyContext(),
                                                                                     QMailRetrievalAction::Auto);
      _service->_client->strategyContext()->retrieveMessageListStrategy.selectedFoldersAppend(folderIds);
@@ -185,10 +185,10 @@ index 37ad03ed..024846cf 100644
      if (!_unavailable)
          return initiateStrategy();
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index 5a951d80..efb853eb 100644
+index c2b13c29..8123d573 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
-@@ -2308,14 +2308,53 @@ void ImapSynchronizeBaseStrategy::previewDiscoveredMessages(ImapStrategyContextB
+@@ -2326,14 +2326,51 @@ void ImapSynchronizeBaseStrategy::previewDiscoveredMessages(ImapStrategyContextB
      }
  }
  
@@ -224,12 +224,10 @@ index 5a951d80..efb853eb 100644
 +            while (!result && check.id().isValid()) {
 +                if (check.id() == inbox) {
 +                    result = true;
-+                }
-+                else {
++                } else {
 +                    if (check.parentFolderId().isValid()) {
 +                        check = QMailFolder(check.parentFolderId());
-+                    }
-+                    else {
++                    } else {
 +                        check = QMailFolder();
 +                    }
 +                }

@@ -7,16 +7,16 @@ Changes the configuration so that the push folders are generated from
 the the policy and folder flags, rather than a separate configuration
 setting.
 ---
- src/libraries/qmfclient/qmailaccount.cpp      | 53 +++++++++++++++++++
+ src/libraries/qmfclient/qmailaccount.cpp      | 54 +++++++++++++++++++
  src/libraries/qmfclient/qmailaccount.h        |  2 +
  .../imap/imapconfiguration.cpp                | 19 ++++++-
- 3 files changed, 73 insertions(+), 1 deletion(-)
+ 3 files changed, 74 insertions(+), 1 deletion(-)
 
 diff --git a/src/libraries/qmfclient/qmailaccount.cpp b/src/libraries/qmfclient/qmailaccount.cpp
-index ddfc5ad3..2b3fb891 100644
+index ddfc5ad3..fef11035 100644
 --- a/src/libraries/qmfclient/qmailaccount.cpp
 +++ b/src/libraries/qmfclient/qmailaccount.cpp
-@@ -775,3 +775,56 @@ void QMailAccount::setFolderSyncPolicy(QMailAccount::FolderSyncPolicy policy)
+@@ -775,3 +775,57 @@ void QMailAccount::setFolderSyncPolicy(QMailAccount::FolderSyncPolicy policy)
  {
      d->_folderSyncPolicy = policy;
  }
@@ -42,7 +42,9 @@ index ddfc5ad3..2b3fb891 100644
 +        break;
 +    case QMailAccount::SyncInboxAndSubfolders: {
 +            // Add only folders with the inbox in their ancestry
-+            QMailFolderIdList folderIds = QMailStore::instance()->queryFolders(filterKey, QMailFolderSortKey::id(Qt::AscendingOrder));
++            QMailFolderIdList folderIds
++                = QMailStore::instance()->queryFolders(filterKey, QMailFolderSortKey::id(Qt::AscendingOrder));
++
 +            for (QMailFolderId folderId : folderIds) {
 +                bool result = false;
 +                QMailFolderId checkId = folderId;
@@ -50,8 +52,7 @@ index ddfc5ad3..2b3fb891 100644
 +                    if (checkId == inbox) {
 +                        folders << folderId;
 +                        result = true;
-+                    }
-+                    else {
++                    } else {
 +                        checkId = QMailFolder(checkId).parentFolderId();
 +                    }
 +                }

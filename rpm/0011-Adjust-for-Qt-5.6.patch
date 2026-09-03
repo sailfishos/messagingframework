@@ -25,10 +25,10 @@ This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
  10 files changed, 84 insertions(+), 26 deletions(-)
 
 diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
-index 75e4c578..60a767cd 100644
+index 4b70087c..e8a8c9d0 100644
 --- a/src/libraries/qmfclient/libaccounts_p.cpp
 +++ b/src/libraries/qmfclient/libaccounts_p.cpp
-@@ -579,7 +579,8 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
+@@ -577,7 +577,8 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
      if ((static_cast<uint>(account->valueAsUInt64(QLatin1String("lastSynchronized")))) == 0) {
          result.setLastSynchronized(QMailTimeStamp());
      } else {
@@ -38,14 +38,14 @@ index 75e4c578..60a767cd 100644
      }
  
      result.setIconPath(account->valueAsString(QLatin1String("iconPath")));
-@@ -936,7 +937,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
-         sharedAccount->setValue(QLatin1String("fullName"), account->fromAddress().name());
-         sharedAccount->setValue(QLatin1String("emailAliases"), toStringList(account->fromAliases()));
+@@ -947,7 +948,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
+ 
          if (account->lastSynchronized().isValid()) {
--            sharedAccount->setValue(QLatin1String("lastSynchronized"), static_cast<quint64>(account->lastSynchronized().toLocalTime().toSecsSinceEpoch()));
-+            sharedAccount->setValue(QLatin1String("lastSynchronized"), static_cast<quint64>(account->lastSynchronized().toLocalTime().toMSecsSinceEpoch() / 1000));
+             updateValue(sharedAccount, QLatin1String("lastSynchronized"),
+-                        static_cast<quint64>(account->lastSynchronized().toLocalTime().toSecsSinceEpoch()));
++                        static_cast<quint64>(account->lastSynchronized().toLocalTime().toMSecsSinceEpoch() / 1000));
          } else {
-             sharedAccount->setValue(QLatin1String("lastSynchronized"), quint64(0));
+             updateValue(sharedAccount, QLatin1String("lastSynchronized"), quint64(0));
          }
 diff --git a/src/libraries/qmfclient/mailkeyimpl_p.h b/src/libraries/qmfclient/mailkeyimpl_p.h
 index 5170f2a9..6f9f53b2 100644
