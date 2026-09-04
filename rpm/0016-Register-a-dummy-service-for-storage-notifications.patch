@@ -14,7 +14,7 @@ can then be explicitly allowed.
  2 files changed, 14 insertions(+)
 
 diff --git a/src/libraries/qmfclient/qmailstorenotifier_p.cpp b/src/libraries/qmfclient/qmailstorenotifier_p.cpp
-index 87508cec..608ff4c0 100644
+index e60e0d97..675a4b5e 100644
 --- a/src/libraries/qmfclient/qmailstorenotifier_p.cpp
 +++ b/src/libraries/qmfclient/qmailstorenotifier_p.cpp
 @@ -40,6 +40,7 @@
