@@ -25,10 +25,10 @@ This reverts commit 9c8962c1942eec471d495b3d11436087e7d46cdd.
  10 files changed, 84 insertions(+), 26 deletions(-)
 
 diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
-index 4b70087c..e8a8c9d0 100644
+index 5bc3598f..001f9797 100644
 --- a/src/libraries/qmfclient/libaccounts_p.cpp
 +++ b/src/libraries/qmfclient/libaccounts_p.cpp
-@@ -577,7 +577,8 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
+@@ -580,7 +580,8 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
      if ((static_cast<uint>(account->valueAsUInt64(QLatin1String("lastSynchronized")))) == 0) {
          result.setLastSynchronized(QMailTimeStamp());
      } else {
@@ -38,7 +38,7 @@ index 4b70087c..e8a8c9d0 100644
      }
  
      result.setIconPath(account->valueAsString(QLatin1String("iconPath")));
-@@ -947,7 +948,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
+@@ -950,7 +951,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
  
          if (account->lastSynchronized().isValid()) {
              updateValue(sharedAccount, QLatin1String("lastSynchronized"),
@@ -271,7 +271,7 @@ index 54addffe..e9c8dc35 100644
  
  # hack longstream work without the private/ on include
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 9be40d99..8ba3ac65 100644
+index 7d5bb097..1c5a4d95 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -42,7 +42,6 @@

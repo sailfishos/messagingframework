@@ -49,7 +49,7 @@ index 4192d1f0..b484b737 100644
  
  void ImapConfigurationEditor::setBaseFolder(const QString &s)
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 618c81cc..04173594 100644
+index 449ee768..65cbdc73 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -45,6 +45,9 @@
@@ -62,7 +62,7 @@ index 618c81cc..04173594 100644
  
  namespace {
  
-@@ -1494,6 +1497,13 @@ ImapService::ImapService(const QMailAccountId &accountId)
+@@ -1509,6 +1512,13 @@ ImapService::ImapService(const QMailAccountId &accountId)
      connect(_restartPushEmailTimer, &QTimer::timeout, this, &ImapService::restartPushEmail);
      connect(QMailStore::instance(), &QMailStore::accountsUpdated,
              this, &ImapService::accountsUpdated);
@@ -76,7 +76,7 @@ index 618c81cc..04173594 100644
  }
  
  void ImapService::enable()
-@@ -1874,6 +1884,26 @@ void ImapService::setPersistentConnectionStatus(bool status)
+@@ -1870,6 +1880,26 @@ void ImapService::setPersistentConnectionStatus(bool status)
      _idling = status;
  }
  
@@ -104,10 +104,10 @@ index 618c81cc..04173594 100644
      : QMailMessageServicePlugin()
  {
 diff --git a/src/plugins/messageservices/imap/imapservice.h b/src/plugins/messageservices/imap/imapservice.h
-index 0e6973da..d9394d16 100644
+index ab494301..63e98caa 100644
 --- a/src/plugins/messageservices/imap/imapservice.h
 +++ b/src/plugins/messageservices/imap/imapservice.h
-@@ -74,6 +74,8 @@ private slots:
+@@ -73,6 +73,8 @@ private slots:
      void openIdleSession();
      void closeIdleSession();
  
