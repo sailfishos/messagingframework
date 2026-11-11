@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Andrew Branson <andrew.branson@jolla.com>
+Date: Wed, 11 Nov 2026 13:43:44 +0100
+Subject: [PATCH] Preserve the authoritative account enabled state
+
+Apply the global account enabled flag after restoring service status flags.
+Loading the stored bitmask otherwise overwrites Enabled, so a newly created
+account with the default zero status is treated as disabled.
+
+Restore the ordering used before the libaccounts integration cleanup.
+
+Fixes: 4afe35e0a6bf2131fc2cfdd7992dc22274a5cfbd ("Improve libaccounts integration")
+---
+ src/libraries/qmfclient/libaccounts_p.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
+index 001f979..793e4a1 100644
+--- a/src/libraries/qmfclient/libaccounts_p.cpp
++++ b/src/libraries/qmfclient/libaccounts_p.cpp
+@@ -546,12 +546,13 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
+ 
+     account->selectService();
+     result.setName(account->displayName());
+-    result.setStatus(QMailAccount::Enabled, account->isEnabled());
++    const bool enabled = account->isEnabled();
+     result.setFolderSyncPolicy(folderSyncPolicyToEnum(account->valueAsString(QLatin1String("folderSyncPolicy"))));
+ 
+     account->selectService(service);
+     result.setMessageType(static_cast<QMailMessageMetaData::MessageType>(account->valueAsInt(QLatin1String("type"))));
+     result.setStatus(account->valueAsUInt64(QLatin1String("status")));
++    result.setStatus(QMailAccount::Enabled, enabled);
+ 
+     const bool isDefault = account->valueAsBool(QLatin1String("email/default"));
+     const bool canTransmit = account->valueAsBool(QLatin1String("canTransmit"), true);
