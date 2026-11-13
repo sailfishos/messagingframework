@@ -271,7 +271,7 @@ index 54addffe..e9c8dc35 100644
  
  # hack longstream work without the private/ on include
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 7d5bb097..1c5a4d95 100644
+index 3ad2e880..7bca65a1 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -42,7 +42,6 @@
@@ -303,10 +303,10 @@ index 7d5bb097..1c5a4d95 100644
  
      return ('<' +
 diff --git a/tests/tst_smtp/tst_smtp.cpp b/tests/tst_smtp/tst_smtp.cpp
-index 5784e7c0..e7f197d5 100644
+index 59096ee2..34a01c31 100644
 --- a/tests/tst_smtp/tst_smtp.cpp
 +++ b/tests/tst_smtp/tst_smtp.cpp
-@@ -94,9 +94,9 @@ void tst_SmtpClient::test_connection()
+@@ -96,9 +96,9 @@ void tst_SmtpClient::test_connection()
      QVERIFY(completed.wait());
  
      QCOMPARE(updateStatus.count(), 3);
@@ -319,7 +319,7 @@ index 5784e7c0..e7f197d5 100644
  }
  
  void tst_SmtpClient::test_auth()
-@@ -115,9 +115,9 @@ void tst_SmtpClient::test_auth()
+@@ -117,9 +117,9 @@ void tst_SmtpClient::test_auth()
      QVERIFY(!completed.wait(250)); // Fails with wrong credentials
  
      QCOMPARE(updateStatus.count(), 3);
@@ -332,7 +332,7 @@ index 5784e7c0..e7f197d5 100644
  
      smtp.setSmtpAuthentication(QMail::PlainMechanism);
      QVERIFY(QMailStore::instance()->updateAccountConfiguration(&config));
-@@ -126,9 +126,9 @@ void tst_SmtpClient::test_auth()
+@@ -128,9 +128,9 @@ void tst_SmtpClient::test_auth()
      QVERIFY(!completed.wait(250)); // Fails with wrong credentials
  
      QCOMPARE(updateStatus.count(), 3);
@@ -344,4 +344,4 @@ index 5784e7c0..e7f197d5 100644
 +    QCOMPARE(updateStatus.takeFirst().first().toString(), QString::fromLatin1("Connected"));
  }
  
- QTEST_MAIN(tst_SmtpClient)
+ Q_DECLARE_METATYPE(QMailTransport::EncryptType)
